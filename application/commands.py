@@ -63,6 +63,7 @@ def load_everything():
 @click.command()
 @with_appcontext
 def clear_everything():
+    db.session.query(Publication).delete()
     db.session.query(Organisation).delete()
     db.session.query(Area).delete()
     db.session.commit()
