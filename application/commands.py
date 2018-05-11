@@ -1,11 +1,12 @@
 import click
+import markdown
 import requests
 import csv
 
 from contextlib import closing
 from flask.cli import with_appcontext
 
-from application.models import Organisation, Area
+from application.models import Organisation, Area, Publication
 from application.extensions import db
 
 @click.command()
@@ -36,10 +37,26 @@ def load_everything():
 
                 db.session.add(org)
 
+        publication_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/local-authority-boundary.md'
+        data = requests.get(publication_url).content.decode('utf-8')
+        md = markdown.Markdown(extensions = ['markdown.extensions.meta'])
+        md.convert(data)
+
+        publication = Publication(publication=md.Meta['publication'][0],
+                                  name=md.Meta['name'][0],
+                                  url=md.Meta['documentation-url'][0],
+                                  data_url=md.Meta['data-url'][0])
+
+        organisation = db.session.query(Organisation).get(md.Meta['organisation'][0])
+        publication.organisation = organisation
+
+        db.session.add(publication)
+        # TODO copyright, licence, geography. the body text as well?
+
         db.session.commit()
 
-    except:
-
+    except Exception as e:
+        print(e)
         db.session.rollback()
 
 

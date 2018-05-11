@@ -3,14 +3,14 @@ from flask import (
     render_template
 )
 
-from application.models import Organisation
+from application.models import Organisation, Publication
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 
 @frontend.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', publications=Publication.query.all())
 
 
 @frontend.route('/local-authorities')
@@ -23,6 +23,12 @@ def local_authorities():
 def local_authority(org_id):
     la = Organisation.query.get(org_id)
     return render_template('local-authority.html', local_authority=la)
+
+
+@frontend.route('/publications/<publication_id>')
+def publication(publication_id):
+    pub = Publication.query.get(publication_id)
+    return render_template('publication.html', publication=pub)
 
 
 @frontend.context_processor
