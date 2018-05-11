@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Local Authorities{% endblock %}
+{% block content %}
+    <div id="content" role="main">
+        <h1 class="heading-xlarge">Local Authorities</h1>
+        <div class="grid-row">
+            <div class="column-full">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Local Authorities</th>
+                        <th>Name</th>
+                        <th>Website</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for la in local_authorities %}
+                        <tr>
+                            <td><a href="{{ url_for('frontend.local_authority', org_id=la.organisation) }}">
+                                {{ la.organisation }}</a>
+                            </td>
+                            <td>{{ la.name }}</td>
+                            <td><a href="{{ la.website }}">{{ la.website }}</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

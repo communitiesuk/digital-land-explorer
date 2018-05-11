@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+click = "*"
+gunicorn = "*"
+"psycopg2-binary" = "*"
+python-dotenv = "*"
+python-editor = "*"
+Flask = "*"
+Flask-Migrate = "*"
+Flask-SQLAlchemy = "*"
+requests = "*"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.6"

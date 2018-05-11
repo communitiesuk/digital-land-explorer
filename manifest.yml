@@ -1,0 +1,5 @@
+---
+applications:
+- name: digital-land-explorer
+  memory: 512M
+  buildpack: python_buildpack

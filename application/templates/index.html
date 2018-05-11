@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Digital Land Explorer{% endblock %}
+{% block content %}
+    <div id="content" role="main">
+        <h1 class="heading-xlarge">Digital Land Explorer</h1>
+        <div class="grid-row">
+
+            <div class="column-one-third">
+                <h2 class="heading-small"><a href="{{ url_for('frontend.local_authorities') }}">Local Authorities</a></h2>
+            </div>
+
+            <div class="column-one-third">
+                <h2 class="heading-small"><a href="#">Publications</a></h2>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
