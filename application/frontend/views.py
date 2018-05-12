@@ -1,7 +1,7 @@
 from flask import (
     Blueprint,
-    render_template
-)
+    render_template,
+    abort)
 
 from application.models import Organisation, Publication
 
@@ -13,16 +13,24 @@ def index():
     return render_template('index.html', publications=Publication.query.all())
 
 
-@frontend.route('/local-authorities')
-def local_authorities():
-    las = Organisation.query.filter(Organisation.organisation.like('local-authority-%')).all()
-    return render_template('local-authorities.html', local_authorities=las)
+@frontend.route('/organisations')
+def organisations():
+    return render_template('organisations.html', organisations=Organisation.query.all(), org_type='organisation')
 
 
-@frontend.route('/local-authorities/<org_id>')
-def local_authority(org_id):
-    la = Organisation.query.get(org_id)
-    return render_template('local-authority.html', local_authority=la)
+@frontend.route('/<org_type>')
+def organisation_by_type(org_type):
+    query_filter = '%s%s'% (org_type, '%')
+    orgs = Organisation.query.filter(Organisation.organisation.like(query_filter)).all()
+    if not orgs:
+        abort(404)
+    return render_template('organisations.html', organisations=orgs, org_type=org_type)
+
+
+@frontend.route('/organisations/<id>')
+def organisation(id):
+    org = Organisation.query.get(id)
+    return render_template('organisation.html', organisation=org)
 
 
 @frontend.route('/publications/<publication_id>')

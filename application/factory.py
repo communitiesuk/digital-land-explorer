@@ -3,7 +3,6 @@ import os
 from flask import Flask, render_template
 from flask.cli import load_dotenv
 
-
 if os.environ['FLASK_ENV'] == 'production':
     dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
     load_dotenv(dotenv_path)
@@ -16,6 +15,7 @@ def create_app(config_filename):
     register_blueprints(app)
     register_extensions(app)
     register_commands(app)
+    register_filters(app)
     return app
 
 
@@ -43,3 +43,8 @@ def register_commands(app):
     from application.commands import load_everything, clear_everything
     app.cli.add_command(load_everything, name='load')
     app.cli.add_command(clear_everything, name='clear')
+
+
+def register_filters(app):
+    from application.filters import format_org_type
+    app.add_template_filter(format_org_type)

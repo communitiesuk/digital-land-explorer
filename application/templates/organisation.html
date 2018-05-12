@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ local_authority.organisation }}{% endblock %}
+{% block title %}{{ organisation.organisation }}{% endblock %}
 
 {% block end_head %}
      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
@@ -16,11 +16,11 @@
     <div id="content" role="main">
 
         <div class="grid-row">
-            <h1 class="heading-xlarge">{{ local_authority.organisation   }}</h1>
-            <h2 class="heading-medium">{{ local_authority.name }}</h2>
+            <h1 class="heading-xlarge">{{ organisation.organisation   }}</h1>
+            <h2 class="heading-medium">{{ organisation.name }}</h2>
         </div>
 
-        {% if local_authority.area %}
+        {% if organisation.area %}
             <div class="grid-row">
                 <div class="column-full">
                     <h2 class="heading-small">Area</h2>
@@ -30,7 +30,7 @@
             </div>
         {% endif %}
 
-        {% if local_authority.publications %}
+        {% if organisation.publications %}
                 <div class="grid-row">
                     <div class="column-full">
                         <!-- TODO list publications -->
@@ -54,7 +54,7 @@
             accessToken: '{{ config.MAPBOX_TOKEN }}'
         }).addTo(map);
 
-        geojsonLayer = L.geoJSON({{ local_authority.feature() | tojson }}).addTo(map);
+        geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
 
 
