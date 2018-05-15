@@ -26,6 +26,7 @@ def upgrade():
     op.create_table('attribution',
     sa.Column('attribution', sa.String(length=64), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=True),
+    sa.Column('url', sa.String(length=256), nullable=True),
     sa.PrimaryKeyConstraint('attribution')
     )
     op.create_table('category',
@@ -36,6 +37,7 @@ def upgrade():
     op.create_table('licence',
     sa.Column('licence', sa.String(length=256), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=True),
+    sa.Column('url', sa.String(length=256), nullable=True),
     sa.Column('text', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('licence')
     )

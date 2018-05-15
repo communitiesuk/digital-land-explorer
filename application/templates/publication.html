@@ -12,6 +12,7 @@
                             <th>Organisation</th>
                             <th>url</th>
                             <th>Data url</th>
+                            <th>Licence</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -22,6 +23,7 @@
                             </td>
                             <td><a href="{{ publication.url }}">publication url</a></td>
                             <td><a href="{{ publication.data_url }}">data url</a></td>
+                            <td><a href="{{ publication.licence.licence }}">licence</a></td>
                         </tr>
                     </tbody>
                 </table>

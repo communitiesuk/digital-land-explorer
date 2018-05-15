@@ -30,13 +30,21 @@
             </div>
         {% endif %}
 
-        {% if organisation.publications %}
-                <div class="grid-row">
-                    <div class="column-full">
-                        <!-- TODO list publications -->
-                    </div>
-                </div>
-        {% endif %}
+
+        <div class="grid-row">
+            <div class="column-full">
+                <h2 class="heading-small">Publications</h2>
+                <ul>
+                    {% for publication in organisation.publications %}
+                    <li>
+                        <a href="{{ url_for('frontend.publication', publication_id=publication.publication) }}">
+                            {{ publication.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
     </div>
 {% endblock %}

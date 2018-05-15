@@ -14,9 +14,11 @@ class Category(db.Model):
     publications = db.relationship('Publication', backref='category', lazy=True)
     organisations  = db.relationship('Organisation', backref='category', lazy=True)
 
+
 class Licence(db.Model):
     licence = db.Column(db.String(256), primary_key=True)
     name = db.Column(db.String(256))
+    url = db.Column(db.Text)
     text = db.Column(db.Text)
 
     publications = db.relationship('Publication', backref='licence', lazy=True)
@@ -25,6 +27,7 @@ class Licence(db.Model):
 class Attribution(db.Model):
     attribution = db.Column(db.String(64), primary_key=True)
     name = db.Column(db.String(256))
+    url = db.Column(db.Text)
 
     publications = db.relationship('Publication', backref='attribution', lazy=True)
 
