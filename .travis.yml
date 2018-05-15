@@ -1,0 +1,15 @@
+language: python
+python:
+  - "3.6"
+install:
+  - pip install -r requirements.txt
+
+env:
+  - FLASK_ENV=development
+  - FLASK_CONFIG=config.TestConfig
+  - FLASK_APP=application.wsgi:app
+  - SECRET_KEY=doesnotmatter
+#  - SQLALCHEMY_DATABASE_URI=workthisoutonciwhenneeded
+
+#script:
+#  - pytest # or py.test for Python versions 3.5 and below
