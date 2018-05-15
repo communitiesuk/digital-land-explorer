@@ -14,6 +14,7 @@ Flask-Migrate = "*"
 Flask-SQLAlchemy = "*"
 requests = "*"
 markdown = "*"
+pytest = "*"
 
 [dev-packages]
 pytest = "*"
