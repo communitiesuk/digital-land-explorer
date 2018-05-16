@@ -14,10 +14,10 @@
             </div>
 
             <div class="column-one-third">
-                <h2 class="heading-small"><a href="#">Publications</a></h2>
+                <h2 class="heading-small"><a href="{{ url_for('frontend.publications') }}">Publications</a></h2>
                 <ul>
                     {% for publication in publications %}
-                        <li><a href="{{ url_for('frontend.publication', publication_id=publication.publication) }}">
+                        <li><a href="{{ url_for('frontend.publication', id=publication.publication) }}">
                             {{ publication.name }}</a>
                         </li>
                     {% endfor %}
@@ -25,7 +25,13 @@
             </div>
 
             <div class="column-one-third">
-                <h2 class="heading-small"><a href="#">Areas</a></h2>
+                <h2 class="heading-small"><a href="{{ url_for('frontend.licences') }}">Licences</a></h2>
+                <ul>
+                    {% for licence in licences %}
+                        <li><a href="{{ url_for('frontend.licence', id=licence.licence) }}">{{ licence.name }}</a></li>
+                    {% endfor %}
+
+                </ul>
                 <ul>
 
                 </ul>

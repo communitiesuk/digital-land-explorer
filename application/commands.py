@@ -120,4 +120,5 @@ def clear_everything():
     db.session.query(Organisation).delete()
     db.session.query(Area).delete()
     db.session.query(Licence).delete()
+    db.session.query(Attribution).delete()
     db.session.commit()

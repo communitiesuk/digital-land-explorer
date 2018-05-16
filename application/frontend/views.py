@@ -3,14 +3,16 @@ from flask import (
     render_template,
     abort)
 
-from application.models import Organisation, Publication
+from application.models import Organisation, Publication, Licence, Area
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 
 @frontend.route('/')
 def index():
-    return render_template('index.html', publications=Publication.query.all())
+    return render_template('index.html',
+                           publications=Publication.query.all(),
+                           licences=Licence.query.all())
 
 
 @frontend.route('/organisations')
@@ -33,10 +35,26 @@ def organisation(id):
     return render_template('organisation.html', organisation=org)
 
 
-@frontend.route('/publications/<publication_id>')
-def publication(publication_id):
-    pub = Publication.query.get(publication_id)
+@frontend.route('/publications')
+def publications():
+    return render_template('publications.html', publications=Publication.query.all())
+
+
+@frontend.route('/publications/<id>')
+def publication(id):
+    pub = Publication.query.get(id)
     return render_template('publication.html', publication=pub)
+
+
+@frontend.route('/licences')
+def licences():
+    return render_template('licences.html', licences=Licence.query.all())
+
+
+@frontend.route('/licences/<id>')
+def licence(id):
+    lic = Licence.query.get(id)
+    return render_template('licence.html', licence=lic)
 
 
 @frontend.context_processor

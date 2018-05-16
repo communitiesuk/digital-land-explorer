@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ publication.publication }}{% endblock %}
+{% block title %}Publications{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">{{ publication.publication }}</h1>
+        <h1 class="heading-xlarge">Publications</h1>
         <div class="grid-row">
             <div class="column-full">
                 <table>
@@ -16,7 +16,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                   {% for publication in publications %}
+                       <tr>
                             <td>{{ publication.name }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
                                 {{ publication.organisation.organisation }}</a>
@@ -25,6 +26,7 @@
                             <td><a href="{{ publication.data_url }}">data url</a></td>
                             <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
                         </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
