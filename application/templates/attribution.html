@@ -1,25 +1,24 @@
 {% extends "base.html" %}
-{% block title %}{{ licence.licence }}{% endblock %}
+{% block title %}{{ attribution.attribution }}{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">{{ licence.licence }}</h1>
+        <h1 class="heading-xlarge">{{ attribution.attribution }}</h1>
         <div class="grid-row">
             <div class="column-full">
                 <table>
                     <thead>
                         <tr>
-                            <th>Licence</th>
                             <th>Name</th>
                             <th>url</th>
-                            <th>text</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{ licence.licence}}</td>
-                            <td>{{ licence.name }}</td>
-                            <td><a href="{{ licence.url }}">licence url</a></td>
-                            <td>{{ licence.text }}</td>
+                            <td>{{ attribution.name }}</td>
+                            <td>{% if attribution.url %}
+                                <a href="{{ attribution.url }}">attribution url</a>
+                            {% endif %}
+                            </td>
                         </tr>
                     </tbody>
                 </table>

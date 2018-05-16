@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Attributions{% endblock %}
+{% block content %}
+    <div id="content" role="main">
+        <h1 class="heading-xlarge">Attributions</h1>
+        <div class="grid-row">
+            <div class="column-full">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribution</th>
+                            <th>Name</th>
+                            <th>url</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                   {% for attribution in attributions %}
+                       <tr>
+                            <td><a href="{{ url_for('frontend.attribution', id=attribution.attribution) }}">
+                                    {{ attribution.attribution}}
+                                </a>
+                            </td>
+                            <td>{{ attribution.name }}</td>
+                            <td>{% if attribution.url %}
+                                    <a href="{{ attribution.url }}">attribution url</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

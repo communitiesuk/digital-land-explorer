@@ -13,6 +13,7 @@
                             <th>url</th>
                             <th>Data url</th>
                             <th>Licence</th>
+                            <th>Attribution</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,6 +25,7 @@
                             <td><a href="{{ publication.url }}">publication url</a></td>
                             <td><a href="{{ publication.data_url }}">data url</a></td>
                             <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
+                            <td><a href="{{ url_for('frontend.attribution', id=publication.attribution.attribution) }}">{{ publication.attribution.name }}</a></td>
                         </tr>
                     </tbody>
                 </table>

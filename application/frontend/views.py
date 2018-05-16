@@ -3,7 +3,7 @@ from flask import (
     render_template,
     abort)
 
-from application.models import Organisation, Publication, Licence, Area
+from application.models import Organisation, Publication, Licence, Area, Attribution
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
@@ -55,6 +55,16 @@ def licences():
 def licence(id):
     lic = Licence.query.get(id)
     return render_template('licence.html', licence=lic)
+
+@frontend.route('/attributions')
+def attributions():
+    return render_template('attributions.html', attributions=Attribution.query.all())
+
+
+@frontend.route('/attributions/<id>')
+def attribution(id):
+    attr = Attribution.query.get(id)
+    return render_template('attribution.html', attribution=attr)
 
 
 @frontend.context_processor

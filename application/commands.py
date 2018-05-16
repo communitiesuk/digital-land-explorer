@@ -14,6 +14,9 @@ from application.extensions import db
 @with_appcontext
 def load_everything():
 
+    print('Loading the entire universe')
+
+    count = 0
     licenses = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/licence.tsv'
     with closing(requests.get(licenses, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
@@ -24,9 +27,13 @@ def load_everything():
             try:
                 db.session.add(lic)
                 db.session.commit()
+                count += 1
             except Exception as e:
                 print(e)
                 db.session.rollback()
+
+    print('Loaded', count, 'licences')
+    count = 0
 
     attributions = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/copyright/index.tsv'
     with closing(requests.get(attributions, stream=True)) as r:
@@ -41,9 +48,13 @@ def load_everything():
             try:
                 db.session.add(attribution)
                 db.session.commit()
+                count += 1
             except Exception as e:
                 print(e)
                 db.session.rollback()
+
+    print('Loaded', count, 'attributions')
+    count = 0
 
     areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
     with closing(requests.get(areas, stream=True)) as r:
@@ -60,9 +71,13 @@ def load_everything():
                     try:
                         db.session.add(area)
                         db.session.commit()
+                        count += 1
                     except Exception as e:
                         print(e)
                         db.session.rollback()
+
+    print('Loaded', count, 'areas')
+    count = 0
 
     organisations = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/organisation.tsv'
     with closing(requests.get(organisations, stream=True)) as r:
@@ -77,9 +92,13 @@ def load_everything():
             try:
                 db.session.add(org)
                 db.session.commit()
+                count += 1
             except Exception as e:
                 print(e)
                 db.session.rollback()
+
+    print('Loaded', count, 'organisations')
+    count = 0
 
     publications = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/index.tsv'
     with closing(requests.get(publications, stream=True)) as r:
@@ -102,15 +121,21 @@ def load_everything():
             if lic is not None:
                 publication.licence = lic
 
+            attribution = db.session.query(Attribution).get(md.Meta['copyright'][0])
+            if attribution is not None:
+                publication.attribution = attribution
+
             try:
                 db.session.add(publication)
                 db.session.commit()
-
+                count += 1
             except Exception as e:
                 print(e)
                 db.session.rollback()
 
-    # TODO copyright, licence, geography. the body text as well?
+    print('Loaded', count, 'publications')
+
+    # TODO geography. the body text as well?
 
 
 @click.command()
@@ -122,3 +147,4 @@ def clear_everything():
     db.session.query(Licence).delete()
     db.session.query(Attribution).delete()
     db.session.commit()
+    print('cleared db')

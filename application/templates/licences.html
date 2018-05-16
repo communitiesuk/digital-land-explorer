@@ -17,7 +17,7 @@
                     <tbody>
                    {% for licence in licences %}
                        <tr>
-                            <td>{{ licence.licence}}</td>
+                            <td><a href="{{ url_for('frontend.licence', id=licence.licence) }}">{{ licence.licence}}</a></td>
                             <td>{{ licence.name }}</td>
                             <td><a href="{{ licence.url }}">licence url</a></td>
                             <td>{{ licence.text }}</td>
