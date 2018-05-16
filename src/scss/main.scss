@@ -4,3 +4,5 @@ $path: "/static/govuk_template/images/";
 
 // Import all the govuk-elements partials listed in _govuk-elements.scss
 @import "govuk-elements";
+
+@import "additional";

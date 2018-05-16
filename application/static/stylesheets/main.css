@@ -2186,3 +2186,66 @@ input[type=number] {
     display: revert;
   }
 }
+
+.results {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #dee0e2;
+}
+
+ul.details {
+  margin-top: 10px;
+}
+
+#content, .hero_content, .full-page-width-container {
+  max-width: 960px;
+  margin: 0 15px;
+}
+
+@media (min-width: 641px) {
+  #content, .hero_content, .full-page-width-container {
+    margin: 0 30px;
+  }
+}
+
+@media (min-width: 1020px) {
+  #content, .hero_content, .full-page-width-container {
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 641px) {
+  .hero {
+    margin-bottom: 30px;
+  }
+}
+
+.hero {
+  background: #005ea5;
+  color: #fff;
+}
+
+@media (min-width: 641px) {
+  .hero_content {
+    padding: 40px 0 30px;
+  }
+}
+
+.hero_content {
+  padding: 25px 0 15px;
+}
+
+.row {
+  padding: 25px 0px;
+}
+
+.list-bullet {
+  list-style-type: disc;
+  padding-left: 20px;
+  padding-top: 5px;
+}
+
+.areas {
+  text-decoration: underline;
+  color: #005ea5;
+}

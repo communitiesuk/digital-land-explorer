@@ -1,49 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Digital Land Explorer{% endblock %}
 {% block content %}
+
+    <header class="hero">
+		<div class="hero_content">
+			<h1 class="heading-xlarge">Digital Land Explorer</h1>
+			<p class="lede text">
+				Some organisations, publications and data sets related to land
+			</p>
+		</div>
+	</header>
+
     <div id="content" role="main">
-        <h1 class="heading-xlarge">Digital Land Explorer</h1>
-        <div class="grid-row">
+        <div class="grid-row row">
 
             <div class="column-one-third">
-                <h2 class="heading-small"><a href="{{ url_for('frontend.organisations') }}">Organisations</a></h2>
-                <ul>
-                    <li><a href="{{ url_for('frontend.organisation_by_type', org_type='local-authority') }}">Local Authorities</a></li>
-                    <li><a href="{{ url_for('frontend.organisation_by_type', org_type='government-organisation') }}">Government organisations</a></li>
-                </ul>
+                <span class="data-item font-medium">
+                     <a href="{{ url_for('frontend.organisations') }}">{{ organisations | count }} Organisations</a></span>
+                 </span>
             </div>
 
             <div class="column-one-third">
-                <h2 class="heading-small"><a href="{{ url_for('frontend.publications') }}">Publications</a></h2>
-                <ul>
-                    {% for publication in publications %}
-                        <li><a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                            {{ publication.name }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+                <span class="data-item font-medium">
+                    <a href="{{ url_for('frontend.publications') }}">{{ publications | count }} Publications</a>
+                </span>
             </div>
 
             <div class="column-one-third">
-                <h2 class="heading-small"><a href="{{ url_for('frontend.licences') }}">Licences</a></h2>
-                <ul>
-                    {% for licence in licences %}
-                        <li><a href="{{ url_for('frontend.licence', id=licence.licence) }}">{{ licence.name }}</a></li>
-                    {% endfor %}
-
-                </ul>
+                <span class="data-item font-medium">
+                    <a href="{{ url_for('frontend.licences') }}">{{ licences | count }} Licences</a>
+                </span>
             </div>
 
         </div>
 
-        <div class="grid-row">
+        <div class="grid-row row">
+
             <div class="column-one-third">
-                <h2 class="heading-small">Areas</h2>
-                <ul>
-                    <li><a href="{{ url_for('frontend.geoquery') }}">Basic geoquery</a></li>
+                <span class="data-item font-medium areas">{{  area_count }} Areas</span>
+                <ul class="list-bullet">
+                    <li><a href="{{ url_for('frontend.geoquery') }}">Find areas</a></li>
                 </ul>
+
             </div>
         </div>
+
     </div>
 {% endblock %}
 

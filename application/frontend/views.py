@@ -1,7 +1,10 @@
 from flask import (
     Blueprint,
     render_template,
-    abort)
+    abort
+)
+
+from sqlalchemy import func
 
 from application.frontend.forms import LatLongForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
@@ -11,9 +14,13 @@ frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 @frontend.route('/')
 def index():
+    from application.extensions import db
+    area_count = db.session.query(Area.area).count()
     return render_template('index.html',
                            publications=Publication.query.all(),
-                           licences=Licence.query.all())
+                           licences=Licence.query.all(),
+                           organisations=Organisation.query.all(),
+                           area_count=area_count)
 
 
 @frontend.route('/organisations')
@@ -69,6 +76,11 @@ def attribution(id):
     return render_template('attribution.html', attribution=attr)
 
 
+@frontend.route('/areas')
+def areas():
+    return render_template('areas.html', count=1000)
+
+
 @frontend.route('/areas/<id>')
 def area(id):
     from flask import request
@@ -85,14 +97,20 @@ def area(id):
 def geoquery():
 
     form = LatLongForm()
-    areas = []
+    results = []
+    message = None
 
     if form.validate_on_submit():
         from application.extensions import db
         point = 'POINT(%f %f)' % (form.longitude.data, form.latitude.data)
         areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
+        for area in areas:
+            organisation = Organisation.query.filter_by(area=area).first()
+            results.append({'area': area, 'organisation': organisation})
+        if not results:
+            message = 'No results found'
 
-    return render_template('geoquery.html', form=form, areas=areas)
+    return render_template('geoquery.html', form=form, results=results, message=message)
 
 
 @frontend.context_processor

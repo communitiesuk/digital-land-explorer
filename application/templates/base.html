@@ -59,9 +59,9 @@
                             Digital Land Explorer
                         </a>
                         <ul id="proposition-links">
-                            <li><a href="https://digital-land-portfolio.cloudapps.digital/" class="active">Pattern
+                            <li><a href="https://digital-land-portfolio.cloudapps.digital/">Pattern
                                 Portfolio</a></li>
-                            <li><a href="{{ url_for('frontend.index') }}">Data Explorer</a></li>
+                            <li><a href="{{ url_for('frontend.index') }}" class="active">Data Explorer</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -70,6 +70,18 @@
     </header>
 
     <div id="global-header-bar"></div>
+    <div class="full-page-width-container">
+        <div class="grid-row">
+            <div class="column-full">
+                <div class="phase-banner">
+                    <p>
+                        <strong class="phase-tag">Prototype</strong>
+                        <span>This is a prototype.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {%  block content %}
     {%  endblock %}
