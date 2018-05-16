@@ -5,10 +5,7 @@ install:
 - pip install -r test_requirements.txt
 script: pytest
 env:
-- FLASK_ENV=development
 - FLASK_CONFIG=config.TestConfig
-- FLASK_APP=application.wsgi:app
-- SECRET_KEY=doesnotmatter
 deploy:
   provider: cloudfoundry
   api: https://api.cloud.service.gov.uk
