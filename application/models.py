@@ -69,9 +69,6 @@ class Publication(db.Model):
     url = db.Column(db.Text)  # check for url field type in postgres
     data_url =  db.Column(db.Text)  # check for url field type in postgres
 
-    area_id = db.Column(db.String(256), ForeignKey('area.area', name='publication_area_fkey'))
-    area = db.relationship('Area', uselist=False)
-
     # editions = relationship('Edition', backref='publication', lazy=True)
     # task = db.ForeignKey(Task) # how to fetch an edition ..
 
