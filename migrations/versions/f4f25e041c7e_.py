@@ -5,6 +5,7 @@ Revises:
 Create Date: 2018-05-11 15:01:00.556875
 
 """
+import geoalchemy2
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
@@ -21,6 +22,7 @@ def upgrade():
     op.create_table('area',
     sa.Column('area', sa.String(length=256), nullable=False),
     sa.Column('data', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+    sa.Column('geometry', geoalchemy2.types.Geometry(), nullable=True),
     sa.PrimaryKeyConstraint('area')
     )
     op.create_table('attribution',

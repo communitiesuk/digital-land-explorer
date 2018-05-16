@@ -19,6 +19,16 @@ Install front end build tool (gulp)
 
 Create a local postgres database for the application called digital_land (see the .flaskenv file)
 
+Install PostGIS
+
+If you're using Postgres.app on OSX it should be installed already but you'll need to add it to db. Using psql
+
+    CREATE EXTENSION postgis;
+
+Check if all went well
+
+    SELECT PostGIS_Version();
+
 Create a .env (note .env file is git ignored) and add MAPBOX_TOKEN to you .env file. To get token create an account at
 [Mapbox](https://www.mapbox.com/)
 

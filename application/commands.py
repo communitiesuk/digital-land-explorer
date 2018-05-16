@@ -1,3 +1,5 @@
+import json
+
 import click
 import markdown
 import requests
@@ -56,7 +58,8 @@ def load_everything():
     print('Loaded', count, 'attributions')
     count = 0
 
-    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
+    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/add-lambeth-to-index/data/area/index.tsv'
+    json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -67,7 +70,9 @@ def load_everything():
                         and feature.get('type') == 'Feature'\
                         and feature.get('properties').get('area') is not None:
                     area_id = feature['properties']['area']
-                    area = Area(area=area_id, data=feature)
+                    geo = json.dumps(feature.get('geometry'))
+                    geometry = db.session.execute(json_to_geo_query % geo).fetchone()[0]
+                    area = Area(area=area_id, data=feature, geometry=geometry)
                     try:
                         db.session.add(area)
                         db.session.commit()

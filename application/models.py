@@ -1,3 +1,4 @@
+from geoalchemy2 import Geometry
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import JSON
 
@@ -76,8 +77,7 @@ class Publication(db.Model):
 class Area(db.Model):
     area = db.Column(db.String(256), primary_key=True)
     data = db.Column(JSON)
-
-
+    geometry = db.Column(Geometry())
 
 # class Edition(db.Model):
 #     """

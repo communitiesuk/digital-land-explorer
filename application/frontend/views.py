@@ -3,6 +3,7 @@ from flask import (
     render_template,
     abort)
 
+from application.frontend.forms import LatLongForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
@@ -56,6 +57,7 @@ def licence(id):
     lic = Licence.query.get(id)
     return render_template('licence.html', licence=lic)
 
+
 @frontend.route('/attributions')
 def attributions():
     return render_template('attributions.html', attributions=Attribution.query.all())
@@ -65,6 +67,27 @@ def attributions():
 def attribution(id):
     attr = Attribution.query.get(id)
     return render_template('attribution.html', attribution=attr)
+
+
+@frontend.route('/areas/<id>')
+def area(id):
+    from flask import request
+    a = Area.query.get(id)
+    return render_template('area.html', area=a, lat=request.args.get('lat'), long=request.args.get('long'))
+
+
+@frontend.route('/geoquery', methods=['GET', 'POST'])
+def geoquery():
+
+    form = LatLongForm()
+    areas = []
+
+    if form.validate_on_submit():
+        from application.extensions import db
+        point = 'POINT(%f %f)' % (form.longitude.data, form.latitude.data)
+        areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
+
+    return render_template('geoquery.html', form=form, areas=areas)
 
 
 @frontend.context_processor

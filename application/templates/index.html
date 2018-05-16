@@ -32,11 +32,17 @@
                     {% endfor %}
 
                 </ul>
-                <ul>
-
-                </ul>
             </div>
 
+        </div>
+
+        <div class="grid-row">
+            <div class="column-one-third">
+                <h2 class="heading-small">Areas</h2>
+                <ul>
+                    <li><a href="{{ url_for('frontend.geoquery') }}">Basic geoquery</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 {% endblock %}

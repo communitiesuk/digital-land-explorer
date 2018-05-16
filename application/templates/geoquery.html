@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Test geo queries{% endblock %}
+{% block content %}
+    <div id="content" role="main">
+        <h1 class="heading-xlarge">Find areas by coordinates</h1>
+        <div class="grid-row">
+            <div class="column-half">
+               <div class="form-group">
+                   <form method="POST" action="{{ url_for('frontend.geoquery') }}">
+                       <fieldset>
+                           <legend>
+                                <h2 class="heading-small">
+                                   Search for areas containing a given lat long
+                                </h2>
+                           </legend>
+                           <span class="form-hint">
+                               For example enter 54.29159, -1.99674 below
+                               <br>
+                               (which happens to be Aysgarth in Yorkshire Dales National Park)
+                           </span>
+
+                            {{ form.latitude.label(class="form-label")  }}
+                            {{ form.latitude(class="form-control") }}
+                            {{ form.longitude.label(class="form-label") }}
+                            {{ form.longitude(class="form-control") }}
+                       </fieldset>
+                       <button style="margin-top: 5px" class="button" type="submit">Go</button>
+                    </form>
+                </div>
+            </div>
+            <div class="column-half">
+                <h2 class="heading-small">Results</h2>
+                <ul>
+                {% for area in areas %}
+                    <li><a href="{{ url_for('frontend.area', id=area.area, lat=form.latitude.data, long=form.longitude.data) }}">{{ area.area }}</a></li>
+                {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
