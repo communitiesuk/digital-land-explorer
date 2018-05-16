@@ -19,12 +19,22 @@
             <h1 class="heading-large">{{ area.area }}</h1>
         </div>
 
-        <div class="column-full">
-            <h2 class="heading-small">Area</h2>
-            <div id="mapid" style="width: 600px; height: 400px;"></div>
-            <!-- TODO map here-->
+        <div class="grid-row">
+            <div class="column-half">
+                <h2 class="heading-small">Area</h2>
+                <div id="mapid" style="width: 400px; height: 300px;"></div>
+                <!-- TODO map here-->
+            </div>
+            <div class="column-half">
+                {% if organisation %}
+                    <h2 class="heading-small">Organisation</h2>
+                <p>
+                    <a href="{{ url_for('frontend.organisation', id=organisation.organisation) }}">{{ organisation.name }}</a>
+                </p>
+                {% endif %}
+            </div>
         </div>
-    </div>
+        </div>
 {% endblock %}
 
 {% block end_body %}

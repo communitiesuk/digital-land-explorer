@@ -73,7 +73,12 @@ def attribution(id):
 def area(id):
     from flask import request
     a = Area.query.get(id)
-    return render_template('area.html', area=a, lat=request.args.get('lat'), long=request.args.get('long'))
+    organisation = Organisation.query.filter_by(area=a).first()
+    return render_template('area.html',
+                           area=a,
+                           lat=request.args.get('lat'),
+                           long=request.args.get('long'),
+                           organisation=organisation)
 
 
 @frontend.route('/geoquery', methods=['GET', 'POST'])
