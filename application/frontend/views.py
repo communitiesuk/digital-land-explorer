@@ -96,6 +96,21 @@ def area(id):
                            organisation=organisation)
 
 
+@frontend.route('/publication/<id>/areas')
+def publication_area(id):
+    if id[-1] == 's':
+        prefix = id[:-1]
+    else:
+        prefix = id
+    q = prefix + '%'
+    publication = Publication.query.get(id)
+    areas = [area.data for area in Area.query.filter(Area.area.like(q)).all()]
+    return render_template('publication_area.html',
+                           publication=publication,
+                           areas=areas)
+
+
+
 @frontend.route('/find-area', methods=['GET', 'POST'])
 def find_area():
 
