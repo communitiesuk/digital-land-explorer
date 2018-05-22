@@ -12,13 +12,7 @@ frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 @frontend.route('/')
 def index():
-    from application.extensions import db
-    area_count = db.session.query(Area.area).count()
-    return render_template('index.html',
-                           publications=Publication.query.all(),
-                           licences=Licence.query.all(),
-                           organisations=Organisation.query.all(),
-                           area_count=area_count)
+    return render_template('index.html')
 
 
 @frontend.route('/organisations')
@@ -102,8 +96,8 @@ def area(id):
                            organisation=organisation)
 
 
-@frontend.route('/geoquery', methods=['GET', 'POST'])
-def geoquery():
+@frontend.route('/find-area', methods=['GET', 'POST'])
+def find_area():
 
     form = LatLongForm()
     results = []
@@ -119,7 +113,7 @@ def geoquery():
         if not results:
             message = 'No results found'
 
-    return render_template('geoquery.html', form=form, results=results, message=message)
+    return render_template('find_area.html', form=form, results=results, message=message)
 
 
 @frontend.context_processor

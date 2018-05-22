@@ -47,5 +47,5 @@ def register_commands(app):
 
 
 def register_filters(app):
-    from application.filters import format_org_type
-    app.add_template_filter(format_org_type)
+    from application.filters import format_identifier
+    app.add_template_filter(format_identifier)

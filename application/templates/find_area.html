@@ -24,7 +24,7 @@
 
             <div class="column-half">
                <div class="form-group">
-                   <form method="POST" action="{{ url_for('frontend.geoquery') }}" class="geoquery-form">
+                   <form method="POST" action="{{ url_for('frontend.find_area') }}" class="find-area-form">
                        <fieldset>
                            <legend>
                                 <h2 class="heading-medium visuallyhidden">
@@ -152,7 +152,7 @@
 					place.current_query = true;
 					{% endif %}
 
-					var $queryForm = jQuery(".geoquery-form");
+					var $queryForm = jQuery(".find-area-form");
 
 					/* check if geolocation available
 					   and not current query */

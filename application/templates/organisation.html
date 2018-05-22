@@ -20,8 +20,7 @@
     <div id="content" role="main">
 
         <div class="grid-row">
-            <h1 class="heading-xlarge">{{ organisation.organisation }}</h1>
-            <h2 class="heading-medium">{{ organisation.name }}</h2>
+            <h1 class="heading-xlarge">{{ organisation.name }}</h1>
         </div>
 
         {% if organisation.area %}
@@ -49,7 +48,7 @@
         {% if points %}
             <div class="grid-row">
                 <div class="column-full">
-                    <h2 class="heading-medium">Lambeth contaminated sites</h2>
+                    <h2 class="heading-small">Lambeth contaminated sites</h2>
                     <div id="map_points" style="width: 900px; height: 600px;"></div>
                 </div>
             </div>
@@ -59,7 +58,7 @@
         <div class="grid-row">
             <div class="column-full">
                 {% for key in areas_by_type.keys() %}
-                     <h3 class="heading-small">{{ key }}</h3>
+                     <h2 class="heading-small">{{ key | format_identifier }}</h2>
                      <div id="map_{{ key }}" style="width: 900px; height: 600px;"></div>
                 {% endfor %}
             </div>

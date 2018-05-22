@@ -16,19 +16,19 @@
 
             <div class="column-one-third">
                 <span class="data-item font-medium">
-                     <a href="{{ url_for('frontend.organisations') }}">{{ organisations | count }} Organisations</a></span>
+                     <a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
                  </span>
             </div>
 
             <div class="column-one-third">
                 <span class="data-item font-medium">
-                    <a href="{{ url_for('frontend.publications') }}">{{ publications | count }} Publications</a>
+                    <a href="{{ url_for('frontend.publications') }}">Publications</a>
                 </span>
             </div>
 
             <div class="column-one-third">
                 <span class="data-item font-medium">
-                    <a href="{{ url_for('frontend.licences') }}">{{ licences | count }} Licences</a>
+                    <a href="{{ url_for('frontend.licences') }}">Licences</a>
                 </span>
             </div>
 
@@ -37,9 +37,9 @@
         <div class="grid-row row">
 
             <div class="column-one-third">
-                <span class="data-item font-medium areas">{{  area_count }} Areas</span>
+                <span class="data-item font-medium areas">Areas</span>
                 <ul class="list-bullet">
-                    <li><a href="{{ url_for('frontend.geoquery') }}">Find areas</a></li>
+                    <li><a href="{{ url_for('frontend.find_area') }}">Find areas</a></li>
                 </ul>
 
             </div>

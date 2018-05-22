@@ -2,13 +2,14 @@
 {% block title %}{{ publication.publication }}{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">{{ publication.publication }}</h1>
+        <h1 class="heading-xlarge">{{ publication.name }}</h1>
         <div class="grid-row">
             <div class="column-full">
                 <table>
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Identifier</th>
                             <th>Organisation</th>
                             <th>url</th>
                             <th>Data url</th>
@@ -19,6 +20,7 @@
                     <tbody>
                         <tr>
                             <td>{{ publication.name }}</td>
+                            <td>{{ publication.publication }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
                                 {{ publication.organisation.organisation }}</a>
                             </td>

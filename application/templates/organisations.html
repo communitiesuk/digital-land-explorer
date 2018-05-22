@@ -2,13 +2,13 @@
 {% block title %}Organisations{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">{{ org_type | format_org_type }}</h1>
+        <h1 class="heading-xlarge">{{ org_type | format_identifier }}</h1>
         <div class="grid-row">
             <div class="column-full">
                 <table>
                     <thead>
                     <tr>
-                        <th>{{ org_type | format_org_type }}</th>
+                        <th>{{ org_type | format_identifier }}</th>
                         <th>Name</th>
                         <th>Website</th>
                     </tr>
