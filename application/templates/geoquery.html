@@ -82,13 +82,27 @@
 						return parseFloat(latlng.toFixed(decs));
 					}
 
-					var setLatLng = function(ev){
-						$queryForm.find("#latitude").val( roundLatLngVal(ev.latlng.lat, 5) );
-						$queryForm.find("#longitude").val( roundLatLngVal(ev.latlng.lng, 5) );
+					var addMarkerToMap = function(map, lat, lng) {
+						var marker = L.marker([lat, lng]);
+						map.addLayer(marker);
+						return marker;
 					}
 
+					var setLatLng = function(ev){
+						var lat = roundLatLngVal(ev.latlng.lat, 5),
+								lng = roundLatLngVal(ev.latlng.lng, 5);
+						$queryForm.find("#latitude").val( lat );
+						$queryForm.find("#longitude").val( lng );
+						mymap.removeLayer(query_marker);
+						query_marker = addMarkerToMap(mymap, lat, lng);
+					}
+
+					/* My Leaflet vars */
+					var mymap;
+					var query_marker;
+
 					var renderMap = function(){
-						var mymap = L.map('geoquery-map').setView([place.lat, place.lng], place.zoom);;
+						mymap = L.map('geoquery-map').setView([place.lat, place.lng], place.zoom);
 
 	          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
 	              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -97,10 +111,12 @@
 	              accessToken: '{{ config.MAPBOX_TOKEN }}'
 	          }).addTo(mymap);
 
+						query_marker = addMarkerToMap(mymap, place.lat, place.lng);
+
 						mymap.on('click', setLatLng);
 					};
 
-					{% if form.latitude.data is defined %}
+					{% if form.latitude.data is defined and form.latitude.data != None %}
 					place.lat = {{ form.latitude.data }};
 					place.lng = {{ form.longitude.data }};
 					place.current_query = true;
