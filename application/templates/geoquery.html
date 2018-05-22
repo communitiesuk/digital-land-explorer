@@ -16,31 +16,44 @@
     <div id="content" role="main">
         <h1 class="heading-xlarge">Find areas</h1>
         <div class="grid-row">
+
+					<div class="column-half">
+						<h2 class="heading-medium">Search for areas by lat/long</h2>
+						<div id="geoquery-map" style="height: 350px;"></div>
+					</div>
+
             <div class="column-half">
                <div class="form-group">
                    <form method="POST" action="{{ url_for('frontend.geoquery') }}" class="geoquery-form">
                        <fieldset>
                            <legend>
-                                <h2 class="heading-medium">
+                                <h2 class="heading-medium visuallyhidden">
                                    Search for areas by lat/long
                                 </h2>
                            </legend>
-                           <span class="form-hint">
-                               For example enter 54.29159, -1.99674 below
-                               <br>
+                           <p class="form-hint">
+                               Either click on the map
+															 <br />or enter lat and long values (e.g. 54.29159, -1.99674)
+                               <br />
                                (which happens to be Aysgarth in Yorkshire Dales National Park and Richmondshire District Council)
-                           </span>
+															 <br />
+                           </p>
+													 <div class="form-group">
                            {{ form.latitude.label(class="form-label")  }}
                            {{ form.latitude(class="form-control") }}
+
                            {{ form.longitude.label(class="form-label") }}
                            {{ form.longitude(class="form-control") }}
+													 </div>
                        </fieldset>
                        <button style="margin-top: 5px" class="button" type="submit">Go</button>
                        {{ form.csrf_token }}
                     </form>
                 </div>
-								<div id="geoquery-map" style="width: 400px; height: 300px;"></div>
             </div>
+
+				</div>
+				<div class="grid-row">
             <div class="column-half">
                 {% if results %}
                     <h2 class="heading-medium">Results</h2>

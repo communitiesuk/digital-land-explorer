@@ -6,3 +6,11 @@ $path: "/static/govuk_template/images/";
 @import "govuk-elements";
 
 @import "additional";
+
+.geoquery-form {
+	margin-top: $gutter;
+	@include media(tablet) {
+		// margin-top: em(95); seems to be making it 80px
+		margin-top: 95px;
+	}	
+}
