@@ -46,7 +46,7 @@
                            {{ form.longitude(class="form-control") }}
 													 </div>
                        </fieldset>
-                       <button style="margin-top: 5px" class="button" type="submit">Go</button>
+                       <button style="margin-top: 5px" class="button" type="submit">Search</button>
                        {{ form.csrf_token }}
                     </form>
                 </div>
@@ -54,30 +54,37 @@
 
 				</div>
 				<div class="grid-row">
-            <div class="column-half">
-                {% if results %}
-                    <h2 class="heading-medium">Results</h2>
-                    {% for result in results %}
-                        <div class="results">
-                            <div id="mapid_{{ loop.index }}" style="width: 400px; height: 300px;"></div>
-                            <h3 class="heading-small">Details</h3>
-                            <ul class="details">
-                                <li>
-                                    Area: <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.area }}</a>
-                                </li>
-                                {% if result.organisation %}
-                                    <li>
-                                        Organisation: <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                     {% endfor %}
-                {% else %}
-                    <h2 class="heading-medium">{% if message %}{{ message }}{% endif %}</h2>
-                {% endif %}
-            </div>
+					{% if results %}
+					<div class="column-full">
+						<header class="results-head">
+							<h2 class="heading-medium">{{ results | length }} Results</h2>
+						</header>
+					</div>
+
+					<div class="column-half">
+						{% for result in results %}
+						<div class="results">
+	            <div id="mapid_{{ loop.index }}" style="width: 400px; height: 300px;"></div>
+	            <h3 class="heading-small">Details</h3>
+	            <ul class="details">
+								<li>
+									Area: <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.area }}</a>
+								</li>
+								{% if result.organisation %}
+								<li>
+									Organisation: <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>
+								</li>
+								{% endif %}
+							</ul>
+						</div>
+						{% endfor %}
+					</div>
+				
+					{% else %}
+					<h2 class="heading-medium">{% if message %}{{ message }}{% endif %}</h2>
+					{% endif %}
         </div>
+
     </div>
 {% endblock %}
 

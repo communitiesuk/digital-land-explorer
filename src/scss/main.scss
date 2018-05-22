@@ -14,3 +14,12 @@ $path: "/static/govuk_template/images/";
 		margin-top: 95px;
 	}	
 }
+
+.results-head {
+	margin-top: $gutter*2;
+	border-top: 1px solid $border-colour;
+
+	&__heading {
+		margin-top: $gutter-half;
+	}
+}
