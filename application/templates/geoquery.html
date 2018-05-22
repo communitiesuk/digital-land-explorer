@@ -73,31 +73,22 @@
 				<script>
 					var place = {
 						lat: 54.29159,
-						lon:  -1.99674,
-						zoom: 12
+						lng:  -1.99674,
+						zoom: 12,
+						current_query: false
 					};
-					var $queryForm = jQuery(".geoquery-form");
 
-					if ("geolocation" in navigator) {
-					  /* geolocation is available */
-						navigator.geolocation.getCurrentPosition(function(position) {
-						  place.lat = position.coords.latitude;
-							place.lon = position.coords.longitude;
-							renderMap();
-						});
-					} else {
-						/* geolocation not available */
-						renderMap();
+					var roundLatLngVal = function(latlng, decs) {
+						return parseFloat(latlng.toFixed(decs));
 					}
 
-					var setLatLong = function(ev){
-						console.log(parseFloat(ev.latlng.lat.toFixed(5)), parseFloat(ev.latlng.lng.toFixed(5)));
-						$queryForm.find("#latitude").val(parseFloat(ev.latlng.lat.toFixed(5)));
-						$queryForm.find("#longitude").val(parseFloat(ev.latlng.lng.toFixed(5)));
+					var setLatLng = function(ev){
+						$queryForm.find("#latitude").val( roundLatLngVal(ev.latlng.lat, 5) );
+						$queryForm.find("#longitude").val( roundLatLngVal(ev.latlng.lng, 5) );
 					}
 
 					var renderMap = function(){
-						var mymap = L.map('geoquery-map').setView([place.lat, place.lon], place.zoom);;
+						var mymap = L.map('geoquery-map').setView([place.lat, place.lng], place.zoom);;
 
 	          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
 	              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -106,8 +97,29 @@
 	              accessToken: '{{ config.MAPBOX_TOKEN }}'
 	          }).addTo(mymap);
 
-						mymap.on('click', setLatLong);
+						mymap.on('click', setLatLng);
 					};
+
+					{% if form.latitude.data is defined %}
+					place.lat = {{ form.latitude.data }};
+					place.lng = {{ form.longitude.data }};
+					place.current_query = true;
+					{% endif %}
+
+					var $queryForm = jQuery(".geoquery-form");
+
+					/* check if geolocation available
+					   and not current query */
+					if ("geolocation" in navigator && !place.current_query) {
+						navigator.geolocation.getCurrentPosition(function(position) {
+						  place.lat = position.coords.latitude;
+							place.lng = position.coords.longitude;
+							renderMap();
+						});
+					} else {
+						renderMap();
+					}
+
 				</script>
 
     {% for result in results %}
