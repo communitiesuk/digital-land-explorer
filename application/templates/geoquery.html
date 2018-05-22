@@ -18,7 +18,7 @@
         <div class="grid-row">
             <div class="column-half">
                <div class="form-group">
-                   <form method="POST" action="{{ url_for('frontend.geoquery') }}">
+                   <form method="POST" action="{{ url_for('frontend.geoquery') }}" class="geoquery-form">
                        <fieldset>
                            <legend>
                                 <h2 class="heading-medium">
@@ -39,6 +39,7 @@
                        {{ form.csrf_token }}
                     </form>
                 </div>
+								<div id="geoquery-map" style="width: 400px; height: 300px;"></div>
             </div>
             <div class="column-half">
                 {% if results %}
@@ -68,6 +69,47 @@
 {% endblock %}
 
 {% block end_body %}
+				<script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
+				<script>
+					var place = {
+						lat: 54.29159,
+						lon:  -1.99674,
+						zoom: 12
+					};
+					var $queryForm = jQuery(".geoquery-form");
+
+					if ("geolocation" in navigator) {
+					  /* geolocation is available */
+						navigator.geolocation.getCurrentPosition(function(position) {
+						  place.lat = position.coords.latitude;
+							place.lon = position.coords.longitude;
+							renderMap();
+						});
+					} else {
+						/* geolocation not available */
+						renderMap();
+					}
+
+					var setLatLong = function(ev){
+						console.log(parseFloat(ev.latlng.lat.toFixed(5)), parseFloat(ev.latlng.lng.toFixed(5)));
+						$queryForm.find("#latitude").val(parseFloat(ev.latlng.lat.toFixed(5)));
+						$queryForm.find("#longitude").val(parseFloat(ev.latlng.lng.toFixed(5)));
+					}
+
+					var renderMap = function(){
+						var mymap = L.map('geoquery-map').setView([place.lat, place.lon], place.zoom);;
+
+	          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+	              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+	              maxZoom: 18,
+	              id: 'mapbox.streets',
+	              accessToken: '{{ config.MAPBOX_TOKEN }}'
+	          }).addTo(mymap);
+
+						mymap.on('click', setLatLong);
+					};
+				</script>
+
     {% for result in results %}
         <script>
             var map = L.map('mapid_{{ loop.index  }}');
