@@ -58,11 +58,20 @@ def load_everything():
     print('Loaded', count, 'attributions')
     count = 0
 
-    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/add-lambeth-to-index/data/area/index.tsv'
+    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/prefix.tsv'
+    prefixes = {}
+    org_area_mappings = []
+    with closing(requests.get(prefix_file, stream=True)) as r:
+        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
+        for row in reader:
+            prefixes[row.get('prefix')] = row.get('organisation')
+
+    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/2331f9e04b96f6dfa361cb910576105fdf7f48a6/data/area/index.tsv'
     json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
+            print('Loading', row['path'])
             area_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/%s' % row['path']
             area_data = requests.get(area_url).json()
             for feature in area_data['features']:
@@ -77,6 +86,10 @@ def load_everything():
                         db.session.add(area)
                         db.session.commit()
                         count += 1
+                        p = area_id.split(':')[0]
+                        if p in prefixes.keys():
+                            org = prefixes.get(p)
+                            org_area_mappings.append({'organisation': org, 'area': area_id})
                     except Exception as e:
                         print(e)
                         db.session.rollback()
@@ -140,12 +153,21 @@ def load_everything():
 
     print('Loaded', count, 'publications')
 
-    # TODO geography. the body text as well?
+    from application.models import organisation_area
+
+    for org_area in org_area_mappings:
+        db.session.execute(organisation_area.insert().values(**org_area))
+        db.session.commit()
+
+    print('Loaded other areas for organisations')
+    print('Done')
 
 
 @click.command()
 @with_appcontext
 def clear_everything():
+    from application.models import organisation_area
+    db.session.execute(organisation_area.delete())
     db.session.query(Publication).delete()
     db.session.query(Organisation).delete()
     db.session.query(Area).delete()

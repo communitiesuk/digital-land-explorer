@@ -5,6 +5,12 @@ from sqlalchemy.dialects.postgresql import JSON
 from application.extensions import  db
 
 
+organisation_area = db.Table('organisation_area',
+                             db.Column('organisation', db.String(64), db.ForeignKey('organisation.organisation'),
+                                       primary_key=True),
+                             db.Column('area', db.String(256), db.ForeignKey('area.area'), primary_key=True),
+                            )
+
 class Category(db.Model):
     """
     actually our wiki, containing concepts and tags, linked to by markdown
@@ -43,6 +49,13 @@ class Organisation(db.Model):
 
     category_id = db.Column(db.String(64), ForeignKey('category.category', name='organisation_category_fkey'))
     publications = db.relationship('Publication', backref='organisation', lazy=True)
+
+    other_areas = db.relationship('Area',
+                                  lazy='subquery',
+                                  secondary=organisation_area,
+                                  primaryjoin='Organisation.organisation == organisation_area.columns.organisation',
+                                  secondaryjoin='Area.area == organisation_area.columns.area',
+                                  backref=db.backref('organisation', lazy=True))
 
     def feature(self):
         if self.area is not None:

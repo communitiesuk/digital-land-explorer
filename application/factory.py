@@ -16,6 +16,7 @@ def create_app(config_filename):
     register_extensions(app)
     register_commands(app)
     register_filters(app)
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 10
     return app
 
 
