@@ -105,5 +105,3 @@ node_modules
 
 .pytest_cache/
 
-# generated css
-application/static/stylesheets/
