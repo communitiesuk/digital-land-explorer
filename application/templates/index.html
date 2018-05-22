@@ -20,10 +20,21 @@
                 <ul class="list-bullet">
                     <li><a href="{{ url_for('frontend.find_area') }}">Find areas</a></li>
                 </ul>
-
             </div>
-        </div>
 
+             <div class="column-one-third">
+               <span class="data-item font-medium">
+                     <a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
+                 </span>
+            </div>
+
+            <div class="column-one-third">
+                <span class="data-item font-medium">
+                    <a href="{{ url_for('frontend.publications') }}">Publications</a>
+                </span>
+            </div>
+
+        </div>
     </div>
 {% endblock %}
 

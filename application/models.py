@@ -51,7 +51,7 @@ class Organisation(db.Model):
     publications = db.relationship('Publication', backref='organisation', lazy=True)
 
     other_areas = db.relationship('Area',
-                                  lazy='subquery',
+                                  lazy=True,
                                   secondary=organisation_area,
                                   primaryjoin='Organisation.organisation == organisation_area.columns.organisation',
                                   secondaryjoin='Area.area == organisation_area.columns.area',
