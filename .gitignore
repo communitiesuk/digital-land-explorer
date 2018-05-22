@@ -104,3 +104,6 @@ node_modules
 .idea
 
 .pytest_cache/
+
+# generated css
+application/static/stylesheets/
