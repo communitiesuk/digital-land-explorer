@@ -71,6 +71,7 @@
 {% block end_body %}
 				<script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
 				<script>
+					/* default place vals */
 					var place = {
 						lat: 54.29159,
 						lng:  -1.99674,
@@ -78,16 +79,23 @@
 						current_query: false
 					};
 
+					/* reduce lat or lng number to desirable 
+					   number of decimal places */
 					var roundLatLngVal = function(latlng, decs) {
 						return parseFloat(latlng.toFixed(decs));
 					}
 
+					/* Given map
+					   create marker at lat and lng
+					   return marker ref */
 					var addMarkerToMap = function(map, lat, lng) {
 						var marker = L.marker([lat, lng]);
 						map.addLayer(marker);
 						return marker;
 					}
 
+					/* update lat and lng in form and
+					   update marker pos */
 					var setLatLng = function(ev){
 						var lat = roundLatLngVal(ev.latlng.lat, 5),
 								lng = roundLatLngVal(ev.latlng.lng, 5);
@@ -101,6 +109,8 @@
 					var mymap;
 					var query_marker;
 
+					/* renders the initial map
+					   adds click handler */
 					var renderMap = function(){
 						mymap = L.map('geoquery-map').setView([place.lat, place.lng], place.zoom);
 
