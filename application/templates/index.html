@@ -94,12 +94,19 @@
 		(function($, window) {
 			var mymap,
 					query_marker,
+					$form,
 					$latlngPanel;
 
 			/* reduce lat or lng number to desirable 
 			   number of decimal places */
 			var roundLatLngVal = function(latlng, decs) {
 				return parseFloat(latlng.toFixed(decs));
+			}
+
+			var resetField = function($form, fieldselector) {
+				if( $form !== undefined ) {
+					$form.find(fieldselector).val("");
+				}
 			}
 
 			/* Given map
@@ -130,6 +137,7 @@
 				//query_marker = addMarkerToMap(mymap, place.lat, place.lng);
 
 				mymap.on('click', function(ev){
+					resetField($form, ".location");
 					displayLatLng({
 						lat: ev.latlng.lat,
 						lng: ev.latlng.lng
@@ -153,8 +161,8 @@
 			};
 
 			$(function() {
-				var $form = $(".location-search-form");
-						$latlngPanel = $(".lat-lng-panel");
+				$form = $(".location-search-form");
+				$latlngPanel = $(".lat-lng-panel");
 
 				$form.on("submit", function(e){
 					$.ajax({
