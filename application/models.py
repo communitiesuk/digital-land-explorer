@@ -51,7 +51,7 @@ class Organisation(db.Model):
     publications = db.relationship('Publication', backref='organisation', lazy=True)
 
     other_areas = db.relationship('Area',
-                                  lazy=True,
+                                  lazy='dynamic',
                                   secondary=organisation_area,
                                   primaryjoin='Organisation.organisation == organisation_area.columns.organisation',
                                   secondaryjoin='Area.area == organisation_area.columns.area',
@@ -91,6 +91,7 @@ class Area(db.Model):
     area = db.Column(db.String(256), primary_key=True)
     data = db.Column(JSON)
     geometry = db.Column(Geometry())
+    name = db.Column(db.Text)
 
 # class Edition(db.Model):
 #     """

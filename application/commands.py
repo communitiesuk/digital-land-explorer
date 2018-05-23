@@ -26,13 +26,9 @@ def load_everything():
             lic = Licence(licence=row['licence'],
                           name=row['name'],
                           url=row['url'])
-            try:
-                db.session.add(lic)
-                db.session.commit()
-                count += 1
-            except Exception as e:
-                print(e)
-                db.session.rollback()
+            db.session.add(lic)
+            db.session.commit()
+            count += 1
 
     print('Loaded', count, 'licences')
     count = 0
@@ -47,13 +43,7 @@ def load_everything():
             md.convert(attribution_data)
             attribution = Attribution(attribution=md.Meta['copyright'][0],
                                       name=md.Meta['name'][0])
-            try:
-                db.session.add(attribution)
-                db.session.commit()
-                count += 1
-            except Exception as e:
-                print(e)
-                db.session.rollback()
+            count += 1
 
     print('Loaded', count, 'attributions')
     count = 0
@@ -65,6 +55,19 @@ def load_everything():
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
             prefixes[row.get('prefix')] = row.get('organisation')
+
+    print('Load data for areas')
+    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/index.tsv'
+    area_data_mappings = {}
+    with closing(requests.get(data, stream=True)) as r:
+        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
+        for row in reader:
+            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/%s' % row[
+                'path']
+            with closing(requests.get(data_url, stream=True)) as data_r:
+                data_reader = csv.DictReader(data_r.iter_lines(decode_unicode=True), delimiter='\t')
+                for data_row in data_reader:
+                    area_data_mappings[data_row.get('area')] = data_row.get('name')
 
     areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
     json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
@@ -82,17 +85,16 @@ def load_everything():
                     geo = json.dumps(feature.get('geometry'))
                     geometry = db.session.execute(json_to_geo_query % geo).fetchone()[0]
                     area = Area(area=area_id, data=feature, geometry=geometry)
-                    try:
-                        db.session.add(area)
-                        db.session.commit()
-                        count += 1
-                        p = area_id.split(':')[0]
-                        if p in prefixes.keys():
-                            org = prefixes.get(p)
-                            org_area_mappings.append({'organisation': org, 'area': area_id})
-                    except Exception as e:
-                        print(e)
-                        db.session.rollback()
+                    if area_id in area_data_mappings.keys():
+                        area.name = area_data_mappings[area_id]
+
+                    db.session.add(area)
+                    db.session.commit()
+                    count += 1
+                    p = area_id.split(':')[0]
+                    if p in prefixes.keys():
+                        org = prefixes.get(p)
+                        org_area_mappings.append({'organisation': org, 'area': area_id})
 
     print('Loaded', count, 'areas')
     count = 0
@@ -107,13 +109,10 @@ def load_everything():
             if row.get('area'):
                 area = db.session.query(Area).get(row.get('area'))
                 org.area = area
-            try:
-                db.session.add(org)
-                db.session.commit()
-                count += 1
-            except Exception as e:
-                print(e)
-                db.session.rollback()
+
+            db.session.add(org)
+            db.session.commit()
+            count += 1
 
     print('Loaded', count, 'organisations')
     count = 0
@@ -149,13 +148,9 @@ def load_everything():
             if attribution is not None:
                 publication.attribution = attribution
 
-            try:
-                db.session.add(publication)
-                db.session.commit()
-                count += 1
-            except Exception as e:
-                print(e)
-                db.session.rollback()
+            db.session.add(publication)
+            db.session.commit()
+            count += 1
 
     print('Loaded', count, 'publications')
 

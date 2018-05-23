@@ -3,6 +3,7 @@ from flask import (
     render_template,
     abort
 )
+from sqlalchemy import func
 
 from application.frontend.forms import LatLongForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
@@ -32,12 +33,13 @@ def organisation_by_type(org_type):
 @frontend.route('/organisations/<id>')
 def organisation(id):
     org = Organisation.query.get(id)
-    points = [point for point in org.other_areas if point.data['geometry']['type'] == 'Point']
-    other_areas = [area for area in org.other_areas if area.data['geometry']['type'] != 'Point']
-
+    points = org.other_areas.filter(func.ST_GeometryType(Area.geometry) == 'ST_Point').all()
+    other_areas = org.other_areas.filter(func.ST_GeometryType(Area.geometry) != 'ST_Point')
     areas_by_type = {}
     for a in other_areas:
         area_type_key = a.data['properties']['area'].split(':')[0]
+        if a.name is not None:
+            a.data['properties']['content'] = a.name
         if area_type_key not in areas_by_type.keys():
             areas_by_type[area_type_key] = [a.data]
         else:

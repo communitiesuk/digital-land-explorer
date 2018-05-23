@@ -103,6 +103,12 @@
         pointsMap.fitBounds(geojsonLayer.getBounds());
 
 
+        function onEachFeature(feature, layer) {
+        if (feature.properties && feature.properties.content) {
+            layer.bindPopup(feature.properties.content);
+        }
+}
+
         {% for key, val in areas_by_type.items() %}
 
             var otherMap  = L.map('map_{{ key }}');
@@ -114,7 +120,9 @@
                 accessToken: '{{ config.MAPBOX_TOKEN }}'
             }).addTo(otherMap);
 
-            geojsonLayer = L.geoJSON({{ val | tojson }}).addTo(otherMap);
+            geojsonLayer = L.geoJSON({{ val | tojson }}, {
+                onEachFeature: onEachFeature
+            }).addTo(otherMap);
             otherMap.fitBounds(geojsonLayer.getBounds());
 
         {%  endfor %}
