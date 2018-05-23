@@ -6,6 +6,7 @@ $path: "/static/govuk_template/images/";
 @import "govuk-elements";
 
 @import "additional";
+@import "components/hero";
 
 .find-area-form {
 	margin-top: $gutter;
