@@ -1,0 +1,4 @@
+- name: digital-land-explorer-db-migration
+    no-route: true
+    memory: 512M
+    buildpack: python_buildpack

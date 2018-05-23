@@ -23,8 +23,9 @@ if [ -n "$CF_USERNAME" ] && [ -n "$CF_PASSWORD" ]; then
   cf login -a "$CF_API" -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
 fi
 
+cf push -f manifest-db-migration.yml
+cf run-task digital-land-explorer-db-migration "flask db upgrade" --name db-upgrade
+
+# push default manifest - i.e. the actual application
 
 cf push
-
-cf run-task digital-land-explorer "flask db upgrade" --name db-upgrade
-
