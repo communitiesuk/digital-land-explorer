@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 
 # nicked from here https://github.com/18F/cf-cd-example/blob/master/deploy.sh
 
@@ -24,7 +24,6 @@ if [ -n "$CF_USERNAME" ] && [ -n "$CF_PASSWORD" ]; then
 fi
 
 cf push -f manifest-db-migration.yml
-cf bind-service digital-land-explorer-db-migration pg-digital-land-explorer
 cf run-task digital-land-explorer-db-migration "flask db upgrade" --name db-upgrade
 
 # push default manifest - i.e. the actual application
