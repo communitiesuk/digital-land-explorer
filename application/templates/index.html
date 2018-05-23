@@ -11,7 +11,7 @@
 		</div>
 	</header>
 
-    <div id="content" role="main">
+    <main id="content" role="main">
 
         <div class="grid-row row">
 
@@ -35,6 +35,77 @@
             </div>
 
         </div>
-    </div>
+
+				<div class="grid-row">
+					<div class="column-full">
+						<h2 class="heading-medium">Search a location</h2>
+						<p class="text">Enter a UK address or click on a point on the map below to find out what land data is available. Land data is data such as:</p>
+						<ul class="list-bullet">
+							<li>Example 1</li>
+							<li>Example 2</li>
+							<li>Example 3</li>
+						</ul>
+
+						<form action="" class="form location-search-form">
+							<div class="form-group">
+                {{ form.location.label(class="form-label")  }}
+                {{ form.location(class="form-control location") }}
+							</div>
+							<div class="form-group">
+              	<button class="button" type="submit">Search</button>
+							</div>
+              {{ form.csrf_token }}
+						</form>
+						<div class="lat-lng-panel">
+							<dl class="definition-inline">
+								<dt>Query</dt>
+								<dd class="display-query"></dd>
+								<dt>Latitude</dt>
+								<dd class="display-lat"></dd>
+								<dt>Longitude</dt>
+								<dd class="display-lng"></dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+    </main>
+{% endblock %}
+
+{% block end_body %}
+	<script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
+	<script>
+		(function($, window) {
+
+			/* reduce lat or lng number to desirable 
+			   number of decimal places */
+			var roundLatLngVal = function(latlng, decs) {
+				return parseFloat(latlng.toFixed(decs));
+			}
+
+			$(function() {
+				var $form = $(".location-search-form");
+				var $latlngPanel = $(".lat-lng-panel");
+
+				var displayLatLng = function(data) {
+					$latlngPanel.find(".display-query").text( data.query );
+					$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
+					$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
+				};
+
+				$form.on("submit", function(e){
+					console.log($form.find(".location").val());
+					$.ajax({
+					  type: "POST",
+					  contentType: "application/json; charset=utf-8",
+					  url: "/geocode",
+					  data: JSON.stringify({ query: $form.find(".location").val() }),
+					  success: displayLatLng,
+					  dataType: "json"
+					});
+					e.preventDefault();
+				});
+			});
+		}).call(this, jQuery, window);
+	</script>
 {% endblock %}
 

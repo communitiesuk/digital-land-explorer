@@ -1,18 +1,46 @@
+import requests
+
 from flask import (
     Blueprint,
     render_template,
-    abort
+    abort,
+    jsonify,
+    request
 )
 
-from application.frontend.forms import LatLongForm
+from application.frontend.forms import LatLongForm, UKAreaForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
+def nomgeocode(query):
+  # send the query to the nominatim geocoder and parse the json response
+  url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q={}'
+  url = url_template.format(query)
+  response = requests.get(url, timeout=60)
+  results = response.json()
+
+  geo_result = {
+    "success": True,
+    "query": query
+  }
+
+  # if results were returned, parse lat and long out of the result
+  if len(results) > 0 and 'lat' in results[0] and 'lon' in results[0]:
+    geo_result['lat'] = float(results[0]['lat'])
+    geo_result['lng'] = float(results[0]['lon'])
+    geo_result['display_name'] = results[0]['display_name']
+    
+  else:
+    geo_result['success'] = False
+    geo_result['msg'] = "Failed to return lat/lng for query:{}".format(query)
+
+  return geo_result
 
 @frontend.route('/')
 def index():
-    return render_template('index.html')
+    form = UKAreaForm()
+    return render_template('index.html', form=form)
 
 
 @frontend.route('/organisations')
@@ -129,6 +157,14 @@ def find_area():
 
     return render_template('find_area.html', form=form, results=results, message=message)
 
+@frontend.route('/geocode', methods=['POST'])
+def geocode():
+  response = {}
+  json = request.get_json()
+  
+  geocoded_query = nomgeocode(json['query'])
+
+  return jsonify(geocoded_query)
 
 @frontend.context_processor
 def asset_path_context_processor():

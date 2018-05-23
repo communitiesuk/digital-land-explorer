@@ -1,5 +1,5 @@
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -27,21 +27,21 @@
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -69,14 +69,14 @@
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -2248,6 +2248,23 @@ ul.details {
 .areas {
   text-decoration: underline;
   color: #005ea5;
+}
+
+/* dl */
+.definition-inline dt {
+  float: left;
+  margin-right: 5px;
+  clear: left;
+  font-weight: bold;
+}
+
+.definition-inline dt:after {
+  content: ':';
+}
+
+.definition-inline dd {
+  float: left;
+  margin-right: 15px;
 }
 
 .geoquery-form {
