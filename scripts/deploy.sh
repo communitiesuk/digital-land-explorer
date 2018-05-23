@@ -20,10 +20,9 @@ fi
 
 
 if [ -n "$CF_USERNAME" ] && [ -n "$CF_PASSWORD" ]; then
-  cf login -a "$CF_API" -u "$CF_USERNAME" -p "$CF_PASSWORD"
+  cf login -a "$CF_API" -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$ORG" -s "$SPACE"
 fi
 
-cf target -o "$ORG" -s "$SPACE"
 
 cf push
 
