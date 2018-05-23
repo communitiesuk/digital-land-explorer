@@ -5,15 +5,16 @@ install:
 - pip install -r test_requirements.txt
 script: pytest
 env:
-- FLASK_CONFIG=config.TestConfig
+  global:
+  - FLASK_CONFIG=config.TestConfig
+  - CF_API=https://api.cloud.service.gov.uk
+  - CF_ORGANIZATION=mhclg-digital-land
+  - CF_USERNAME=adam.shimali@gmail.com
+  - CF_TRACE=true
+  - secure: qdNtJ4EGYnaSXkxLNT5xwR4rF4eEf34qoRJzrp7L+Iqhf2Ag320HGSJ1anOQDESvtzmQAG11b+TUzZHMzbuKCFeCPlinABruUoMTeJfOg9V/GwsgCBXCr4k0K10xmq+KwZgYBnVOkEqdhyDhhNP0bS/1JLMlgdcDR0HCol/8+d6WKsYZBSfwjG8JpcJ6ZMnlqUkuQfZ3Vn5PcoVjyAKobL++DN0X6BC6mwOeNZVxX29mr6o/TaDJCAUfAv48eW9ytWNicTBTjfMG/Hqqe7E2sF7nCsRMKRWlhTqDyqOXdwiHUDCRGC5s55s6pdAunhDrPWP5OPPGocc5f0e1WBvBdR4JuaoqKq1wDaiEDD7r1BdGSxo5t+Kt1RvPSkMml9e5M5HkV8abMfQZkQn7Dh/tcOEnXMP7YfB0dG2sMh+tw14cAIc/1MduZxdvJ2sOipD37wRnMtwXO7XpY3Hj4EUMalVyjXWLxZqg/w9UtDeKnC4OzO+9OZRiDvSAlFlvCT+G2DDoESshQ+48MbX/lAkiABm0Lt8ZI0h7ftWcdJnCTxVR0DJfT6OMXduLyH2ehiVx8i5JqcUBcoSMrdq32ln6MhfqRJjSAB9nez9/ens42KVIwjz7s1aEXdxtPEvoq1ks1PjsXR8dnjExBlFBh5IIKsKVER4uUBgWDrA+8EzSipM=
 deploy:
-  provider: cloudfoundry
-  api: https://api.cloud.service.gov.uk
-  username: adam.shimali@gmail.com
-  password:
-    secure: 7pZuy8lQLrBOmQytLMGgwK0TtMvK9lOhdbMFp0cJEWHAuVhtPOo8grkKIFQ22j5zFEUfiX438QuEF7wKxOwPHrFuWl6PM/N+bkZSpEgA9gXiaW/431+u6T82PwttJW3l+h5qyhPSNeJvC9CATF6sm6XQ17/FQA37XL/tZjV8lgnYRLBcijirdPyr+e6gCuJURtEkZf1E2aYEq3TH5P7eF8y2R37d+FWHl5jRg+R8x4gcEI0c7wvaBSNCOaM/1Ax0xvE+HJUrEQTu6ur95oMVC36hgYnoWGG4OmlTjHA3qdR3IXQSTCQAKlyozw4vQdOgSS7PgMlBsklNMsKlre5SpwvlwF4jW2VJxod1ViPjzZ0hsA1YXh6vHR3y22z9a4EIqmIobahkAt0WhzpFG8GIETG5sbfy0+iW9Zzfaa0iYybm2IlU+CROZli0zJobG2fMzFXuIue7cA45olZJ6OejZi2rAy4u7cracz2p16MTKxRVpqpa3kSy5eTiRiSSCoPwZoy07c33ZWfWhnJ6GNAzcSbm0PMdeWyZCJXolL7DSlZZf8itQw5Oyw0VmJ9h/CHga7RNCEL6MYNpEtNLCDi4gQdlPfjg122Wdx2l3O4j+LTcCRfZjxAJbdWahqx75xofLDn0541NcIGIiu70Chsq7O41HgVR+qly6axILPur9m0=
-  organization: mhclg-digital-land
-  space: digital-land
+  provider: script
+  script: bash scripts/deploy.sh
+  skip_cleanup: true
   on:
     repo: communitiesuk/digital-land-explorer
-

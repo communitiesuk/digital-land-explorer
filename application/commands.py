@@ -162,8 +162,11 @@ def load_everything():
     from application.models import organisation_area
 
     for org_area in org_area_mappings:
-        db.session.execute(organisation_area.insert().values(**org_area))
-        db.session.commit()
+        # don't load for ons at the moment before introducing some more
+        # thinking about how to load many areas for org.
+        if org_area['organisation'] != 'government-organisation:D303':
+            db.session.execute(organisation_area.insert().values(**org_area))
+            db.session.commit()
 
     print('Loaded other areas for organisations')
     print('Done')
