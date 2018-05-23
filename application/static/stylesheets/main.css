@@ -5,19 +5,19 @@
   clear: both;
 }
 
-#content {
+#content, .hero_content {
   max-width: 960px;
   margin: 0 15px;
 }
 
 @media (min-width: 641px) {
-  #content {
+  #content, .hero_content {
     margin: 0 30px;
   }
 }
 
 @media (min-width: 1020px) {
-  #content {
+  #content, .hero_content {
     margin: 0 auto;
   }
 }
@@ -47,19 +47,19 @@
   clear: both;
 }
 
-#content {
+#content, .hero_content {
   max-width: 960px;
   margin: 0 15px;
 }
 
 @media (min-width: 641px) {
-  #content {
+  #content, .hero_content {
     margin: 0 30px;
   }
 }
 
 @media (min-width: 1020px) {
-  #content {
+  #content, .hero_content {
     margin: 0 auto;
   }
 }
@@ -2197,42 +2197,21 @@ ul.details {
   margin-top: 10px;
 }
 
-#content, .hero_content, .full-page-width-container {
+#content, .full-page-width-container {
   max-width: 960px;
   margin: 0 15px;
 }
 
 @media (min-width: 641px) {
-  #content, .hero_content, .full-page-width-container {
+  #content, .full-page-width-container {
     margin: 0 30px;
   }
 }
 
 @media (min-width: 1020px) {
-  #content, .hero_content, .full-page-width-container {
+  #content, .full-page-width-container {
     margin: 0 auto;
   }
-}
-
-@media (min-width: 641px) {
-  .hero {
-    margin-bottom: 30px;
-  }
-}
-
-.hero {
-  background: #005ea5;
-  color: #fff;
-}
-
-@media (min-width: 641px) {
-  .hero_content {
-    padding: 40px 0 30px;
-  }
-}
-
-.hero_content {
-  padding: 25px 0 15px;
 }
 
 .row {
@@ -2250,12 +2229,37 @@ ul.details {
   color: #005ea5;
 }
 
-.geoquery-form {
+.with-hero #global-header-bar {
+  display: none;
+}
+
+.hero {
+  background: #005ea5;
+  color: #fff;
+}
+
+@media (min-width: 641px) {
+  .hero {
+    margin-bottom: 30px;
+  }
+}
+
+.hero_content {
+  padding: 25px 0 15px;
+}
+
+@media (min-width: 641px) {
+  .hero_content {
+    padding: 40px 0 30px;
+  }
+}
+
+.find-area-form {
   margin-top: 30px;
 }
 
 @media (min-width: 641px) {
-  .geoquery-form {
+  .find-area-form {
     margin-top: 95px;
   }
 }
