@@ -7,7 +7,7 @@ $path: "/static/govuk_template/images/";
 
 @import "additional";
 
-.geoquery-form {
+.find-area-form {
 	margin-top: $gutter;
 	@include media(tablet) {
 		// margin-top: em(95); seems to be making it 80px

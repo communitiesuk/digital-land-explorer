@@ -2250,12 +2250,12 @@ ul.details {
   color: #005ea5;
 }
 
-.geoquery-form {
+.find-area-form {
   margin-top: 30px;
 }
 
 @media (min-width: 641px) {
-  .geoquery-form {
+  .find-area-form {
     margin-top: 95px;
   }
 }
