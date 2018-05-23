@@ -74,8 +74,8 @@
 							<div id="location-search-map" style="height: 450px;"></div>
 							<div class="lat-lng-panel">
 								<dl class="definition-inline">
-									<dt>Query</dt>
-									<dd class="display-query"></dd>
+									<dt class="query-meta">Query</dt>
+									<dd class="display-query query-meta"></dd>
 									<dt>Latitude</dt>
 									<dd class="display-lat"></dd>
 									<dt>Longitude</dt>
@@ -93,7 +93,8 @@
 	<script>
 		(function($, window) {
 			var mymap,
-					query_marker;
+					query_marker,
+					$latlngPanel;
 
 			/* reduce lat or lng number to desirable 
 			   number of decimal places */
@@ -110,8 +111,14 @@
 				return marker;
 			}
 
+			var removeMarkerFromMap = function(marker, map) {
+				if( marker ) {
+					map.removeLayer( marker );
+				}
+			}
+
 			var renderMap = function(){
-				mymap = L.map('location-search-map').setView([54.29159, -1.99674], 9);
+				mymap = L.map('location-search-map').setView([54.29159, -1.99674], 10);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -122,25 +129,34 @@
 
 				//query_marker = addMarkerToMap(mymap, place.lat, place.lng);
 
-				mymap.on('click', function(){
-					console.log("do something");
+				mymap.on('click', function(ev){
+					displayLatLng({
+						lat: ev.latlng.lat,
+						lng: ev.latlng.lng
+					});
 				});
+			};
+
+			var displayLatLng = function(data) {
+				removeMarkerFromMap( query_marker, mymap );
+				var $query_meta = $latlngPanel.find(".query-meta");
+				if( data.query ) {
+					$latlngPanel.find(".display-query").text( data.query );
+					$query_meta.show();
+				} else {
+					$query_meta.hide();
+				}
+				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
+				$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
+				query_marker = addMarkerToMap(mymap, data.lat, data.lng);
+				mymap.panTo(new L.LatLng(data.lat, data.lng));
 			};
 
 			$(function() {
 				var $form = $(".location-search-form");
-				var $latlngPanel = $(".lat-lng-panel");
-
-				var displayLatLng = function(data) {
-					$latlngPanel.find(".display-query").text( data.query );
-					$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
-					$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
-					query_marker = addMarkerToMap(mymap, data.lat, data.lng);
-					mymap.panTo(new L.LatLng(data.lat, data.lng));
-				};
+						$latlngPanel = $(".lat-lng-panel");
 
 				$form.on("submit", function(e){
-					console.log($form.find(".location").val());
 					$.ajax({
 					  type: "POST",
 					  contentType: "application/json; charset=utf-8",
