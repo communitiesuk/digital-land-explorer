@@ -2285,3 +2285,16 @@ ul.details {
 .results-head__heading {
   margin-top: 15px;
 }
+
+.map-wrapper {
+  position: relative;
+}
+
+.lat-lng-panel {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  z-index: 1000;
+  background: #fff;
+  padding: 15px;
+}

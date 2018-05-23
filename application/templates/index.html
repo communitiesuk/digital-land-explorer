@@ -68,19 +68,21 @@
 							</div>
               {{ form.csrf_token }}
 						</form>
-						<div class="lat-lng-panel">
-							<dl class="definition-inline">
-								<dt>Query</dt>
-								<dd class="display-query"></dd>
-								<dt>Latitude</dt>
-								<dd class="display-lat"></dd>
-								<dt>Longitude</dt>
-								<dd class="display-lng"></dd>
-							</dl>
-						</div>
 					</div>
 					<div class="column-full">
-						<div id="location-search-map" style="height: 450px;"></div>
+						<div class="map-wrapper">
+							<div id="location-search-map" style="height: 450px;"></div>
+							<div class="lat-lng-panel">
+								<dl class="definition-inline">
+									<dt>Query</dt>
+									<dd class="display-query"></dd>
+									<dt>Latitude</dt>
+									<dd class="display-lat"></dd>
+									<dt>Longitude</dt>
+									<dd class="display-lng"></dd>
+								</dl>
+							</div>
+						</div>
 					</div>
 				</div>
     </main>

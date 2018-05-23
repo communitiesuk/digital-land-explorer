@@ -24,3 +24,16 @@ $path: "/static/govuk_template/images/";
 		margin-top: $gutter-half;
 	}
 }
+
+.map-wrapper {
+	position: relative;
+}
+
+.lat-lng-panel {
+	position: absolute;
+	bottom: $gutter-half;
+	left: $gutter-half;
+	z-index: 1000;
+	background: $page-colour;
+	padding: $gutter-half;
+}
