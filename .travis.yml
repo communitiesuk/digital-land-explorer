@@ -10,6 +10,7 @@ env:
   - CF_API=https://api.cloud.service.gov.uk
   - CF_ORGANIZATION=mhclg-digital-land
   - CF_USERNAME=adam.shimali@gmail.com
+  - CF_SPACE=digital-land
   - CF_TRACE=true
   - secure: qdNtJ4EGYnaSXkxLNT5xwR4rF4eEf34qoRJzrp7L+Iqhf2Ag320HGSJ1anOQDESvtzmQAG11b+TUzZHMzbuKCFeCPlinABruUoMTeJfOg9V/GwsgCBXCr4k0K10xmq+KwZgYBnVOkEqdhyDhhNP0bS/1JLMlgdcDR0HCol/8+d6WKsYZBSfwjG8JpcJ6ZMnlqUkuQfZ3Vn5PcoVjyAKobL++DN0X6BC6mwOeNZVxX29mr6o/TaDJCAUfAv48eW9ytWNicTBTjfMG/Hqqe7E2sF7nCsRMKRWlhTqDyqOXdwiHUDCRGC5s55s6pdAunhDrPWP5OPPGocc5f0e1WBvBdR4JuaoqKq1wDaiEDD7r1BdGSxo5t+Kt1RvPSkMml9e5M5HkV8abMfQZkQn7Dh/tcOEnXMP7YfB0dG2sMh+tw14cAIc/1MduZxdvJ2sOipD37wRnMtwXO7XpY3Hj4EUMalVyjXWLxZqg/w9UtDeKnC4OzO+9OZRiDvSAlFlvCT+G2DDoESshQ+48MbX/lAkiABm0Lt8ZI0h7ftWcdJnCTxVR0DJfT6OMXduLyH2ehiVx8i5JqcUBcoSMrdq32ln6MhfqRJjSAB9nez9/ens42KVIwjz7s1aEXdxtPEvoq1ks1PjsXR8dnjExBlFBh5IIKsKVER4uUBgWDrA+8EzSipM=
 deploy:
