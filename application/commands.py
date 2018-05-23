@@ -66,7 +66,7 @@ def load_everything():
         for row in reader:
             prefixes[row.get('prefix')] = row.get('organisation')
 
-    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/2331f9e04b96f6dfa361cb910576105fdf7f48a6/data/area/index.tsv'
+    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
     json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
