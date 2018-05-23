@@ -69,6 +69,7 @@
 	            <ul class="details">
 								<li>
 									Area: <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.area }}</a>
+                                    {% if result.area.name %}<p>{{ result.area.name }}</p>{%  endif %}
 								</li>
 								{% if result.organisation %}
 								<li>

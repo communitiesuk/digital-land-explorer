@@ -16,7 +16,7 @@
     <div id="content" role="main">
 
         <div class="grid-row">
-            <h1 class="heading-large">{{ area.area }}</h1>
+            <h1 class="heading-large">{% if area.name %}{{ area.name }}{%  else %}{{ area.area }}{% endif %}</h1>
         </div>
 
         <div class="grid-row">
