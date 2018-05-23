@@ -58,8 +58,8 @@
         <div class="grid-row">
             <div class="column-full">
                 {% for key in areas_by_type.keys() %}
-                     <h2 class="heading-small">{{ key | format_identifier }}</h2>
-                     <a href="lambeth-archaeological-priority-areas"><div id="map_{{ key }}" style="width: 900px; height: 600px;"></div></a>
+                    <h2 class="heading-small">{{ key | format_identifier }}</h2>
+                    <div id="map_{{ key }}" style="width: 900px; height: 600px;"></div>
                 {% endfor %}
             </div>
         </div>

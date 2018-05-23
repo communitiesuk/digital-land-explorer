@@ -110,7 +110,6 @@ def publication_area(id):
                            areas=areas)
 
 
-
 @frontend.route('/find-area', methods=['GET', 'POST'])
 def find_area():
 

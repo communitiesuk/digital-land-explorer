@@ -20,7 +20,7 @@
                     <tbody>
                         <tr>
                             <td>{{ publication.name }}</td>
-                            <td><a href="{{ url_for('frontend.publication_area', id=publication.publication ) }}">{{ publication.publication }}</a></td>
+                            <td>{{ publication.publication }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
                                 {{ publication.organisation.organisation }}</a>
                             </td>

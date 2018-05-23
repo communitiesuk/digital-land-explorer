@@ -101,9 +101,9 @@ def load_everything():
     with closing(requests.get(organisations, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
-            org = Organisation(organisation=row['organisation'],
-                               name=row['name'],
-                               website=row['website'])
+            org = Organisation(organisation=row.get('organisation'),
+                               name=row.get('name'),
+                               website=row.get('website'))
             if row.get('area'):
                 area = db.session.query(Area).get(row.get('area'))
                 org.area = area
@@ -126,10 +126,16 @@ def load_everything():
             publication_data = requests.get(publication_url).content.decode('utf-8')
             md = markdown.Markdown(extensions=['markdown.extensions.meta'])
             md.convert(publication_data)
-            publication = Publication(publication=md.Meta['publication'][0],
-                                      name=md.Meta['name'][0],
-                                      url=md.Meta['documentation-url'][0],
-                                      data_url=md.Meta['data-url'][0])
+            pub = md.Meta['publication'][0]
+            name = md.Meta['name'][0]
+            url = md.Meta.get('documentation-url')
+            url = url[0] if url else None
+            data_url=md.Meta['data-url'][0]
+
+            publication = Publication(publication=pub,
+                                      name=name,
+                                      url=url,
+                                      data_url=data_url)
 
             organisation = db.session.query(Organisation).get(md.Meta['organisation'][0])
             if organisation is not None:
