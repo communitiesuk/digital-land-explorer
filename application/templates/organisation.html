@@ -84,7 +84,7 @@
 
 {% block end_body %}
     <script>
-        var map = L.map('mapid');
+        var map = L.map('mapid', {zoomControl: false});
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -96,7 +96,7 @@
         geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
 
-        var pointsMap  = L.map('map_points');
+        var pointsMap  = L.map('map_points', {zoomControl: false});
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -126,7 +126,7 @@
 
         {% for key, val in areas_by_type.items() %}
 
-            var otherMap  = L.map('map_{{ key }}');
+            var otherMap  = L.map('map_{{ key }}', {zoomControl: false});
 
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
                 attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',

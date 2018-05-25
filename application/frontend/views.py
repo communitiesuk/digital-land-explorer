@@ -1,8 +1,8 @@
 from flask import (
     Blueprint,
     render_template,
-    abort
-)
+    abort,
+    request)
 from sqlalchemy import func
 
 from application.frontend.forms import LatLongForm
@@ -13,7 +13,8 @@ frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 @frontend.route('/')
 def index():
-    return render_template('index.html')
+    form = LatLongForm()
+    return render_template('index.html', form=form)
 
 
 @frontend.route('/organisations')
@@ -111,16 +112,14 @@ def publication_area(id):
                            areas=areas)
 
 
-@frontend.route('/find-area', methods=['GET', 'POST'])
-def find_area():
-
-    form = LatLongForm()
+@frontend.route('/about-an-area')
+def about_an_area():
     results = []
     message = None
-
-    if form.validate_on_submit():
+    lat, long = request.args.get('latitude'), request.args.get('longitude')
+    if lat is not None and long is not None:
         from application.extensions import db
-        point = 'POINT(%f %f)' % (form.longitude.data, form.latitude.data)
+        point = 'POINT(%f %f)' % (float(long), float(lat))
         areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
         for area in areas:
             publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
@@ -128,8 +127,10 @@ def find_area():
             results.append({'area': area, 'organisation': organisation, 'publication': publication})
         if not results:
             message = 'No results found'
+    else:
+        message = 'Both latitude and longitude parameters required'
 
-    return render_template('find_area.html', form=form, results=results, message=message)
+    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message)
 
 
 @frontend.context_processor

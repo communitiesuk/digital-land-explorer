@@ -13,45 +13,149 @@
 
     <div id="content" role="main">
 
-        <div class="grid-row row">
+        <div class="grid-row">
 
-            <div class="column-one-third">
-                <span class="data-item font-medium areas">Areas</span>
-                <ul class="list-bullet">
-                    <li><a href="{{ url_for('frontend.find_area') }}">Find areas</a></li>
-                </ul>
-            </div>
-
-             <div class="column-one-third">
+             <div class="column-one-quarter">
                <span class="data-item font-medium">
                      <a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
                  </span>
             </div>
 
-            <div class="column-one-third">
+            <div class="column-one-quarter">
                 <span class="data-item font-medium">
                     <a href="{{ url_for('frontend.publications') }}">Publications</a>
                 </span>
             </div>
 
-        </div>
-
-        <div class="grid-row">
-
-            <div class="column-one-third">
+            <div class="column-one-quarter">
                 <span class="data-item font-medium">
                     <a href="{{ url_for('frontend.licences') }}">Licences</a>
                 </span>
             </div>
 
-            <div class="column-one-third">
+            <div class="column-one-quarter">
                 <span class="data-item font-medium">
                     <a href="{{ url_for('frontend.attributions') }}">Attributions</a>
                 </span>
             </div>
 
-
         </div>
+
+        {% if form %}
+            <h2 class="heading-medium">Find out about an area</h2>
+            <div class="grid-row">
+                <div class="column-two-thirds">
+                    <div id="find-area-map" style="height: 400px;"></div>
+                </div>
+                <div class="column-one-third">
+                    <div class="form-group">
+                        <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="find-area-form">
+                            <fieldset class="inline">
+                                <legend>
+                                    <h2 class="heading-medium visuallyhidden">
+                                        Search for areas by lat/long
+                                    </h2>
+                                </legend>
+                                <p class="form-hint">
+                                    Either click on the map
+                                    <br/>or enter a latitude and longitude
+                                </p>
+                                <div class="form-group">
+                                    {{ form.latitude.label(class="form-label") }}
+                                    {{ form.latitude(class="form-control") }}
+
+                                    {{ form.longitude.label(class="form-label") }}
+                                    {{ form.longitude(class="form-control") }}
+                                </div>
+                            </fieldset>
+                        <button style="margin-top: 5px" class="button" type="submit">Search</button>
+                        {{ form.csrf_token }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
+
 {% endblock %}
 
+
+{% block end_body %}
+    <script>
+        /* default place vals */
+        var place = {
+            lat: 54.29159,
+            lng:  -1.99674,
+            zoom: 12,
+            current_query: false
+        };
+
+        /* reduce lat or lng number to desirable
+           number of decimal places */
+        var roundLatLngVal = function(latlng, decs) {
+            return parseFloat(latlng.toFixed(decs));
+        }
+
+        /* Given map
+           create marker at lat and lng
+           return marker ref */
+        var addMarkerToMap = function(map, lat, lng) {
+            var marker = L.marker([lat, lng]);
+            map.addLayer(marker);
+            return marker;
+        }
+
+        /* update lat and lng in form and
+           update marker pos */
+        var setLatLng = function(ev){
+            var lat = roundLatLngVal(ev.latlng.lat, 5),
+                    lng = roundLatLngVal(ev.latlng.lng, 5);
+            $queryForm.find("#latitude").val( lat );
+            $queryForm.find("#longitude").val( lng );
+            mymap.removeLayer(query_marker);
+            query_marker = addMarkerToMap(mymap, lat, lng);
+        }
+
+        /* My Leaflet vars */
+        var mymap;
+        var query_marker;
+
+        /* renders the initial map
+           adds click handler */
+        var renderMap = function(){
+            mymap = L.map('find-area-map').setView([place.lat, place.lng], place.zoom);
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+              maxZoom: 18,
+              id: 'mapbox.streets',
+              accessToken: '{{ config.MAPBOX_TOKEN }}'
+            }).addTo(mymap);
+
+            query_marker = addMarkerToMap(mymap, place.lat, place.lng);
+
+            mymap.on('click', setLatLng);
+        };
+
+        {% if form.latitude.data and form.latitude.data %}
+            place.lat = {{ form.latitude.data }};
+            place.lng = {{ form.longitude.data }};
+            place.current_query = true;
+        {% endif %}
+
+        var $queryForm = jQuery(".find-area-form");
+
+        /* check if geolocation available
+           and not current query */
+        if ("geolocation" in navigator && !place.current_query) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              place.lat = position.coords.latitude;
+                place.lng = position.coords.longitude;
+                renderMap();
+            });
+        } else {
+            renderMap();
+        }
+
+    </script>
+{% endblock %}
