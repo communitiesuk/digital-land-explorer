@@ -44,7 +44,7 @@ def register_commands(app):
     from application.commands import load_everything, clear_everything, load_large_area
     app.cli.add_command(load_everything, name='load')
     app.cli.add_command(clear_everything, name='clear')
-    app.cli.add_command(load_large_area, name='local-large-area')
+    app.cli.add_command(load_large_area, name='load-large-area')
 
 
 def register_filters(app):

@@ -9,7 +9,8 @@ import csv
 from contextlib import closing
 from flask.cli import with_appcontext
 from ijson import common
-from ijson.backends import yajl2
+import ijson
+# from ijson.backends import yajl2 as ijson
 
 from application.models import Organisation, Area, Publication, Licence, Attribution
 from application.extensions import db
@@ -40,7 +41,7 @@ def load_large_area(file):
 def process_file(f, area_data_mappings):
     areas = []
     count = 0
-    events = map(floaten, yajl2.parse(f))
+    events = map(floaten, ijson.parse(f))
     data = common.items(events, 'features.item')
     for feature in data:
         area_id = feature['properties']['area']

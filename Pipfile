@@ -17,6 +17,8 @@ markdown = "*"
 pytest = "*"
 "geoalchemy2" = "*"
 flask-wtf = "*"
+ijson = "*"
+yajl-py = "*"
 
 [dev-packages]
 pytest = "*"
