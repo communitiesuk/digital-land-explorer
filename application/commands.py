@@ -1,4 +1,5 @@
 import json
+from urllib.request import urlopen
 
 import click
 import markdown
@@ -7,9 +8,75 @@ import csv
 
 from contextlib import closing
 from flask.cli import with_appcontext
+from ijson import common
+from ijson.backends import yajl2
 
 from application.models import Organisation, Area, Publication, Licence, Attribution
 from application.extensions import db
+
+json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
+
+
+def floaten(event):
+    if event[1] == 'number':
+        return (event[0], event[1], float(event[2]))
+    else:
+        return event
+
+
+@click.command()
+@click.argument('file')
+@with_appcontext
+def load_large_area(file):
+    print('Loading', file)
+    area_data_mappings = get_area_data_mappings()
+    if file.startswith('http'):
+        process_file(urlopen(file), area_data_mappings)
+    else:
+        with open(file, 'rb') as f:
+            process_file(f, area_data_mappings)
+
+
+def process_file(f, area_data_mappings):
+    areas = []
+    count = 0
+    events = map(floaten, yajl2.parse(f))
+    data = common.items(events, 'features.item')
+    for feature in data:
+        area_id = feature['properties']['area']
+        geo = json.dumps(feature['geometry'])
+        geometry = db.session.execute(json_to_geo_query % geo).fetchone()[0]
+        area = Area(area=area_id, data=feature, geometry=geometry)
+        if area_id in area_data_mappings.keys():
+            area.name = area_data_mappings[area_id]
+        areas.append(area)
+        count += 1
+        if count % 1000 == 0:
+            db.session.bulk_save_objects(areas)
+            db.session.commit()
+            print('Saved', count)
+            areas = []
+            count = 0
+    db.session.bulk_save_objects(areas)
+    db.session.commit()
+    print('Saved last', len(areas))
+    print('Done')
+
+
+def get_area_data_mappings():
+    print('Load data for areas')
+    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/index.tsv'
+    area_data_mappings = {}
+    with closing(requests.get(data, stream=True)) as r:
+        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
+        for row in reader:
+            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/%s' % row[
+                'path']
+            with closing(requests.get(data_url, stream=True)) as data_r:
+                data_reader = csv.DictReader(data_r.iter_lines(decode_unicode=True), delimiter='\t')
+                for data_row in data_reader:
+                    area_data_mappings[data_row.get('area')] = data_row.get('name')
+    return area_data_mappings
 
 
 @click.command()
@@ -56,21 +123,10 @@ def load_everything():
         for row in reader:
             prefixes[row.get('prefix')] = row.get('organisation')
 
-    print('Load data for areas')
-    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/index.tsv'
-    area_data_mappings = {}
-    with closing(requests.get(data, stream=True)) as r:
-        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
-        for row in reader:
-            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/%s' % row[
-                'path']
-            with closing(requests.get(data_url, stream=True)) as data_r:
-                data_reader = csv.DictReader(data_r.iter_lines(decode_unicode=True), delimiter='\t')
-                for data_row in data_reader:
-                    area_data_mappings[data_row.get('area')] = data_row.get('name')
+    area_data_mappings = get_area_data_mappings()
 
     areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
-    json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
+
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:

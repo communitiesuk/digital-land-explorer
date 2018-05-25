@@ -103,11 +103,11 @@
         pointsMap.fitBounds(geojsonLayer.getBounds());
 
 
-        function onEachFeature(feature, layer) {
-        if (feature.properties && feature.properties.content) {
-            layer.bindTooltip(feature.properties.content);
-        }
-}
+        var onEachFeature = function(feature, layer){
+            if (feature.properties && feature.properties.content) {
+                layer.bindTooltip(feature.properties.content);
+            }
+        };
 
         {% for key, val in areas_by_type.items() %}
 
