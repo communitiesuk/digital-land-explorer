@@ -88,14 +88,13 @@ def areas():
 
 @frontend.route('/areas/<id>')
 def area(id):
-    from flask import request
     a = Area.query.get(id)
     organisation = Organisation.query.filter_by(area=a).first()
+    publication = Publication.query.filter(Publication.publication == a.area.split(':')[0]).first()
     return render_template('area.html',
                            area=a,
-                           lat=request.args.get('lat'),
-                           long=request.args.get('long'),
-                           organisation=organisation)
+                           organisation=organisation,
+                           publication=publication)
 
 
 @frontend.route('/publication/<id>/areas')
@@ -124,8 +123,9 @@ def find_area():
         point = 'POINT(%f %f)' % (form.longitude.data, form.latitude.data)
         areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
         for area in areas:
+            publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
             organisation = Organisation.query.filter_by(area=area).first()
-            results.append({'area': area, 'organisation': organisation})
+            results.append({'area': area, 'organisation': organisation, 'publication': publication})
         if not results:
             message = 'No results found'
 

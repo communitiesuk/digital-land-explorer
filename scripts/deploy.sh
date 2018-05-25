@@ -25,6 +25,7 @@ fi
 
 cf push -f manifest-db-migration.yml
 cf run-task digital-land-explorer-db-migration "flask db upgrade" --name db-upgrade
+cf stop digital-land-explorer-db-migration
 
 # push default manifest - i.e. the actual application
 

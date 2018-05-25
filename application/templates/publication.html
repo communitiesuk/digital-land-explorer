@@ -8,8 +8,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Name</th>
                             <th>Publication</th>
+                            <th>Name</th>
                             <th>Organisation</th>
                             <th>url</th>
                             <th>Data url</th>
@@ -19,10 +19,10 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{ publication.name }}</td>
                             <td>{{ publication.publication }}</td>
+                            <td>{{ publication.name }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
-                                {{ publication.organisation.organisation }}</a>
+                                {{ publication.organisation.name }}</a>
                             </td>
                             <td><a href="{{ publication.url }}">publication url</a></td>
                             <td><a href="{{ publication.data_url }}">data url</a></td>

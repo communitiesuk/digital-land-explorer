@@ -23,27 +23,42 @@
             <h1 class="heading-xlarge">{{ organisation.name }}</h1>
         </div>
 
-        {% if organisation.area %}
-            <div class="grid-row">
+        <div class="grid-row">
+            {% if organisation.area %}
+
                 <div class="column-half">
                     <h2 class="heading-small">Local authority boundary</h2>
                     <div id="mapid" style="width: 400px; height: 300px;"></div>
                     <!-- TODO map here-->
                 </div>
                 <div class="column-half">
-                <h2 class="heading-small">Publications</h2>
-                <ul>
-                    {% for publication in organisation.publications %}
-                    <li>
-                        <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                            {{ publication.name }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            </div>
-        {% endif %}
+                    <h2 class="heading-small">Publications</h2>
+                    <ul>
+                        {% for publication in organisation.publications %}
+                            <li>
+                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
+                                    {{ publication.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            {% elif organisation.publications %}
+                <div class="column-half">
+                    <h2 class="heading-small">Publications</h2>
+                    <ul>
+                        {% for publication in organisation.publications %}
+                            <li>
+                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
+                                    {{ publication.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
 
         {% if points %}
             <div class="grid-row">

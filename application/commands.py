@@ -9,8 +9,13 @@ import csv
 from contextlib import closing
 from flask.cli import with_appcontext
 from ijson import common
-import ijson
-# from ijson.backends import yajl2 as ijson
+
+import platform
+
+if platform.system() == 'Darwin':
+    from ijson.backends import yajl2 as ijson
+else:
+    import ijson
 
 from application.models import Organisation, Area, Publication, Licence, Attribution
 from application.extensions import db
@@ -111,6 +116,8 @@ def load_everything():
             md.convert(attribution_data)
             attribution = Attribution(attribution=md.Meta['copyright'][0],
                                       name=md.Meta['name'][0])
+            db.session.add(attribution)
+            db.session.commit()
             count += 1
 
     print('Loaded', count, 'attributions')

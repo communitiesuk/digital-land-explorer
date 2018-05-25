@@ -30,4 +30,4 @@ sqlalchemy==1.2.7
 urllib3==1.22
 werkzeug==0.14.1
 wtforms==2.1
-#yajl-py==2.1.2
+yajl-py==2.1.2; sys_platform == 'darwin'
