@@ -19,6 +19,31 @@
         </div>
         {{ form.csrf_token }}
       </form>
+      <div class="grid-row">
+        <div class="column-full">
+          <div class="map-wrapper">
+						<div id="location-search-map" style="height: 450px;"></div>
+						<div class="lat-lng-panel">
+							<dl class="definition-inline">
+								<dt class="query-meta">Query</dt>
+								<dd class="display-query query-meta">{% if query %}{{ query }}{% else %}Lat/Long search{% endif %}</dd>
+								<dt>Latitude</dt>
+								<dd class="display-lat">{{ '%0.5f'| format(latitude|float) }}</dd>
+								<dt>Longitude</dt>
+								<dd class="display-lng">{{ '%0.5f'| format(longitude|float) }}</dd>
+							</dl>
+              {% if query %}
+              <a class="button reload-results-btn visually-hidden" href="{{ url_for('frontend.about_an_area') }}?query={{ query }}">Reload results</a>
+              {% elif latitude %}
+              <a class="button reload-results-btn visually-hidden" href="{{ url_for('frontend.about_an_area') }}?latitude={{ latitude }}&longitude={{ longitude }}">Reload results</a>
+              {% else %}
+              <a class="button reload-results-btn visually-hidden" href="{{ url_for('frontend.about_an_area') }}">Reload results</a>
+              {% endif %}
+              
+						</div>
+					</div>
+				</div>
+      </div>
 
         {% if results %}
             <div class="grid-row">
@@ -71,7 +96,117 @@
 {% endblock %}
 
 {% block end_body %}
+    <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
+    <script>
+      (function($, window) {
+        var mymap,
+					query_marker,
+					$form,
+					$latlngPanel,
+          base_url = "{{ url_for('frontend.about_an_area') }}";
 
+        /* reduce lat or lng number to desirable 
+           number of decimal places */
+			  var roundLatLngVal = function(latlng, decs) {
+				  return parseFloat(latlng.toFixed(decs));
+			  };
+
+    		var resetField = function($form, fieldselector) {
+          if( $form !== undefined ) {
+            $form.find(fieldselector).val("");
+          }
+        };
+
+        var updateLinkURL = function(linkselector, baseURL, queryStr) {
+          var url_str = baseURL + queryStr;
+          $( linkselector ).attr("href", url_str).removeClass("visually-hidden");
+        };
+
+        /* Given map
+  			   create marker at lat and lng
+  			   return marker ref */
+  			var addMarkerToMap = function(map, lat, lng) {
+  				var marker = L.marker([lat, lng]);
+  				map.addLayer(marker);
+  				return marker;
+  			};
+
+        var removeMarkerFromMap = function(marker, map) {
+          if( marker ) {
+            map.removeLayer( marker );
+          }
+        };
+
+
+        var renderMap = function(lat, lng){
+          mymap = L.map('location-search-map').setView([lat, lng], 12);
+          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+            accessToken: '{{ config.MAPBOX_TOKEN }}'
+          }).addTo(mymap);
+
+          mymap.on('click', function(ev){
+            resetField($form, ".location");
+            var query_str = "?latitude=" + ev.latlng.lat + "&longitude=" + ev.latlng.lng;
+            updateLinkURL(".reload-results-btn", base_url, query_str);
+            displayLatLng({
+              lat: ev.latlng.lat,
+              lng: ev.latlng.lng
+            });
+          });
+        };
+
+        var displayLatLng = function(data) {
+  				removeMarkerFromMap( query_marker, mymap );
+  				var $query_meta = $latlngPanel.find(".query-meta");
+  				if( data.query ) {
+  					$latlngPanel.find(".display-query").text( data.query );
+  					$query_meta.show();
+  				} else {
+  					$query_meta.hide();
+  				}
+  				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
+  				$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
+  				query_marker = addMarkerToMap(mymap, data.lat, data.lng);
+  				mymap.panTo(new L.LatLng(data.lat, data.lng));
+  			};
+
+        var updateSearchQueryCallback = function(data) {
+          var query_str = "?query=" + data.query;
+          updateLinkURL(".reload-results-btn", base_url, query_str);
+          displayLatLng(data);
+        }
+
+        $(function() {
+          console.log( "{{ message }}" );
+
+  				$form = $(".location-search-form");
+  				$latlngPanel = $(".lat-lng-panel");
+
+          $form.on("submit", function(e){
+  					$.ajax({
+  					  type: "POST",
+  					  contentType: "application/json; charset=utf-8",
+  					  url: "/geocode",
+  					  data: JSON.stringify({ query: $form.find(".location").val() }),
+  					  success: updateSearchQueryCallback,
+  					  dataType: "json"
+  					});
+  					e.preventDefault();
+  				});
+
+          {% if latitude %}
+          renderMap({{ latitude }}, {{ longitude }});
+          query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }})
+          {% else %}
+  				renderMap(54.29159, -1.99674);
+          {% endif %}
+  			});
+
+      }).call(this, jQuery, window);
+    </script>
     {% for result in results %}
         <script>
 

@@ -4,7 +4,8 @@ from flask import (
     Blueprint,
     render_template,
     abort,
-    request)
+    request,
+    jsonify)
 from sqlalchemy import func
 
 from application.frontend.forms import LatLongForm, UKAreaForm
@@ -14,7 +15,7 @@ frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 def nomgeocode(query):
   # send the query to the nominatim geocoder and parse the json response
-  url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q={}'
+  url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gb&q={}'
   url = url_template.format(query)
   response = requests.get(url, timeout=60)
   results = response.json()
@@ -170,6 +171,14 @@ def about_an_area():
 
     return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message, query=query, form=form)
 
+@frontend.route('/geocode', methods=['POST'])
+def geocode():
+  response = {}
+  json = request.get_json()
+  
+  geocoded_query = nomgeocode(json['query'])
+
+  return jsonify(geocoded_query)
 
 @frontend.context_processor
 def asset_path_context_processor():

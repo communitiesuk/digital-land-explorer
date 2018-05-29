@@ -1,0 +1,22 @@
+// An inline definition list 
+// 
+// For example:
+// - name:value pairs
+//
+// ===================
+/* dl */.definition-inline {
+  @extend %contain-floats;
+  dt {
+    float: left;
+    margin-right: 5px;
+    &:after {
+      content: ':';
+    }
+		clear: left;
+		font-weight: bold;
+  }
+  dd {
+    float: left;
+    margin-right: $gutter-half;
+  }
+}
