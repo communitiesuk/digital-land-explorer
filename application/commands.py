@@ -18,7 +18,7 @@ if platform.system() == 'Darwin':
 else:
     import ijson
 
-from application.models import Organisation, Area, Publication, Licence, Attribution
+from application.models import Organisation, Area, Publication, Licence, Attribution, organisation_area
 from application.extensions import db
 
 json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
@@ -38,17 +38,19 @@ def floaten(event):
 @with_appcontext
 def load_large_area(file):
     print('Loading', file)
+    prefixes = get_prefixes(branch)
     area_data_mappings = get_area_data_mappings()
     if file.startswith('http'):
-        process_file(urlopen(file), area_data_mappings)
+        process_file(urlopen(file), area_data_mappings, prefixes)
     else:
         with open(file, 'rb') as f:
-            process_file(f, area_data_mappings)
+            process_file(f, area_data_mappings, prefixes)
 
 
-def process_file(f, area_data_mappings):
+def process_file(f, area_data_mappings, prefixes):
     areas = []
     count = 0
+    org_area_mappings = []
     events = map(floaten, ijson.parse(f))
     data = common.items(events, 'features.item')
     for feature in data:
@@ -59,15 +61,28 @@ def process_file(f, area_data_mappings):
         if area_id in area_data_mappings.keys():
             area.name = area_data_mappings[area_id]
         areas.append(area)
+        p = area_id.split(':')[0]
+        if p in prefixes.keys():
+            org = prefixes.get(p)
+            org_area_mappings.append({'organisation': org, 'area': area_id})
         count += 1
         if count % 1000 == 0:
             db.session.bulk_save_objects(areas)
             db.session.commit()
+            for org_area in org_area_mappings:
+                if org_area['organisation'] != 'government-organisation:D303':
+                    db.session.execute(organisation_area.insert().values(**org_area))
+                    db.session.commit()
             print('Saved', count)
+            org_area_mappings = []
             areas = []
             count = 0
     db.session.bulk_save_objects(areas)
     db.session.commit()
+    for org_area in org_area_mappings:
+        if org_area['organisation'] != 'government-organisation:D303':
+            db.session.execute(organisation_area.insert().values(**org_area))
+            db.session.commit()
     print('Saved last', len(areas))
     print('Done')
 
@@ -86,6 +101,18 @@ def get_area_data_mappings():
                 for data_row in data_reader:
                     area_data_mappings[data_row.get('area')] = data_row.get('name')
     return area_data_mappings
+
+
+def get_prefixes(branch):
+    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/prefix.tsv' % branch
+    prefixes = {}
+
+    with closing(requests.get(prefix_file, stream=True)) as r:
+        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
+        for row in reader:
+            prefixes[row.get('prefix')] = row.get('organisation')
+
+    return prefixes
 
 
 @click.command()
@@ -126,18 +153,13 @@ def load_everything():
     print('Loaded', count, 'attributions')
     count = 0
 
-    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/prefix.tsv' % branch
-    prefixes = {}
-    org_area_mappings = []
-    with closing(requests.get(prefix_file, stream=True)) as r:
-        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
-        for row in reader:
-            prefixes[row.get('prefix')] = row.get('organisation')
+    prefixes = get_prefixes(branch)
 
     area_data_mappings = get_area_data_mappings()
 
     areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/area/index.tsv' % branch
 
+    org_area_mappings = []
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
