@@ -56,7 +56,7 @@
                           {% if query %}
                           "{{ query }}"
                           {% else %}
-                          {{ latitude }}, {{ longitude }}
+                          {{ '%0.5f'| format(latitude|float) }}, {{ '%0.5f'| format(longitude|float) }}
                           {% endif %}
                         </h2>
                     </header>
