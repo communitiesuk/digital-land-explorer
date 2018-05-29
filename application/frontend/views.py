@@ -1,14 +1,40 @@
+import requests
+
 from flask import (
     Blueprint,
     render_template,
     abort,
-    request)
+    request,
+    jsonify)
 from sqlalchemy import func
 
-from application.frontend.forms import LatLongForm
+from application.frontend.forms import LatLongForm, UKAreaForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
+
+def nomgeocode(query):
+  # send the query to the nominatim geocoder and parse the json response
+  url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gb&q={}'
+  url = url_template.format(query)
+  response = requests.get(url, timeout=60)
+  results = response.json()
+
+  geo_result = {
+    "success": True,
+    "query": query
+  }
+
+  # if results were returned, parse lat and long out of the result
+  if len(results) > 0 and 'lat' in results[0] and 'lon' in results[0]:
+    geo_result['lat'] = float(results[0]['lat'])
+    geo_result['lng'] = float(results[0]['lon'])
+    geo_result['display_name'] = results[0]['display_name']
+  else:
+    geo_result['success'] = False
+    geo_result['msg'] = "Failed to return lat/lng for query:{}".format(query)
+
+  return geo_result
 
 
 @frontend.route('/')
@@ -111,27 +137,48 @@ def publication_area(id):
                            publication=publication,
                            areas=areas)
 
+def get_data_from_a_point(lat, lng):
+  results = []
+  from application.extensions import db
+  point = 'POINT(%f %f)' % (float(lng), float(lat))
+  areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
+  for area in areas:
+      publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
+      organisation = Organisation.query.filter_by(area=area).first()
+      results.append({'area': area, 'organisation': organisation, 'publication': publication})
+  return results
 
 @frontend.route('/about-an-area')
 def about_an_area():
+    form = UKAreaForm()
     results = []
     message = None
-    lat, long = request.args.get('latitude'), request.args.get('longitude')
+    lat, long, query = request.args.get('latitude'), request.args.get('longitude'), request.args.get('query')
     if lat is not None and long is not None:
-        from application.extensions import db
-        point = 'POINT(%f %f)' % (float(long), float(lat))
-        areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
-        for area in areas:
-            publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
-            organisation = Organisation.query.filter_by(area=area).first()
-            results.append({'area': area, 'organisation': organisation, 'publication': publication})
+        results = get_data_from_a_point(lat, long)
         if not results:
             message = 'No results found'
+    elif query is not None:
+        geocoded_query = nomgeocode(query)
+        if geocoded_query['success']:
+          lat = geocoded_query['lat']
+          long = geocoded_query['lng']
+          results = get_data_from_a_point(geocoded_query['lat'], geocoded_query['lng'])
+        else:
+          message = "Unable to geocode query: {}".format(query)
     else:
         message = 'Both latitude and longitude parameters required'
 
-    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message)
+    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message, query=query, form=form)
 
+@frontend.route('/geocode', methods=['POST'])
+def geocode():
+  response = {}
+  json = request.get_json()
+  
+  geocoded_query = nomgeocode(json['query'])
+
+  return jsonify(geocoded_query)
 
 @frontend.context_processor
 def asset_path_context_processor():
