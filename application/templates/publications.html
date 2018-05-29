@@ -8,8 +8,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Name</th>
                             <th>Publication</th>
+                            <th>Name</th>
                             <th>Organisation</th>
                             <th>url</th>
                             <th>Data url</th>
@@ -19,14 +19,16 @@
                     <tbody>
                    {% for publication in publications %}
                        <tr>
-                            <td>{{ publication.name }}</td>
-                            <td><a href="{{ url_for('frontend.publication', id=publication.publication ) }}">{{ publication.publication }}</a></td>
-                            <td><a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
-                                {{ publication.organisation.organisation.name }}</a>
-                            </td>
-                            <td><a href="{{ publication.url }}">publication url</a></td>
-                            <td><a href="{{ publication.data_url }}">data url</a></td>
-                            <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
+                           <td><a href="{{ url_for('frontend.publication', id=publication.publication ) }}">{{ publication.publication }}</a></td>
+                           <td>{{ publication.name }}</td>
+                           <td>
+                               {% if publication.organisation %}
+                                    <a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">{{ publication.organisation.name }}</a>
+                               {% endif %}
+                           </td>
+                           <td><a href="{{ publication.url }}">publication url</a></td>
+                           <td><a href="{{ publication.data_url }}">data url</a></td>
+                           <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
                         </tr>
                     {% endfor %}
                     </tbody>
