@@ -1,4 +1,5 @@
 import json
+import os
 from urllib.request import urlopen
 
 import click
@@ -21,6 +22,8 @@ from application.models import Organisation, Area, Publication, Licence, Attribu
 from application.extensions import db
 
 json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
+
+branch = os.getenv('BRANCH', 'master')
 
 
 def floaten(event):
@@ -71,13 +74,13 @@ def process_file(f, area_data_mappings):
 
 def get_area_data_mappings():
     print('Load data for areas')
-    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/index.tsv'
+    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/data/index.tsv' % branch
     area_data_mappings = {}
     with closing(requests.get(data, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
-            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/%s' % row[
-                'path']
+            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/data/%s' % (branch, row[
+                'path'])
             with closing(requests.get(data_url, stream=True)) as data_r:
                 data_reader = csv.DictReader(data_r.iter_lines(decode_unicode=True), delimiter='\t')
                 for data_row in data_reader:
@@ -92,7 +95,7 @@ def load_everything():
     print('Loading the entire universe')
 
     count = 0
-    licenses = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/licence.tsv'
+    licenses = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/licence.tsv' % branch
     with closing(requests.get(licenses, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -106,7 +109,7 @@ def load_everything():
     print('Loaded', count, 'licences')
     count = 0
 
-    attributions = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/copyright/index.tsv'
+    attributions = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/copyright/index.tsv' % branch
     with closing(requests.get(attributions, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -123,7 +126,7 @@ def load_everything():
     print('Loaded', count, 'attributions')
     count = 0
 
-    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/prefix.tsv'
+    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/prefix.tsv' % branch
     prefixes = {}
     org_area_mappings = []
     with closing(requests.get(prefix_file, stream=True)) as r:
@@ -133,13 +136,13 @@ def load_everything():
 
     area_data_mappings = get_area_data_mappings()
 
-    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
+    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/area/index.tsv' % branch
 
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
             print('Loading', row['path'])
-            area_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/%s' % row['path']
+            area_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/area/%s' % (branch, row['path'])
             area_data = requests.get(area_url).json()
             for feature in area_data['features']:
                 if feature.get('type') is not None \
@@ -163,7 +166,7 @@ def load_everything():
     print('Loaded', count, 'areas')
     count = 0
 
-    organisations = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/organisation.tsv'
+    organisations = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/organisation.tsv' % branch
     with closing(requests.get(organisations, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -181,11 +184,11 @@ def load_everything():
     print('Loaded', count, 'organisations')
     count = 0
 
-    publications = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/index.tsv'
+    publications = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/publication/index.tsv' % branch
     with closing(requests.get(publications, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
-            publication_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/%s' % row['path']
+            publication_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/publication/%s' % (branch, row['path'])
             publication_data = requests.get(publication_url).content.decode('utf-8')
             md = markdown.Markdown(extensions=['markdown.extensions.meta'])
             md.convert(publication_data)

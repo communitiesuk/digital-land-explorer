@@ -21,26 +21,23 @@
                     <div id="mapid_{{ loop.index }}" style="height: 350px;"></div>
                 </div>
                 <div class="column-one-third">
-                    <h3 class="heading-small">Details</h3>
-                    <ul class="details">
-                        <li>
-                            Area: <a href="{{ url_for('frontend.area', id=result.area.area) }}">
-                            {% if result.area.name %}{{ result.area.name }}{% else %}{{ result.area.area }}{% endif %}
-                        </a>
-                        </li>
-                        {% if result.publication %}
-                            <li>
-                                Publication: <a
-                                    href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>
-                            </li>
-                        {% endif %}
+                    <div class="details">
                         {% if result.organisation %}
-                            <li>
-                                Organisation: <a
-                                    href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>
-                            </li>
+                            <h2 class="heading-small">Organisation </h2>
+                            <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>
+
                         {% endif %}
-                    </ul>
+
+                        <h2 class="heading-small">Area</h2>
+                        <a href="{{ url_for('frontend.area', id=result.area.area) }}">
+                            {% if result.area.name %}{{ result.area.name }}{% else %}{{ result.area.area }}{% endif %}</a>
+
+                        {% if result.publication %}
+                            <h2 class="heading-small">Publication</h2>
+                            <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>
+                        {% endif %}
+
+                    </div>
                 </div>
             </div>
         {% endfor %}
