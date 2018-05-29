@@ -149,6 +149,7 @@ def get_data_from_a_point(lat, lng):
 
 @frontend.route('/about-an-area')
 def about_an_area():
+    form = UKAreaForm()
     results = []
     message = None
     lat, long, query = request.args.get('latitude'), request.args.get('longitude'), request.args.get('query')
@@ -167,7 +168,7 @@ def about_an_area():
     else:
         message = 'Both latitude and longitude parameters required'
 
-    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message, query=query)
+    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message, query=query, form=form)
 
 
 @frontend.context_processor
