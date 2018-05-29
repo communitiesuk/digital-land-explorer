@@ -2302,3 +2302,21 @@ ul.details {
   background: #fff;
   padding: 15px;
 }
+
+.search-form-control-wrapper {
+  position: relative;
+}
+
+.button-search {
+  background: #0b0c0c;
+  position: absolute;
+  right: 0;
+  top: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.location {
+  width: 100%;
+}

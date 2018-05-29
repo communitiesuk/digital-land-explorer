@@ -38,3 +38,19 @@ $path: "/static/govuk_template/images/";
 	background: $page-colour;
 	padding: $gutter-half;
 }
+
+.search-form-control-wrapper {
+  position: relative;
+}
+
+.button-search {
+  background: $text-colour;
+  position: absolute;
+  right: 0;
+  top: 0;
+  @include box-shadow(none);
+}
+
+.location {
+  width: 100%;
+}

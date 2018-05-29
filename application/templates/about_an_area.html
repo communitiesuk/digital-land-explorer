@@ -8,14 +8,16 @@
       <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
         <div class="form-group">
           {{ form.query.label(class="form-label")  }}
-          {% if query %}
-          {{ form.query(class="form-control location", value=query) }}
-          {% else %}
-          {{ form.query(class="form-control location") }}
-          {% endif %}
-        </div>
-        <div class="form-group">
-          <button class="button" type="submit">Search</button>
+          <div class="grid-row">
+            <div class="search-form-control-wrapper column-half">
+              {% if query %}
+              {{ form.query(class="form-control location", value=query) }}
+              {% else %}
+              {{ form.query(class="form-control location") }}
+              {% endif %}
+              <button class="button button-search" type="submit">Search</button>
+            </div>
+          </div>
         </div>
         {{ form.csrf_token }}
       </form>
