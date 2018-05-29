@@ -4,10 +4,16 @@
 {% block content %}
 
     <main id="content" role="main">
-      <h1 class="heading-xlarge">About an area</h1>
+      <h1 class="heading-xlarge">Search for data about an area</h1>
       <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
-        <div class="form-group">
+        <fieldset class="form-group">
+          <legend>
+            <h2 class="heading-medium visuallyhidden">
+              Search for areas by lat/long
+            </h2>
+          </legend>
           {{ form.query.label(class="form-label")  }}
+          <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
           <div class="grid-row">
             <div class="search-form-control-wrapper column-half">
               {% if query %}
@@ -18,7 +24,7 @@
               <button class="button button-search" type="submit">Search</button>
             </div>
           </div>
-        </div>
+        </fieldset>
         {{ form.csrf_token }}
       </form>
       <div class="grid-row">
