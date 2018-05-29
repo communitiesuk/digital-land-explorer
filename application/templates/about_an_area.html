@@ -151,6 +151,21 @@
           }
         };
 
+        /* Update a marker position on a map
+            marker: an existing marker object
+            Lmap: a leaflet map
+            lat: new latitude
+            lng: new longitude
+            pan: [Bool] if you want map to pan to new marker */
+        var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
+          removeMarkerFromMap( marker, Lmap );
+  				new_marker = addMarkerToMap(Lmap, lat, lng);
+          if ( pan ) {
+            Lmap.panTo(new L.LatLng(lat, lng));
+          }
+          return new_marker;
+        };
+
 
         var renderMap = function(lat, lng){
           mymap = L.map('location-search-map').setView([lat, lng], 12);
@@ -173,7 +188,6 @@
         };
 
         var displayLatLng = function(data) {
-  				removeMarkerFromMap( query_marker, mymap );
   				var $query_meta = $latlngPanel.find(".query-meta");
   				if( data.query ) {
   					$latlngPanel.find(".display-query").text( data.query );
@@ -183,8 +197,7 @@
   				}
   				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
   				$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
-  				query_marker = addMarkerToMap(mymap, data.lat, data.lng);
-  				mymap.panTo(new L.LatLng(data.lat, data.lng));
+          query_marker = updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
   			};
 
         var updateSearchQueryCallback = function(data) {
