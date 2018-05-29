@@ -1,6 +1,6 @@
-.results {
-  margin-top: 20px;
-  padding: 10px;
+.result {
+  margin-top: $gutter;
+  padding: $gutter-half;
   border: 1px solid $grey-3;
 }
 

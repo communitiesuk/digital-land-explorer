@@ -64,8 +64,11 @@
             </div>
         {% endif %}
 
+        
+          <ul class="results">
         {% for result in results %}
-            <div class="grid-row results">
+            <li class="result">
+              <div class="grid-row">
                 <div class="column-two-thirds">
                     <div id="mapid_{{ loop.index }}" style="height: 350px;"></div>
                 </div>
@@ -91,8 +94,11 @@
                         {% endif %}
                     </ul>
                 </div>
-            </div>
+              </div>
+            </li>
         {% endfor %}
+          </ul>
+        
     </main>
 
 {% endblock %}

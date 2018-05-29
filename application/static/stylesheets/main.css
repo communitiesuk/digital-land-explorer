@@ -2187,9 +2187,9 @@ input[type=number] {
   }
 }
 
-.results {
-  margin-top: 20px;
-  padding: 10px;
+.result {
+  margin-top: 30px;
+  padding: 15px;
   border: 1px solid #dee0e2;
 }
 
