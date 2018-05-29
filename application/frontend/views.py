@@ -19,16 +19,7 @@ def index():
 
 @frontend.route('/organisations')
 def organisations():
-    return render_template('organisations.html', organisations=Organisation.query.all(), org_type='organisation')
-
-
-@frontend.route('/<org_type>')
-def organisation_by_type(org_type):
-    query_filter = '%s%s'% (org_type, '%')
-    orgs = Organisation.query.filter(Organisation.organisation.like(query_filter)).all()
-    if not orgs:
-        abort(404)
-    return render_template('organisations.html', organisations=orgs, org_type=org_type)
+    return render_template('organisations.html', organisations=Organisation.query.all())
 
 
 @frontend.route('/organisations/<id>')
