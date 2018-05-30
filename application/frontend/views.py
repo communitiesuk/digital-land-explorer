@@ -137,39 +137,35 @@ def publication_area(id):
                            publication=publication,
                            areas=areas)
 
-def get_data_from_a_point(lat, lng):
-  results = []
-  from application.extensions import db
-  point = 'POINT(%f %f)' % (float(lng), float(lat))
-  areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
-  for area in areas:
-      publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
-      organisation = Organisation.query.filter_by(area=area).first()
-      results.append({'area': area, 'organisation': organisation, 'publication': publication})
-  return results
 
 @frontend.route('/about-an-area')
 def about_an_area():
     form = UKAreaForm()
+    return render_template('about_an_area.html', form=form)
+
+
+@frontend.route('/about-an-area-query')
+def about_an_area_query():
     results = []
     message = None
     lat, long, query = request.args.get('latitude'), request.args.get('longitude'), request.args.get('query')
     if lat is not None and long is not None:
-        results = get_data_from_a_point(lat, long)
+        results = _get_data_from_a_point(lat, long)
         if not results:
             message = 'No results found'
     elif query is not None:
         geocoded_query = nomgeocode(query)
         if geocoded_query['success']:
-          lat = geocoded_query['lat']
-          long = geocoded_query['lng']
-          results = get_data_from_a_point(geocoded_query['lat'], geocoded_query['lng'])
+            lat = geocoded_query['lat']
+            long = geocoded_query['lng']
+            results = _get_data_from_a_point(geocoded_query['lat'], geocoded_query['lng'])
         else:
-          message = "Unable to geocode query: {}".format(query)
+            message = "Unable to geocode query: {}".format(query)
     else:
         message = 'Both latitude and longitude parameters required'
 
-    return render_template('about_an_area.html', latitude=lat, longitude=long, results=results, message=message, query=query, form=form)
+    return render_template('about_an_area_results.html', latitude=lat, longitude=long, results=results, message=message)
+
 
 @frontend.route('/geocode', methods=['POST'])
 def geocode():
@@ -180,6 +176,19 @@ def geocode():
 
   return jsonify(geocoded_query)
 
+
 @frontend.context_processor
 def asset_path_context_processor():
     return {'asset_path': '/static/govuk_template'}
+
+
+def _get_data_from_a_point(lat, lng):
+  results = []
+  from application.extensions import db
+  point = 'POINT(%f %f)' % (float(lng), float(lat))
+  areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
+  for area in areas:
+      publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
+      organisation = Organisation.query.filter_by(area=area).first()
+      results.append({'area': area, 'organisation': organisation, 'publication': publication})
+  return results
