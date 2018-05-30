@@ -1,5 +1,5 @@
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -27,21 +27,21 @@
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -69,14 +69,14 @@
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
 }
 
 .grid-row:after, #content:after, .notice:after, .panel:after, fieldset:after, .form-section:after,
-.form-group:after, .form-group-error:after, .breadcrumbs ol:after {
+.form-group:after, .form-group-error:after, .breadcrumbs ol:after, .definition-inline:after {
   content: "";
   display: block;
   clear: both;
@@ -2187,9 +2187,9 @@ input[type=number] {
   }
 }
 
-.results {
-  margin-top: 20px;
-  padding: 10px;
+.result {
+  margin-top: 30px;
+  padding: 15px;
   border: 1px solid #dee0e2;
 }
 
@@ -2254,6 +2254,23 @@ ul.details {
   }
 }
 
+/* dl */
+.definition-inline dt {
+  float: left;
+  margin-right: 5px;
+  clear: left;
+  font-weight: bold;
+}
+
+.definition-inline dt:after {
+  content: ':';
+}
+
+.definition-inline dd {
+  float: left;
+  margin-right: 15px;
+}
+
 .find-area-form {
   margin-top: 30px;
 }
@@ -2271,4 +2288,35 @@ ul.details {
 
 .results-head__heading {
   margin-top: 15px;
+}
+
+.map-wrapper {
+  position: relative;
+}
+
+.lat-lng-panel {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  z-index: 1000;
+  background: #fff;
+  padding: 15px;
+}
+
+.search-form-control-wrapper {
+  position: relative;
+}
+
+.button-search {
+  background: #0b0c0c;
+  position: absolute;
+  right: 0;
+  top: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.location {
+  width: 100%;
 }
