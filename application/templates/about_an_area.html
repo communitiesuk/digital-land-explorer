@@ -60,8 +60,7 @@
     <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
     <script>
 
-        var doSearch = function(url, lat, lng, message) {
-            console.log('CALLED DO SEARCH', message);
+        var doSearch = function(url, lat, lng) {
             $.ajax({
                 type: "GET",
                 url: url,
@@ -98,7 +97,7 @@
                 $( linkselector ).click(function(event){
                     event.preventDefault();
                     url = event.currentTarget.getAttribute('href');
-                    doSearch(url, lat, lng, 'from load');
+                    doSearch(url, lat, lng);
                 });
             }
         };
@@ -212,7 +211,7 @@
       document.addEventListener("DOMContentLoaded", function() {
           url =  $(".reload-results-btn" ).attr("href");
           if(url !== undefined) {
-              doSearch(url, {{ latitude }}, {{ longitude }}, 'from page load');
+              doSearch(url, {{ latitude }}, {{ longitude }});
           }
       });
 
