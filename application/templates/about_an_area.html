@@ -59,6 +59,20 @@
 {% block end_body %}
     <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
     <script>
+
+        var doSearch = function(url, lat, lng, message) {
+            console.log('CALLED DO SEARCH', message);
+            $.ajax({
+                type: "GET",
+                url: url,
+                contentType: "text/html; charset=utf-8",
+                success: function(data) {
+                    $('#results-container').html(data);
+                    window.history.pushState({}, "current search", "/about-an-area?latitude="+lat+"&longitude="+lng);
+                }
+            });
+        };
+
       (function($, window) {
           var mymap,
               query_marker,
@@ -80,10 +94,11 @@
         var updateLinkURL = function(linkselector, lat, lng) {
             if(lat !== undefined && lng !== undefined) {
                 $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
+                $( linkselector ).off('click');
                 $( linkselector ).click(function(event){
                     event.preventDefault();
                     url = event.currentTarget.getAttribute('href');
-                    doSearch(url);
+                    doSearch(url, lat, lng, 'from load');
                 });
             }
         };
@@ -165,18 +180,6 @@
           displayLatLng(data);
         };
 
-        var doSearch = function(url) {
-            $.ajax({
-                type: "GET",
-                url: url,
-                contentType: "text/html; charset=utf-8",
-                success: function(data) {
-                    $('#results-container').html(data);
-                    window.history.pushState({}, "current search", "/about-an-area?latitude="+lat+"&longitude="+lng);
-                }
-            });
-        };
-
         $(function() {
 
             $form = $(".location-search-form");
@@ -198,15 +201,21 @@
                 renderMap({{ latitude }}, {{ longitude }});
                 query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
                 updateLinkURL(".reload-results-btn", lat ={{ latitude }}, long ={{ longitude }});
-                debugger;
                 url =  $( ".reload-results-btn" ).attr("href");
-                doSearch(url);
             {% else %}
                 renderMap(54.29159, -1.99674);
             {% endif %}
         });
 
       }).call(this, jQuery, window);
+
+      document.addEventListener("DOMContentLoaded", function() {
+          url =  $(".reload-results-btn" ).attr("href");
+          if(url !== undefined) {
+              doSearch(url, {{ latitude }}, {{ longitude }}, 'from page load');
+          }
+      });
+
     </script>
 
 {% endblock %}
