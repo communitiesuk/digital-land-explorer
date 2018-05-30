@@ -89,6 +89,7 @@
   					    contentType: "text/html; charset=utf-8",
                         success: function(data) {
                             $('#results-container').html(data);
+                            window.history.pushState({}, "current search", "/about-an-area?latitude="+lat+"&longitude="+lng);
                         }
                     });
                 });
