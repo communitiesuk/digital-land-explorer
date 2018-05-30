@@ -1,3 +1,4 @@
 
 def format_identifier(identifier):
-    return identifier.replace('-', ' ').capitalize()
+    id = identifier.split(':')[0]
+    return id.replace('-', ' ').capitalize()

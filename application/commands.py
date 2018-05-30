@@ -1,4 +1,5 @@
 import json
+import os
 from urllib.request import urlopen
 
 import click
@@ -17,10 +18,12 @@ if platform.system() == 'Darwin':
 else:
     import ijson
 
-from application.models import Organisation, Area, Publication, Licence, Attribution
+from application.models import Organisation, Area, Publication, Licence, Attribution, organisation_area
 from application.extensions import db
 
 json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
+
+branch = os.getenv('BRANCH', 'master')
 
 
 def floaten(event):
@@ -35,17 +38,19 @@ def floaten(event):
 @with_appcontext
 def load_large_area(file):
     print('Loading', file)
+    prefixes = get_prefixes(branch)
     area_data_mappings = get_area_data_mappings()
     if file.startswith('http'):
-        process_file(urlopen(file), area_data_mappings)
+        process_file(urlopen(file), area_data_mappings, prefixes)
     else:
         with open(file, 'rb') as f:
-            process_file(f, area_data_mappings)
+            process_file(f, area_data_mappings, prefixes)
 
 
-def process_file(f, area_data_mappings):
+def process_file(f, area_data_mappings, prefixes):
     areas = []
     count = 0
+    org_area_mappings = []
     events = map(floaten, ijson.parse(f))
     data = common.items(events, 'features.item')
     for feature in data:
@@ -56,33 +61,58 @@ def process_file(f, area_data_mappings):
         if area_id in area_data_mappings.keys():
             area.name = area_data_mappings[area_id]
         areas.append(area)
+        p = area_id.split(':')[0]
+        if p in prefixes.keys():
+            org = prefixes.get(p)
+            org_area_mappings.append({'organisation': org, 'area': area_id})
         count += 1
         if count % 1000 == 0:
             db.session.bulk_save_objects(areas)
             db.session.commit()
+            for org_area in org_area_mappings:
+                if org_area['organisation'] != 'government-organisation:D303':
+                    db.session.execute(organisation_area.insert().values(**org_area))
+                    db.session.commit()
             print('Saved', count)
+            org_area_mappings = []
             areas = []
             count = 0
     db.session.bulk_save_objects(areas)
     db.session.commit()
+    for org_area in org_area_mappings:
+        if org_area['organisation'] != 'government-organisation:D303':
+            db.session.execute(organisation_area.insert().values(**org_area))
+            db.session.commit()
     print('Saved last', len(areas))
     print('Done')
 
 
 def get_area_data_mappings():
     print('Load data for areas')
-    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/index.tsv'
+    data = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/data/index.tsv' % branch
     area_data_mappings = {}
     with closing(requests.get(data, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
-            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/data/%s' % row[
-                'path']
+            data_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/data/%s' % (branch, row[
+                'path'])
             with closing(requests.get(data_url, stream=True)) as data_r:
                 data_reader = csv.DictReader(data_r.iter_lines(decode_unicode=True), delimiter='\t')
                 for data_row in data_reader:
                     area_data_mappings[data_row.get('area')] = data_row.get('name')
     return area_data_mappings
+
+
+def get_prefixes(branch):
+    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/prefix.tsv' % branch
+    prefixes = {}
+
+    with closing(requests.get(prefix_file, stream=True)) as r:
+        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
+        for row in reader:
+            prefixes[row.get('prefix')] = row.get('organisation')
+
+    return prefixes
 
 
 @click.command()
@@ -92,7 +122,7 @@ def load_everything():
     print('Loading the entire universe')
 
     count = 0
-    licenses = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/licence.tsv'
+    licenses = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/licence.tsv' % branch
     with closing(requests.get(licenses, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -106,7 +136,7 @@ def load_everything():
     print('Loaded', count, 'licences')
     count = 0
 
-    attributions = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/copyright/index.tsv'
+    attributions = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/copyright/index.tsv' % branch
     with closing(requests.get(attributions, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -123,23 +153,18 @@ def load_everything():
     print('Loaded', count, 'attributions')
     count = 0
 
-    prefix_file = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/prefix.tsv'
-    prefixes = {}
-    org_area_mappings = []
-    with closing(requests.get(prefix_file, stream=True)) as r:
-        reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
-        for row in reader:
-            prefixes[row.get('prefix')] = row.get('organisation')
+    prefixes = get_prefixes(branch)
 
     area_data_mappings = get_area_data_mappings()
 
-    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/index.tsv'
+    areas = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/area/index.tsv' % branch
 
+    org_area_mappings = []
     with closing(requests.get(areas, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
             print('Loading', row['path'])
-            area_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/area/%s' % row['path']
+            area_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/area/%s' % (branch, row['path'])
             area_data = requests.get(area_url).json()
             for feature in area_data['features']:
                 if feature.get('type') is not None \
@@ -163,7 +188,7 @@ def load_everything():
     print('Loaded', count, 'areas')
     count = 0
 
-    organisations = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/organisation.tsv'
+    organisations = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/organisation.tsv' % branch
     with closing(requests.get(organisations, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
@@ -181,11 +206,11 @@ def load_everything():
     print('Loaded', count, 'organisations')
     count = 0
 
-    publications = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/index.tsv'
+    publications = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/publication/index.tsv' % branch
     with closing(requests.get(publications, stream=True)) as r:
         reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
         for row in reader:
-            publication_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/master/data/publication/%s' % row['path']
+            publication_url = 'https://raw.githubusercontent.com/communitiesuk/digital-land-data/%s/data/publication/%s' % (branch, row['path'])
             publication_data = requests.get(publication_url).content.decode('utf-8')
             md = markdown.Markdown(extensions=['markdown.extensions.meta'])
             md.convert(publication_data)
