@@ -191,8 +191,9 @@
   				});
 
           {% if latitude %}
-          renderMap({{ latitude }}, {{ longitude }});
-          query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }})
+             renderMap({{ latitude }}, {{ longitude }});
+             query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
+             updateLinkURL(".reload-results-btn", lat={{ latitude }}, long={{ longitude }});
           {% else %}
   				renderMap(54.29159, -1.99674);
           {% endif %}

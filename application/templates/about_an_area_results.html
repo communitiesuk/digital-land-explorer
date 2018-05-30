@@ -22,9 +22,14 @@
                  {% endif %}
 
                 <h2 class="heading-small">Area</h2>
-                    <a href="{{ url_for('frontend.area', id=result.area.area) }}">
-                        {% if result.area.name %}{{ result.area.name }}{% else %}{{ result.area.area }}{% endif %}
-                    </a>
+                    {% if result.area.name %}
+                        <p>
+                            <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.name }}</a>
+                        </p>
+                    {% endif %}
+                    <p>
+                        <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.area }}</a>
+                    </p>
                     {% if result.publication %}
                         <h2 class="heading-small">Publication</h2>
                         <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>

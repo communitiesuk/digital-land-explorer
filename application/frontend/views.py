@@ -132,7 +132,8 @@ def publication_area(id):
 @frontend.route('/about-an-area')
 def about_an_area():
     form = UKAreaForm()
-    return render_template('about_an_area.html', form=form)
+    lat, lng = request.args.get('latitude'), request.args.get('longitude')
+    return render_template('about_an_area.html', form=form, latitude=lat, longitude=lng)
 
 
 @frontend.route('/about-an-area-query')
