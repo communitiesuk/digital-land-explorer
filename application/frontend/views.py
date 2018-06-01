@@ -39,7 +39,7 @@ def nomgeocode(query):
 
 @frontend.route('/')
 def index():
-    form = LatLongForm()
+    form = UKAreaForm()
     return render_template('index.html', form=form)
 
 
