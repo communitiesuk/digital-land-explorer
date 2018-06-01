@@ -11,71 +11,68 @@
 		</div>
 	</header>
 
-    <div id="content" role="main">
-
-        <div class="grid-row">
-
-             <div class="column-one-quarter">
-               <span class="data-item font-medium">
-                     <a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
-                 </span>
-            </div>
-
-            <div class="column-one-quarter">
-                <span class="data-item font-medium">
-                    <a href="{{ url_for('frontend.publications') }}">Publications</a>
-                </span>
-            </div>
-
-            <div class="column-one-quarter">
-                <span class="data-item font-medium">
-                    <a href="{{ url_for('frontend.licences') }}">Licences</a>
-                </span>
-            </div>
-
-            <div class="column-one-quarter">
-                <span class="data-item font-medium">
-                    <a href="{{ url_for('frontend.attributions') }}">Attributions</a>
-                </span>
-            </div>
-
-        </div>
+    <main id="content" role="main">
 
         {% if form %}
-            <h2 class="heading-medium">Find out about an area</h2>
-            <div class="grid-row">
-                <div class="column-two-thirds">
-                    <div id="find-area-map" style="height: 400px;"></div>
-                </div>
-                <div class="column-one-third">
-                    <div class="form-group">
-                        <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="find-area-form">
-                            <fieldset class="inline">
-                                <legend>
-                                    <h2 class="heading-medium visuallyhidden">
-                                        Search for areas by lat/long
-                                    </h2>
-                                </legend>
-                                <p class="form-hint">
-                                    Either click on the map
-                                    <br/>or enter a latitude and longitude
-                                </p>
-                                <div class="form-group">
-                                    {{ form.latitude.label(class="form-label") }}
-                                    {{ form.latitude(class="form-control") }}
-
-                                    {{ form.longitude.label(class="form-label") }}
-                                    {{ form.longitude(class="form-control") }}
-                                </div>
-                            </fieldset>
-                        <button style="margin-top: 5px" class="button" type="submit">Search</button>
-                        {{ form.csrf_token }}
-                        </form>
-                    </div>
-                </div>
-            </div>
+				<div class="grid-row">
+					<div class="column-two-thirds">
+			      <h2 class="heading-large">Search for data about an area</h2>
+			      <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
+			        <fieldset class="form-group">
+			          <legend>
+			            <h2 class="heading-medium visuallyhidden">
+			              Search for areas by lat/long
+			            </h2>
+			          </legend>
+			          {{ form.query.label(class="form-label")  }}
+			          <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
+			          <div class="grid-row">
+			            <div class="search-form-control-wrapper column-half">
+			              {% if query %}
+			              {{ form.query(class="form-control location", value=query) }}
+			              {% else %}
+			              {{ form.query(class="form-control location") }}
+			              {% endif %}
+			              <button class="button button-search" type="submit">Search</button>
+			            </div>
+			          </div>
+			        </fieldset>
+			        {{ form.csrf_token }}
+			      </form>
+			      <div class="grid-row">
+			        <div class="column-full">
+			          <div class="map-wrapper">
+									<div id="location-search-map" style="height: 450px;"></div>
+									<div class="lat-lng-panel">
+										<dl class="definition-inline">
+											<dt class="query-meta">Query</dt>
+											<dd class="display-query query-meta"></dd>
+											<dt>Latitude</dt>
+											<dd class="display-lat"></dd>
+											<dt>Longitude</dt>
+											<dd class="display-lng"></dd>
+										</dl>
+										<a class="button load-results-btn" href="#">Load data</a>
+									</div>
+								</div>
+							</div>
+			      </div>
+					</div>
+					
+					<div class="column-one-third">
+						<h3 class="heading-medium">
+							Related data
+						</h3>
+						<ul>
+							<li><a href="{{ url_for('frontend.organisations') }}">Organisations</a></li>
+							<li><a href="{{ url_for('frontend.publications') }}">Publications</a></li>
+							<li><a href="{{ url_for('frontend.licences') }}">Licences</a></li>
+							<li><a href="{{ url_for('frontend.attributions') }}">Attributions</a></li>
+						</ul>
+					</div>
+				</div>
         {% endif %}
-    </div>
+    </main>
 
 {% endblock %}
 
@@ -103,55 +100,133 @@
             var marker = L.marker([lat, lng]);
             map.addLayer(marker);
             return marker;
-        }
+        };
+
+        var removeMarkerFromMap = function(marker, map) {
+          if( marker ) {
+            map.removeLayer( marker );
+          }
+        };
+
+        /* Update a marker position on a map
+            marker: an existing marker object
+            Lmap: a leaflet map
+            lat: new latitude
+            lng: new longitude
+            pan: [Bool] if you want map to pan to new marker */
+        var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
+          removeMarkerFromMap( marker, Lmap );
+  				new_marker = addMarkerToMap(Lmap, lat, lng);
+          if ( pan ) {
+            Lmap.panTo(new L.LatLng(lat, lng));
+          }
+          return new_marker;
+        };
 
         /* update lat and lng in form and
            update marker pos */
-        var setLatLng = function(ev){
-            var lat = roundLatLngVal(ev.latlng.lat, 5),
-                    lng = roundLatLngVal(ev.latlng.lng, 5);
-            $queryForm.find("#latitude").val( lat );
-            $queryForm.find("#longitude").val( lng );
-            mymap.removeLayer(query_marker);
-            query_marker = addMarkerToMap(mymap, lat, lng);
+        var setLatLng = function(lat, lng, pan){
+      		var lat = roundLatLngVal(lat, 5),
+          		lng = roundLatLngVal(lng, 5);
+			  	$latlngPanel.find(".display-lat").text( lat );
+			  	$latlngPanel.find(".display-lng").text( lng );
+					if (query_marker) {
+						query_marker = updateMarkerPos(query_marker, mymap, lat, lng, pan);
+					} else {
+						query_marker = addMarkerToMap(mymap, lat, lng);
+					}
         }
 
         /* My Leaflet vars */
         var mymap;
         var query_marker;
+				var $latlngPanel;
+
+
+        /* render a basic leaflet map
+            takes #id for the map
+            and any leaflet options */
+        var renderLeafletMap = function(map_element_id, options) {
+          var options = options || {};
+          var Lmap = L.map(map_element_id, options);
+          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+            accessToken: '{{ config.MAPBOX_TOKEN }}'
+          }).addTo(Lmap);
+          return Lmap;
+        };
 
         /* renders the initial map
            adds click handler */
         var renderMap = function(){
-            mymap = L.map('find-area-map').setView([place.lat, place.lng], place.zoom);
+					mymap = renderLeafletMap("location-search-map").setView([place.lat, place.lng], place.zoom);
 
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-              maxZoom: 18,
-              id: 'mapbox.streets',
-              accessToken: '{{ config.MAPBOX_TOKEN }}'
-            }).addTo(mymap);
+          setLatLng(place.lat, place.lng, false);
 
-            query_marker = addMarkerToMap(mymap, place.lat, place.lng);
-
-            mymap.on('click', setLatLng);
+          mymap.on('click', function(ev){
+						var data = {
+							lat: ev.latlng.lat,
+							lng: ev.latlng.lng
+						};
+						updateMapFocus(data, false);
+          });
+  				setQueryDisplay({lat:place.lat, lng: place.lng});
+					updateLinkURL(".load-results-btn", place.lat, place.lng);
         };
 
-        {% if form.latitude.data and form.latitude.data %}
-            place.lat = {{ form.latitude.data }};
-            place.lng = {{ form.longitude.data }};
-            place.current_query = true;
-        {% endif %}
+        var updateLinkURL = function(linkselector, lat, lng) {
+            if(lat !== undefined && lng !== undefined) {
+                $( linkselector ).attr("href", "/about-an-area?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
+            }
+        };
 
-        var $queryForm = jQuery(".find-area-form");
+				var setQueryDisplay = function(data) {
+					var $el = $latlngPanel.find(".query-meta");
+  				if( data.query ) {
+  					$el.filter(".display-query").text( data.query );
+  					$el.show();
+  				} else {
+  					$el.hide();
+  				}
+				};
+
+				var updateMapFocus = function(data, pan) {
+					setLatLng(data.lat, data.lng, pan);
+  				setQueryDisplay(data);
+					updateLinkURL(".load-results-btn", data.lat, data.lng);
+				};
+
+				var updateSearchQueryCallback = function(data) {
+					updateMapFocus(data, true);
+				};
+
+				$(function() {
+					var $searchForm = jQuery(".location-search-form");
+					$latlngPanel = $(".lat-lng-panel");
+
+          $searchForm.on("submit", function (e) {
+              $.ajax({
+                  type: "POST",
+                  contentType: "application/json; charset=utf-8",
+                  url: "{{ url_for('frontend.geocode') }}",
+                  data: JSON.stringify({query: $searchForm.find(".location").val()}),
+                  success: updateSearchQueryCallback,
+                  dataType: "json"
+              });
+              e.preventDefault();
+          });
+
+				});
 
         /* check if geolocation available
            and not current query */
         if ("geolocation" in navigator && !place.current_query) {
             navigator.geolocation.getCurrentPosition(function(position) {
               place.lat = position.coords.latitude;
-                place.lng = position.coords.longitude;
-                renderMap();
+              place.lng = position.coords.longitude;
+              renderMap();
             });
         } else {
             renderMap();
