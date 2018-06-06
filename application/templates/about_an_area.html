@@ -175,8 +175,14 @@
   			};
 
         var updateSearchQueryCallback = function(data) {
-          updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
-          displayLatLng(data);
+          if( data.success ) {
+            $form.find(".location").removeClass("form-control-error");
+            updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
+            displayLatLng(data);
+          } else {
+            console.log("There was an issue with the query");
+            $form.find(".location").addClass("form-control-error");
+          }
         };
 
         $(function() {
