@@ -41,7 +41,7 @@
 								<dd class="display-lng">{% if latitude %}{{ '%0.5f'| format(longitude|float) }}{% endif %}</dd>
 							</dl>
 
-                        <a class="button reload-results-btn visually-hidden" href="#">Reload results</a>
+              <a class="button reload-results-btn button-load-data disabled" href="#">Reload results</a>
 
 						</div>
 					</div>
@@ -92,7 +92,7 @@
 
         var updateLinkURL = function(linkselector, lat, lng) {
             if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
+                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("disabled");
                 $( linkselector ).off('click');
                 $( linkselector ).click(function(event){
                     event.preventDefault();
@@ -199,8 +199,6 @@
             {% if latitude %}
                 renderMap({{ latitude }}, {{ longitude }});
                 query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
-                updateLinkURL(".reload-results-btn", lat ={{ latitude }}, long ={{ longitude }});
-                url =  $( ".reload-results-btn" ).attr("href");
             {% else %}
                 renderMap(54.29159, -1.99674);
             {% endif %}
@@ -209,7 +207,7 @@
       }).call(this, jQuery, window);
 
       document.addEventListener("DOMContentLoaded", function() {
-          url =  $(".reload-results-btn" ).attr("href");
+          url =  "/about-an-area-query?latitude="+{{ latitude }}+"&longitude="+{{ longitude }};
           if(url !== undefined) {
               doSearch(url, {{ latitude }}, {{ longitude }});
           }

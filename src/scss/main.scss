@@ -51,6 +51,11 @@ $path: "/static/govuk_template/images/";
   @include box-shadow(none);
 }
 
+.button-load-data {
+  @include button($govuk-blue);
+  margin-top: 5px;
+}
+
 .location {
   width: 100%;
 }
