@@ -61,16 +61,19 @@
 					</div>
 					
 					<div class="column-one-third">
-						<h3 class="heading-medium">
-							Related data
-						</h3>
-						<ul>
-							<li><a href="{{ url_for('frontend.organisations') }}">Organisations</a></li>
-							<li><a href="{{ url_for('frontend.publications') }}">Publications</a></li>
-							<li><a href="{{ url_for('frontend.licences') }}">Licences</a></li>
-							<li><a href="{{ url_for('frontend.attributions') }}">Attributions</a></li>
-						</ul>
+            <div class="related-section related-section-parallel-large">
+  						<h3 class="heading-small">
+  							Related data
+  						</h3>
+  						<ul class="related-links">
+  							<li><a href="{{ url_for('frontend.organisations') }}">Organisations</a></li>
+  							<li><a href="{{ url_for('frontend.publications') }}">Publications</a></li>
+  							<li><a href="{{ url_for('frontend.licences') }}">Licences</a></li>
+  							<li><a href="{{ url_for('frontend.attributions') }}">Attributions</a></li>
+  						</ul>
+            </div>
 					</div>
+          
 				</div>
         {% endif %}
     </main>

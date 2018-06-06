@@ -1,0 +1,22 @@
+// Related section component
+// -------------------------
+//
+// lays out the related content section
+// as seen on gov.uk
+
+.related-section {
+  border-top: 2px solid $govuk-blue;
+
+  &-parallel-large {
+    @include media(tablet) {
+      margin-top: em(45, 19);
+    }
+  }
+}
+
+.related-links {
+  font-weight: 700;
+  li {
+    margin-top: 5px;
+  }
+}
