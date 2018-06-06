@@ -2233,6 +2233,10 @@ ul.details {
   display: none;
 }
 
+.with-hero .phase-banner {
+  border-bottom: none;
+}
+
 .hero {
   background: #005ea5;
   color: #fff;
