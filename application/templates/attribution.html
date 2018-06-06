@@ -2,7 +2,11 @@
 {% block title %}{{ attribution.attribution }}{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">{{ attribution.attribution }}</h1>
+        <h1 class="heading-xlarge">
+          <span class="heading-secondary">Attribution</span>
+          {{ attribution.attribution }}
+        </h1>
+
         <div class="grid-row">
             <div class="column-full">
                 <table>

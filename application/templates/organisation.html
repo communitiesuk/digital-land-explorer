@@ -19,9 +19,11 @@
 {% block content %}
     <div id="content" role="main">
 
-        <div class="grid-row">
-            <h1 class="heading-xlarge">{{ organisation.name }}</h1>
-        </div>
+        <h1 class="heading-xlarge">
+          <span class="heading-secondary">Organisation</span>
+          {{ organisation.name }}
+        </h1>
+
 
         <div class="grid-row">
             {% if organisation.area %}
