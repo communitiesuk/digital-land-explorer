@@ -2417,6 +2417,10 @@ ul.details {
   height: 120%;
 }
 
+.button-close {
+  margin-top: 5px;
+}
+
 .location {
   width: 100%;
 }

@@ -1,25 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Organisations{% endblock %}
+{% block end_head %}
+<link rel="stylesheet" href="/static/stylesheets/accessible-autocomplete.min.css" />
+{% endblock %}
 {% block content %}
     <div id="content" role="main">
         <h1 class="heading-xlarge">Organisations</h1>
+
+        <div class="grid-row">
+          <form class="form org-search-form column-half">
+            <div class="form-group">
+              <label class="form-label-bold" for="org-picker">Organisation name</label>
+              <select name="org-picker" id="org-picker">
+                <option value="">Select organistion</option>
+                {% for org in organisations %}
+                <option value="{{ org.organisation }}">{{ org.name }}</option>
+                {% endfor %}
+              </select>
+              <a href="{{ url_for('frontend.organisations') }}" class="button button-close">View organisation</a>
+            </div>
+            
+          </form>
+        </div>
+
         <div class="grid-row">
             <div class="column-full">
-                <table>
+                <table class="org-table">
                     <thead>
                     <tr>
-                        <th>Organisation</th>
-                        <th>Name</th>
-                        <th>Website</th>
+                      <th scope="col">Name</th>
+                      <th>Organisation identifier</th>
+                      <th>Website</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for org in organisations %}
-                        <tr>
+                        <tr data-name="{{ org.name }}" data-identifier="{{ org.organisation }}">
+                          <td scope="row">{{ org.name }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=org.organisation) }}">
                                 {{ org.organisation }}</a>
                             </td>
-                            <td>{{ org.name }}</td>
                             <td><a href="{{ org.website }}">{{ org.website }}</a></td>
                         </tr>
                     {% endfor %}
@@ -28,5 +48,32 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block end_body %}
+<script src="/static/javascripts/vendor/accessible-autocomplete.min.js"></script>
+<script type="text/javascript">
+  (function($, window) {
+    var base_url = "/organisations/";
+    $(function() {
+      var $form = $(".org-search-form");
+
+      accessibleAutocomplete.enhanceSelectElement({
+        defaultValue: '',
+        confirmOnBlur: false,
+        selectElement: document.querySelector('#org-picker'),
+        onConfirm: function(val) {
+          console.log("type ahead change", val);
+          var identifier = $(".org-table tr").filter(function(ind, el){
+            if( $(el).data('name') === val ) {
+              return el;
+            }
+          }).data('identifier');
+          $form.find(".button").attr('href', base_url + identifier);
+        }
+      })
+    });
+  }).call(this, jQuery, window);
+</script>
 {% endblock %}
 

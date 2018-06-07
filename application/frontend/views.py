@@ -20,7 +20,7 @@ def index():
 
 @frontend.route('/organisations')
 def organisations():
-    return render_template('organisations.html', organisations=Organisation.query.all())
+    return render_template('organisations.html', organisations=Organisation.query.order_by("name").all())
 
 
 @frontend.route('/organisations/<id>')
