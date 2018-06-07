@@ -13,21 +13,22 @@
             </h2>
           </legend>
 
-          <div class="form-group form-group-search">
-          {{ form.query.label(class="form-label-bold")  }}
-          <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
-          <span class="error-message">There was an issue with your search. Please try again</span>
-          <div class="grid-row">
-            <div class="search-form-control-wrapper column-half">
-              {% if query %}
-              {{ form.query(class="form-control location", value=query) }}
-              {% else %}
-              {{ form.query(class="form-control location") }}
-              {% endif %}
-              <button class="button button-search" type="submit">Search</button>
-            </div>
-          </div>
-          </div>
+          {% from "macros/forms.html" import render_search_field %}
+
+          {% if query %}
+          {{ render_search_field(
+              form.query.label(class="form-label-bold"),
+              form.query(class="form-control location", value=query),
+              "E.g. 'Brockwell Park' or click on map below",
+              "There was an issue with your search. Please try again" ) }}
+          {% else %}
+          {{ render_search_field(
+              form.query.label(class="form-label-bold"),
+              form.query(class="form-control location"),
+              "E.g. 'Brockwell Park' or click on map below",
+              "There was an issue with your search. Please try again" ) }}
+          {% endif %}
+
         </fieldset>
         {{ form.csrf_token }}
       </form>

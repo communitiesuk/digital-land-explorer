@@ -1,0 +1,22 @@
+{% macro render_input_field(field, hint, default_error) -%}
+  <div class="form-group">
+    {{ field.label(class="form-label-bold") }}
+    <span class="form-hint text">{{ hint }}</span>
+    <span class="error-message">{{ default_error }}</span>
+    {{ field(class="form-control") }}
+  </div>
+{%- endmacro %}
+
+{% macro render_search_field(label, input_field, hint, default_error) -%}
+  <div class="form-group form-group-search">
+    {{ label  }}
+    <span class="form-hint text">{{ hint }}</span>
+    <span class="error-message">{{ default_error }}</span>
+    <div class="grid-row">
+      <div class="search-form-control-wrapper column-half">
+        {{ input_field }}
+        <button class="button button-search" type="submit">Search</button>
+      </div>
+    </div>
+  </div>
+{%- endmacro %}
