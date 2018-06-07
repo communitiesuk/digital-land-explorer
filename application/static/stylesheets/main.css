@@ -2233,6 +2233,10 @@ ul.details {
   display: none;
 }
 
+.with-hero .phase-banner {
+  border-bottom: none;
+}
+
 .hero {
   background: #005ea5;
   color: #fff;
@@ -2269,6 +2273,24 @@ ul.details {
 .definition-inline dd {
   float: left;
   margin-right: 15px;
+}
+
+.related-section {
+  border-top: 2px solid #005ea5;
+}
+
+@media (min-width: 641px) {
+  .related-section-parallel-large {
+    margin-top: 2.36842em;
+  }
+}
+
+.related-links {
+  font-weight: 700;
+}
+
+.related-links li {
+  margin-top: 5px;
 }
 
 .find-area-form {
@@ -2317,6 +2339,92 @@ ul.details {
   box-shadow: none;
 }
 
+.button-load-data {
+  background-color: #005ea5;
+  position: relative;
+  display: -moz-inline-stack;
+  display: inline-block;
+  padding: .526315em .789473em .263157em;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  -webkit-appearance: none;
+  -webkit-box-shadow: 0 2px 0 #003259;
+  -moz-box-shadow: 0 2px 0 #003259;
+  box-shadow: 0 2px 0 #003259;
+  font-size: 1em;
+  line-height: 1.25;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  color: #fff;
+  margin-top: 5px;
+}
+
+.button-load-data:visited {
+  background-color: #005ea5;
+}
+
+.button-load-data:hover, .button-load-data:focus {
+  background-color: #004f8c;
+}
+
+.button-load-data:active {
+  top: 2px;
+  -webkit-box-shadow: 0 0 0 #005ea5;
+  -moz-box-shadow: 0 0 0 #005ea5;
+  box-shadow: 0 0 0 #005ea5;
+}
+
+.button-load-data.disabled, .button-load-data[disabled="disabled"], .button-load-data[disabled] {
+  zoom: 1;
+  filter: alpha(opacity=50);
+  opacity: 0.5;
+}
+
+.button-load-data.disabled:hover, .button-load-data[disabled="disabled"]:hover, .button-load-data[disabled]:hover {
+  cursor: default;
+  background-color: #005ea5;
+}
+
+.button-load-data.disabled:active, .button-load-data[disabled="disabled"]:active, .button-load-data[disabled]:active {
+  top: 0;
+  -webkit-box-shadow: 0 2px 0 #003259;
+  -moz-box-shadow: 0 2px 0 #003259;
+  box-shadow: 0 2px 0 #003259;
+}
+
+.button-load-data:link, .button-load-data:link:focus, .button-load-data:hover, .button-load-data:focus, .button-load-data:visited {
+  color: #fff;
+}
+
+.button-load-data:before {
+  content: "";
+  height: 110%;
+  width: 100%;
+  display: block;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.button-load-data:active:before {
+  top: -10%;
+  height: 120%;
+}
+
 .location {
   width: 100%;
+}
+
+.form-group .error-message {
+  display: none;
+}
+
+.form-group-error .error-message {
+  display: block;
 }

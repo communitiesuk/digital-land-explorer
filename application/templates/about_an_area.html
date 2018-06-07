@@ -6,24 +6,29 @@
     <main id="content" role="main">
       <h1 class="heading-xlarge">Search for data about an area</h1>
       <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
-        <fieldset class="form-group">
+        <fieldset>
           <legend>
             <h2 class="heading-medium visuallyhidden">
               Search for areas by lat/long
             </h2>
           </legend>
-          {{ form.query.label(class="form-label")  }}
-          <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
-          <div class="grid-row">
-            <div class="search-form-control-wrapper column-half">
-              {% if query %}
-              {{ form.query(class="form-control location", value=query) }}
-              {% else %}
-              {{ form.query(class="form-control location") }}
-              {% endif %}
-              <button class="button button-search" type="submit">Search</button>
-            </div>
-          </div>
+
+          {% from "macros/forms.html" import render_search_field %}
+
+          {% if query %}
+          {{ render_search_field(
+              form.query.label(class="form-label-bold"),
+              form.query(class="form-control location", value=query),
+              "E.g. 'Brockwell Park' or click on map below",
+              "There was an issue with your search. Please try again" ) }}
+          {% else %}
+          {{ render_search_field(
+              form.query.label(class="form-label-bold"),
+              form.query(class="form-control location"),
+              "E.g. 'Brockwell Park' or click on map below",
+              "There was an issue with your search. Please try again" ) }}
+          {% endif %}
+
         </fieldset>
         {{ form.csrf_token }}
       </form>
@@ -41,7 +46,7 @@
 								<dd class="display-lng">{% if latitude %}{{ '%0.5f'| format(longitude|float) }}{% endif %}</dd>
 							</dl>
 
-                        <a class="button reload-results-btn visually-hidden" href="#">Reload results</a>
+              <a class="button reload-results-btn button-load-data disabled" href="#">Reload results</a>
 
 						</div>
 					</div>
@@ -92,7 +97,7 @@
 
         var updateLinkURL = function(linkselector, lat, lng) {
             if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
+                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("disabled");
                 $( linkselector ).off('click');
                 $( linkselector ).click(function(event){
                     event.preventDefault();
@@ -154,19 +159,31 @@
           mymap.on('click', function(ev){
             resetField($form, ".location");
             updateLinkURL(".reload-results-btn", ev.latlng.lat, ev.latlng.lng);
-            displayLatLng({
-              lat: ev.latlng.lat,
-              lng: ev.latlng.lng
+            performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
+              displayLatLng(data);
             });
+          });
+        };
+
+        var performReverseGeocode = function(lat, lng, cb) {
+          $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "{{ url_for('frontend.reverse_geocode') }}",
+            data: JSON.stringify({lat: lat, lng: lng}),
+            success: cb,
+            dataType: "json"
           });
         };
 
         var displayLatLng = function(data) {
   				var $query_meta = $latlngPanel.find(".query-meta");
+          $query_meta.show();
   				if( data.query ) {
   					$latlngPanel.find(".display-query").text( data.query );
-  					$query_meta.show();
-  				} else {
+  				} else if (data.address) {
+            $latlngPanel.find(".display-query").text( data.address );
+          } else {
   					$query_meta.hide();
   				}
   				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
@@ -175,8 +192,17 @@
   			};
 
         var updateSearchQueryCallback = function(data) {
-          updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
-          displayLatLng(data);
+          var $location_input = $form.find(".location"),
+              $form_group = $form.find(".form-group-search");
+          if( data.success ) {
+            $location_input.removeClass("form-control-error");
+            $form_group.removeClass("form-group-error");
+            updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
+            displayLatLng(data);
+          } else {
+            $form_group.addClass("form-group-error");
+            $location_input.addClass("form-control-error");
+          }
         };
 
         $(function() {
@@ -199,8 +225,6 @@
             {% if latitude %}
                 renderMap({{ latitude }}, {{ longitude }});
                 query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
-                updateLinkURL(".reload-results-btn", lat ={{ latitude }}, long ={{ longitude }});
-                url =  $( ".reload-results-btn" ).attr("href");
             {% else %}
                 renderMap(54.29159, -1.99674);
             {% endif %}
@@ -209,7 +233,7 @@
       }).call(this, jQuery, window);
 
       document.addEventListener("DOMContentLoaded", function() {
-          url =  $(".reload-results-btn" ).attr("href");
+          url =  "/about-an-area-query?latitude="+{{ latitude }}+"&longitude="+{{ longitude }};
           if(url !== undefined) {
               doSearch(url, {{ latitude }}, {{ longitude }});
           }
