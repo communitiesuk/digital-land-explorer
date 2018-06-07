@@ -6,14 +6,17 @@
     <main id="content" role="main">
       <h1 class="heading-xlarge">Search for data about an area</h1>
       <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
-        <fieldset class="form-group">
+        <fieldset>
           <legend>
             <h2 class="heading-medium visuallyhidden">
               Search for areas by lat/long
             </h2>
           </legend>
-          {{ form.query.label(class="form-label")  }}
+
+          <div class="form-group form-group-search">
+          {{ form.query.label(class="form-label-bold")  }}
           <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
+          <span class="error-message">There was an issue with your search. Please try again</span>
           <div class="grid-row">
             <div class="search-form-control-wrapper column-half">
               {% if query %}
@@ -23,6 +26,7 @@
               {% endif %}
               <button class="button button-search" type="submit">Search</button>
             </div>
+          </div>
           </div>
         </fieldset>
         {{ form.csrf_token }}
@@ -175,13 +179,16 @@
   			};
 
         var updateSearchQueryCallback = function(data) {
+          var $location_input = $form.find(".location"),
+              $form_group = $form.find(".form-group-search");
           if( data.success ) {
-            $form.find(".location").removeClass("form-control-error");
+            $location_input.removeClass("form-control-error");
+            $form_group.removeClass("form-group-error");
             updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
             displayLatLng(data);
           } else {
-            console.log("There was an issue with the query");
-            $form.find(".location").addClass("form-control-error");
+            $form_group.addClass("form-group-error");
+            $location_input.addClass("form-control-error");
           }
         };
 

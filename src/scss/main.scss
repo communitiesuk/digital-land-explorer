@@ -60,3 +60,14 @@ $path: "/static/govuk_template/images/";
 .location {
   width: 100%;
 }
+
+.form-group {
+  .error-message {
+    display: none;
+  }
+}
+.form-group-error {
+  .error-message {
+    display: block;
+  }
+}

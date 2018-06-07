@@ -2275,6 +2275,24 @@ ul.details {
   margin-right: 15px;
 }
 
+.related-section {
+  border-top: 2px solid #005ea5;
+}
+
+@media (min-width: 641px) {
+  .related-section-parallel-large {
+    margin-top: 2.36842em;
+  }
+}
+
+.related-links {
+  font-weight: 700;
+}
+
+.related-links li {
+  margin-top: 5px;
+}
+
 .find-area-form {
   margin-top: 30px;
 }
@@ -2403,20 +2421,10 @@ ul.details {
   width: 100%;
 }
 
-.related-section {
-  border-top: 2px solid #005ea5;
+.form-group .error-message {
+  display: none;
 }
 
-@media (min-width: 641px) {
-  .related-section-parallel-large {
-    margin-top: 2.36842em;
-  }
-}
-
-.related-links {
-  font-weight: 700;
-}
-
-.related-links li {
-  margin-top: 5px;
+.form-group-error .error-message {
+  display: block;
 }
