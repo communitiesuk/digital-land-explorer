@@ -159,19 +159,31 @@
           mymap.on('click', function(ev){
             resetField($form, ".location");
             updateLinkURL(".reload-results-btn", ev.latlng.lat, ev.latlng.lng);
-            displayLatLng({
-              lat: ev.latlng.lat,
-              lng: ev.latlng.lng
+            performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
+              displayLatLng(data);
             });
+          });
+        };
+
+        var performReverseGeocode = function(lat, lng, cb) {
+          $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "{{ url_for('frontend.reverse_geocode') }}",
+            data: JSON.stringify({lat: lat, lng: lng}),
+            success: cb,
+            dataType: "json"
           });
         };
 
         var displayLatLng = function(data) {
   				var $query_meta = $latlngPanel.find(".query-meta");
+          $query_meta.show();
   				if( data.query ) {
   					$latlngPanel.find(".display-query").text( data.query );
-  					$query_meta.show();
-  				} else {
+  				} else if (data.address) {
+            $latlngPanel.find(".display-query").text( data.address );
+          } else {
   					$query_meta.hide();
   				}
   				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );

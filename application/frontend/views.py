@@ -8,7 +8,7 @@ from sqlalchemy import func
 
 from application.frontend.forms import LatLongForm, UKAreaForm
 from application.models import Organisation, Publication, Licence, Area, Attribution
-from application.geocode import nomgeocode
+from application.geocode import nom_geocode, nom_reverse_geocode
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
@@ -121,7 +121,7 @@ def about_an_area_query():
         if not results:
             message = 'No results found'
     elif query is not None:
-        geocoded_query = nomgeocode(query)
+        geocoded_query = nom_geocode(query)
         if geocoded_query['success']:
             lat = geocoded_query['lat']
             long = geocoded_query['lng']
@@ -139,7 +139,16 @@ def geocode():
   response = {}
   json = request.get_json()
   
-  geocoded_query = nomgeocode(json['query'])
+  geocoded_query = nom_geocode(json['query'])
+
+  return jsonify(geocoded_query)
+
+@frontend.route('/reversegeocode', methods=['POST'])
+def reverse_geocode():
+  response = {}
+  json = request.get_json()
+  
+  geocoded_query = nom_reverse_geocode(json['lat'], json['lng'])
 
   return jsonify(geocoded_query)
 

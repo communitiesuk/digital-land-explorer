@@ -1,7 +1,7 @@
 import requests
 import sys
 
-def nomgeocode(query):
+def nom_geocode(query):
   # send the query to the nominatim geocoder and parse the json response
   url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gb&q={}'
   url = url_template.format(query)
