@@ -17,7 +17,7 @@ gulp.task('clean-css', function () {
 });
 
 // compile scss to CSS
-gulp.task("scss", ['clean-css'], function() {
+gulp.task("scss", ['clean-css', 'copy'], function() {
 	return gulp.src( config.scssPath + '/*.scss')
 	.pipe(sass({outputStyle: 'expanded',
 		includePaths: [ 'src/govuk_frontend_toolkit/stylesheets',
@@ -29,6 +29,11 @@ gulp.task("scss", ['clean-css'], function() {
 // Watch src folder for changes
 gulp.task("watch", ["scss"], function () {
   gulp.watch("src/scss/**/*", ["scss"])
+});
+
+gulp.task('copy', function() {
+  gulp.src('src/vendor/css/*.css')
+    .pipe(gulp.dest(config.destPath))
 });
 
 // Set watch as default task
