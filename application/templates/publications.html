@@ -2,7 +2,29 @@
 {% block title %}Publications{% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">Publications</h1>
+        <h1 class="heading-xlarge">
+          <span class="heading-secondary">Explore</span>
+          Publications</h1>
+        <div class="grid-row">
+          <div class="column-one-half">
+            <div class="data">
+              <span class="data-item bold-xxlarge">{{ publications|length }}</span>
+              <span class="data-item bold-xsmall">Publications</span>
+            </div>
+          </div>
+          <div class="column-one-quarter">
+            <div class="data">
+              <span class="data-item bold-xxlarge">{{ org_num }}</span>
+              <span class="data-item bold-xsmall">Organisations</span>
+            </div>
+          </div>
+          <div class="column-one-quarter">
+            <div class="data">
+              <span class="data-item bold-xxlarge">{{ lic_num }}</span>
+              <span class="data-item bold-xsmall">Licences</span>
+            </div>
+          </div>
+        </div>
         <div class="grid-row">
             <div class="column-full">
                 <table>

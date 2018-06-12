@@ -43,7 +43,12 @@ def organisation(id):
 
 @frontend.route('/publications')
 def publications():
-    return render_template('publications.html', publications=Publication.query.all())
+    orgs = []
+    for pub in Publication.query.all():
+      if pub.organisation not in orgs:
+        orgs.append(pub.organisation)
+    licences = len(Licence.query.all())
+    return render_template('publications.html', publications=Publication.query.all(), org_num=len(orgs), lic_num=licences)
 
 
 @frontend.route('/publications/<id>')
