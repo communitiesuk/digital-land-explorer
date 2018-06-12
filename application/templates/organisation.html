@@ -33,30 +33,12 @@
                     <!-- TODO map here-->
                 </div>
                 <div class="column-half">
-                    <h2 class="heading-small">Publications</h2>
-                    <ul>
-                        {% for publication in organisation.publications %}
-                            <li>
-                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                                    {{ publication.name }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% include 'partials/_publication-list.html' %}
                 </div>
 
             {% elif organisation.publications %}
                 <div class="column-half">
-                    <h2 class="heading-small">Publications</h2>
-                    <ul>
-                        {% for publication in organisation.publications %}
-                            <li>
-                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                                    {{ publication.name }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% include 'partials/_publication-list.html' %}
                 </div>
             {% endif %}
         </div>

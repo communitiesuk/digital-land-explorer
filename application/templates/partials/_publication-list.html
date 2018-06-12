@@ -1,0 +1,10 @@
+<h2 class="heading-small">Publications</h2>
+<ul>
+    {% for publication in organisation.publications %}
+        <li>
+            <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
+                {{ publication.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
