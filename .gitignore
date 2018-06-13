@@ -104,4 +104,5 @@ node_modules
 .idea
 
 .pytest_cache/
+.DS_Store
 
