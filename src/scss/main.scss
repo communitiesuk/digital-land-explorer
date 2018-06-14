@@ -80,3 +80,16 @@ $path: "/static/govuk_template/images/";
     display: block;
   }
 }
+
+// temp styles for publication
+// content
+.contents-section {
+  padding-left: $gutter;
+  li {
+    margin-left: $gutter-half;
+  }
+}
+
+.pub-info-section__heading {
+  margin: 0;
+}

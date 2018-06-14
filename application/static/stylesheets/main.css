@@ -2479,3 +2479,15 @@ ul.details {
 .form-group-error .error-message {
   display: block;
 }
+
+.contents-section {
+  padding-left: 30px;
+}
+
+.contents-section li {
+  margin-left: 15px;
+}
+
+.pub-info-section__heading {
+  margin: 0;
+}
