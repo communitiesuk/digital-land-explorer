@@ -2,6 +2,8 @@
 {% block title %}Attributions{% endblock %}
 {% block content %}
     <div id="content" role="main">
+      {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
+      {{ render_breadcrumbs("attributions") }}
         <h1 class="heading-xlarge">Attributions</h1>
         <div class="grid-row">
             <div class="column-full">

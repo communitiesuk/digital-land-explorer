@@ -2,10 +2,12 @@
 <div class="breadcrumbs">
   <ol>
     <li><a href="{{ url_for('frontend.index')}}">Explorer</a></li>
+    {% if varargs %}
     {% for item in varargs %}
     <li><a href="{{ url_for('frontend.'+item) }}">{{ item|capitalize }}</a></li>
     {% endfor %}
-    <li aria-current="page">{{ currentpage }}</li>
+    {% endif %}
+    <li aria-current="page">{{ currentpage|capitalize }}</li>
   </ol>
 </div>
   
