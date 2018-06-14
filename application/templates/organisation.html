@@ -19,6 +19,9 @@
 {% block content %}
     <div id="content" role="main">
 
+      {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
+      {{ render_breadcrumbs(organisation.name, "organisations") }}
+
         <h1 class="heading-xlarge">
           <span class="heading-secondary">Organisation</span>
           {{ organisation.name }}
@@ -29,34 +32,17 @@
             {% if organisation.area %}
 
                 <div class="column-half">
+                  <h2 class="heading-small">Boundary</h2>
                     <div id="mapid" style="width: 400px; height: 300px;"></div>
                     <!-- TODO map here-->
                 </div>
                 <div class="column-half">
-                    <h2 class="heading-small">Publications</h2>
-                    <ul>
-                        {% for publication in organisation.publications %}
-                            <li>
-                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                                    {{ publication.name }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% include 'partials/_publication-list.html' %}
                 </div>
 
             {% elif organisation.publications %}
                 <div class="column-half">
-                    <h2 class="heading-small">Publications</h2>
-                    <ul>
-                        {% for publication in organisation.publications %}
-                            <li>
-                                <a href="{{ url_for('frontend.publication', id=publication.publication) }}">
-                                    {{ publication.name }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% include 'partials/_publication-list.html' %}
                 </div>
             {% endif %}
         </div>

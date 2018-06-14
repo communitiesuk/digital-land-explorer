@@ -7,7 +7,8 @@ const gulp = require("gulp"),
 // set paths ...
 const config = {
 	scssPath: "src/scss",
-	destPath: "application/static/stylesheets"
+	destPath: "application/static/stylesheets",
+  imgDestPath: "application/static/govuk_template/images"
 }
 
 // Delete our old stylesheets files
@@ -33,7 +34,9 @@ gulp.task("watch", ["scss"], function () {
 
 gulp.task('copy', function() {
   gulp.src('src/vendor/css/*.css')
-    .pipe(gulp.dest(config.destPath))
+    .pipe(gulp.dest(config.destPath));
+  gulp.src('src/govuk_elements/assets/images/*.png')
+    .pipe(gulp.dest(config.imgDestPath));
 });
 
 // Set watch as default task

@@ -5,7 +5,11 @@
 {% endblock %}
 {% block content %}
     <div id="content" role="main">
-        <h1 class="heading-xlarge">Organisations</h1>
+      {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
+      {{ render_breadcrumbs("organisations") }}
+        <h1 class="heading-xlarge">
+          <span class="heading-secondary">Explore</span>
+          Organisations</h1>
 
         <div class="grid-row">
           <form class="form org-search-form column-half">
