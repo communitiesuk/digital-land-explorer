@@ -14,14 +14,14 @@
         <div class="grid-row">
           <form class="form org-search-form column-half">
             <div class="form-group">
-              <label class="form-label-bold" for="org-picker">Organisation name</label>
+              <label class="form-label-bold" for="org-picker">Filter organisations</label>
               <select name="org-picker" id="org-picker">
                 <option value="">Select organistion</option>
                 {% for org in organisations %}
                 <option value="{{ org.organisation }}">{{ org.name }}</option>
                 {% endfor %}
               </select>
-              <a href="{{ url_for('frontend.organisations') }}" class="button button-close">View organisation</a>
+              <a href="{{ url_for('frontend.organisations') }}" class="button button-close button-filter-table">View organisation</a>
             </div>
           </form>
         </div>
@@ -62,6 +62,7 @@
     var base_url = "/organisations/";
     $(function() {
       var $form = $(".org-search-form");
+      $form.find('.button-filter-table').hide();
 
       accessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
@@ -74,7 +75,10 @@
               return el;
             }
           }).data('identifier');
-          $form.find(".button").attr('href', base_url + identifier);
+          $form
+            .find(".button")
+              .attr('href', base_url + identifier)
+              .show();
         }
       })
     });

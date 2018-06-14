@@ -43,7 +43,7 @@
                   <option value="{{ pub.publication }}">{{ pub.name }}</option>
                   {% endfor %}
                 </select>
-                <a href="{{ url_for('frontend.publications') }}" class="button button-close">View publication</a>
+                <a href="{{ url_for('frontend.publications') }}" class="button button-close button-filter-table">View publication</a>
               </div>
             </form>
           </div>
@@ -91,6 +91,7 @@
     var base_url = "/publications/";
     $(function() {
       var $form = $(".pub-search-form");
+      $form.find('.button-filter-table').hide();
 
       accessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
@@ -103,7 +104,10 @@
               return el;
             }
           }).data('identifier');
-          $form.find(".button").attr('href', base_url + identifier);
+          $form
+            .find(".button")
+              .attr('href', base_url + identifier)
+              .show();
         }
       })
     });
