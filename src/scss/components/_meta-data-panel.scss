@@ -1,0 +1,40 @@
+// Meta data panel component
+// -------------------------
+//
+// creates a panel to highlight key information
+// about a document or publication
+//
+// usually used at the top of the page
+// useful for publications
+
+$mdp-panel-colour: $department-for-communities-and-local-government;
+$mdp-text-colour: darken($page-colour, 10);
+$mdp-link-colour: $page-colour;
+
+$mdp-info-line-height: 1.5em;
+
+.meta-data-panel {
+  background: $mdp-panel-colour;
+  color: $mdp-text-colour;
+  margin-bottom: $gutter*2;
+  padding: $gutter;
+  a {
+    color: $mdp-link-colour;
+  }
+  .heading-secondary {
+    color: darken($mdp-text-colour, 15);
+  }
+}
+
+.mdp-info-section {
+  margin-top: $gutter-half;
+  line-height: $mdp-info-line-height;
+}
+
+.mdp-links-section {
+  border-left: 1px solid $mdp-text-colour;
+  .mdp-heading {
+    margin: 0;
+    line-height: $mdp-info-line-height;
+  }
+}

@@ -1,48 +1,73 @@
 {% extends "base.html" %}
 {% block title %}{{ publication.publication }}{% endblock %}
 {% block content %}
-    <div id="content" role="main">
+    <main id="content" role="main">
       {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
       {{ render_breadcrumbs(publication.name, "publications") }}
 
-        <h1 class="heading-xlarge">
-          <span class="heading-secondary">Publication</span>
-          {{ publication.name }}
-        </h1>
-
+      <div class="meta-data-panel">
         <div class="grid-row">
-            <div class="column-full">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Publication</th>
-                            <th>Name</th>
-                            <th>Organisation</th>
-                            <th>url</th>
-                            <th>Data url</th>
-                            <th>Licence</th>
-                            <th>Attribution</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ publication.publication }}</td>
-                            <td>{{ publication.name }}</td>
-                            <td>
-                                {% if publication.organisation %}
-                                     <a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
-                                {{ publication.organisation.name }}</a>
-                                {% endif %}
-                            </td>
-                            <td><a href="{{ publication.url }}">publication url</a></td>
-                            <td><a href="{{ publication.data_url }}">data url</a></td>
-                            <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
-                            <td><a href="{{ url_for('frontend.attribution', id=publication.attribution.attribution) }}">{{ publication.attribution.name }}</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+          <div class="column-full">
+            <h1 class="heading-xlarge">
+              <span class="heading-secondary">Publication</span>
+              {{ publication.name }}
+            </h1>
+            <h3 class="heading-medium">
+              Published by:
+            {% if publication.organisation %}
+              <a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
+                {{ publication.organisation.name }}</a>
+            {% endif %}
+            </h3>
+
+          </div>
         </div>
-    </div>
+        <div class="grid-row mdp-info-section">
+          <div class="column-three-quarters">
+            <dl class="definition-inline definition-list-spread">
+              <dt>Licence</dt>
+              <dd><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></dd>
+              <dt>Attribution</dt>
+              <dd><a href="{{ url_for('frontend.attribution', id=publication.attribution.attribution) }}">{{ publication.attribution.name }}</a></dd>
+              <dt>Category</dt>
+              <dd></dd>
+            </dl>
+          </div>
+          <div class="column-one-quarter mdp-links-section">
+            <h4 class="heading-small mdp-heading">Links</h4>
+            <ol>
+              <li><a href="{{ publication.url }}">Publication</a></li>
+              <li><a href="{{ publication.data_url }}">Data</a></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row">
+        <div class="column-one-third">
+          <div class="contents-section">
+            Contents
+            <ol>
+              <li>- <a href="#pub-info-description">Description</a></li>
+              <li>- <a href="#pub-info-data">Data</a></li>
+              <li>- <a href="pub-info-tasks">Tasks performed</a></li>
+            </ol>
+          </div>
+        </div>
+        <div class="column-two-thirds">
+
+          {% macro render_pub_info_section(sectionTitle, sectionId) %}
+          <section class="pub-info-section" id="{{ sectionId }}">
+            <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
+          </section>
+          {% endmacro %}
+          {{ render_pub_info_section("Description", "pub-info-description") }}
+          {{ render_pub_info_section("Data", "pub-info-data") }}
+          {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
+
+        </div>
+      </div>
+
+    </main>
 {% endblock %}
 

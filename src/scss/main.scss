@@ -8,7 +8,13 @@ $path: "/static/govuk_template/images/";
 @import "additional";
 @import "components/hero";
 @import "components/definition-list";
+@import "components/filter-section";
 @import "components/related-section";
+@import "components/meta-data-panel";
+
+.column-three-quarters {
+  @include grid-column(3 / 4);
+}
 
 .find-area-form {
 	margin-top: $gutter;
@@ -74,4 +80,17 @@ $path: "/static/govuk_template/images/";
   .error-message {
     display: block;
   }
+}
+
+// temp styles for publication
+// content
+.contents-section {
+  padding-left: $gutter;
+  li {
+    margin-left: $gutter-half;
+  }
+}
+
+.pub-info-section__heading {
+  margin: 0;
 }
