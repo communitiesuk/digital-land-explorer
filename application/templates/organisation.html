@@ -19,6 +19,9 @@
 {% block content %}
     <div id="content" role="main">
 
+      {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
+      {{ render_breadcrumbs(organisation.name, "organisations") }}
+
         <h1 class="heading-xlarge">
           <span class="heading-secondary">Organisation</span>
           {{ organisation.name }}

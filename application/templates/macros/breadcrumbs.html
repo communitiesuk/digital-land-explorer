@@ -1,0 +1,12 @@
+{% macro render_breadcrumbs(currentpage) -%}
+<div class="breadcrumbs">
+  <ol>
+    <li><a href="{{ url_for('frontend.index')}}">Explorer</a></li>
+    {% for item in varargs %}
+    <li><a href="{{ url_for('frontend.'+item) }}">{{ item|capitalize }}</a></li>
+    {% endfor %}
+    <li aria-current="page">{{ currentpage }}</li>
+  </ol>
+</div>
+  
+{%- endmacro %}
