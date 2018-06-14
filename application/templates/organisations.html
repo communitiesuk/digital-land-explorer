@@ -23,7 +23,6 @@
               </select>
               <a href="{{ url_for('frontend.organisations') }}" class="button button-close">View organisation</a>
             </div>
-            
           </form>
         </div>
 
@@ -35,6 +34,7 @@
                       <th scope="col">Name</th>
                       <th>Organisation identifier</th>
                       <th>Website</th>
+                      <th>Publications</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -45,6 +45,7 @@
                                 {{ org.organisation }}</a>
                             </td>
                             <td><a href="{{ org.website }}">{{ org.website }}</a></td>
+                            <td>{{ org.publications|length }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
