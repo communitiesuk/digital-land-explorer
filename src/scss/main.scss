@@ -12,8 +12,11 @@ $path: "/static/govuk_template/images/";
 @import "components/related-section";
 @import "components/meta-data-panel";
 
-.column-three-quarters {
-  @include grid-column(3 / 4);
+@import "common/forms";
+@import "common/layout";
+
+.data-item a {
+  color: $text-colour;
 }
 
 .find-area-form {
@@ -58,29 +61,8 @@ $path: "/static/govuk_template/images/";
   @include box-shadow(none);
 }
 
-.button-load-data,
-.button-filter-table {
-  @include button($govuk-blue);
-  margin-top: 5px;
-}
-
-.button-close {
-  margin-top: 5px;
-}
-
 .location {
   width: 100%;
-}
-
-.form-group {
-  .error-message {
-    display: none;
-  }
-}
-.form-group-error {
-  .error-message {
-    display: block;
-  }
 }
 
 // temp styles for publication
@@ -94,8 +76,4 @@ $path: "/static/govuk_template/images/";
 
 .pub-info-section__heading {
   margin: 0;
-}
-
-.data-item a {
-  color: $text-colour;
 }
