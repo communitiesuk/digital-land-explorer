@@ -2519,3 +2519,7 @@ ul.details {
 .pub-info-section__heading {
   margin: 0;
 }
+
+.data-item a {
+  color: #0b0c0c;
+}

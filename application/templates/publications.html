@@ -20,13 +20,13 @@
           <div class="column-one-quarter">
             <div class="data">
               <span class="data-item bold-xxlarge">{{ org_num }}</span>
-              <span class="data-item bold-xsmall">Organisations</span>
+              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
             </div>
           </div>
           <div class="column-one-quarter">
             <div class="data">
               <span class="data-item bold-xxlarge">{{ lic_num }}</span>
-              <span class="data-item bold-xsmall">Licences</span>
+              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.licences') }}">Licences</a></span>
             </div>
           </div>
         </div>
