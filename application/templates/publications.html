@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Publications{% endblock %}
+{% block end_head %}
+<link rel="stylesheet" href="/static/stylesheets/accessible-autocomplete.min.css" />
+{% endblock %}
 {% block content %}
     <div id="content" role="main">
       {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
@@ -27,9 +30,28 @@
             </div>
           </div>
         </div>
+
+        <div class="filter-section">
+          <h3 class="heading-small visually-hidden">Filter publications</h3>
+          <div class="grid-row">
+            <form class="form pub-search-form column-half">
+              <div class="form-group">
+                <label class="form-label-bold" for="pub-picker">Filter publications</label>
+                <select name="pub-picker" id="pub-picker">
+                  <option value="">Select publication</option>
+                  {% for pub in publications %}
+                  <option value="{{ pub.publication }}">{{ pub.name }}</option>
+                  {% endfor %}
+                </select>
+                <a href="{{ url_for('frontend.publications') }}" class="button button-close">View publication</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        
         <div class="grid-row">
             <div class="column-full">
-                <table>
+                <table class="pub-table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -42,7 +64,7 @@
                     </thead>
                     <tbody>
                    {% for publication in publications %}
-                       <tr>
+                       <tr data-name="{{ publication.name }}" data-identifier="{{ publication.publication }}">
                            <td>{{ publication.name }}</td>
                            <td><a href="{{ url_for('frontend.publication', id=publication.publication ) }}">{{ publication.publication }}</a></td>
                            <td>
@@ -62,3 +84,29 @@
     </div>
 {% endblock %}
 
+{% block end_body %}
+<script src="/static/javascripts/vendor/accessible-autocomplete.min.js"></script>
+<script type="text/javascript">
+  (function($, window) {
+    var base_url = "/publications/";
+    $(function() {
+      var $form = $(".pub-search-form");
+
+      accessibleAutocomplete.enhanceSelectElement({
+        defaultValue: '',
+        confirmOnBlur: false,
+        selectElement: document.querySelector('#pub-picker'),
+        onConfirm: function(val) {
+          console.log("type ahead change", val);
+          var identifier = $(".pub-table tr").filter(function(ind, el){
+            if( $(el).data('name') === val ) {
+              return el;
+            }
+          }).data('identifier');
+          $form.find(".button").attr('href', base_url + identifier);
+        }
+      })
+    });
+  }).call(this, jQuery, window);
+</script>
+{% endblock %}

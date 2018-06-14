@@ -2279,6 +2279,13 @@ ul.details {
   margin-right: 30px;
 }
 
+.filter-section {
+  border-top: 1px solid #bfc1c3;
+  border-bottom: 1px solid #bfc1c3;
+  margin-top: 15px;
+  padding-top: 30px;
+}
+
 .related-section {
   border-top: 2px solid #005ea5;
 }
