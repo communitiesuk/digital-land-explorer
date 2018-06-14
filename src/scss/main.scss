@@ -9,6 +9,11 @@ $path: "/static/govuk_template/images/";
 @import "components/hero";
 @import "components/definition-list";
 @import "components/related-section";
+@import "components/meta-data-panel";
+
+.column-three-quarters {
+  @include grid-column(3 / 4);
+}
 
 .find-area-form {
 	margin-top: $gutter;

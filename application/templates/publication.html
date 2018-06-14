@@ -1,17 +1,51 @@
 {% extends "base.html" %}
 {% block title %}{{ publication.publication }}{% endblock %}
 {% block content %}
-    <div id="content" role="main">
+    <main id="content" role="main">
       {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
       {{ render_breadcrumbs(publication.name, "publications") }}
 
-        <h1 class="heading-xlarge">
-          <span class="heading-secondary">Publication</span>
-          {{ publication.name }}
-        </h1>
-
         <div class="grid-row">
             <div class="column-full">
+
+              <div class="meta-data-panel">
+                <div class="grid-row">
+                  <div class="column-full">
+                    <h1 class="heading-xlarge">
+                      <span class="heading-secondary">Publication</span>
+                      {{ publication.name }}
+                    </h1>
+                    <h3 class="heading-medium">
+                      Published by:
+                    {% if publication.organisation %}
+                      <a href="{{ url_for('frontend.organisation', id=publication.organisation.organisation) }}">
+                        {{ publication.organisation.name }}</a>
+                    {% endif %}
+                    </h3>
+
+                  </div>
+                </div>
+                <div class="grid-row mdp-info-section">
+                  <div class="column-three-quarters">
+                    <dl class="definition-inline definition-list-spread">
+                      <dt>Category</dt>
+                      <dd>Test</dd>
+                      <dt>Licence</dt>
+                      <dd><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></dd>
+                      <dt>Attribution</dt>
+                      <dd><a href="{{ url_for('frontend.attribution', id=publication.attribution.attribution) }}">{{ publication.attribution.name }}</a></dd>
+                    </dl>
+                  </div>
+                  <div class="column-one-quarter mdp-links-section">
+                    <h4 class="heading-small mdp-heading">Links</h4>
+                    <ol>
+                      <li><a href="{{ publication.url }}">Publication</a></li>
+                      <li><a href="{{ publication.data_url }}">Data</a></li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+
                 <table>
                     <thead>
                         <tr>
@@ -43,6 +77,6 @@
                 </table>
             </div>
         </div>
-    </div>
+    </main>
 {% endblock %}
 

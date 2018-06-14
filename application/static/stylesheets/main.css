@@ -2275,6 +2275,10 @@ ul.details {
   margin-right: 15px;
 }
 
+.definition-list-spread dt {
+  margin-right: 30px;
+}
+
 .related-section {
   border-top: 2px solid #005ea5;
 }
@@ -2291,6 +2295,49 @@ ul.details {
 
 .related-links li {
   margin-top: 5px;
+}
+
+.meta-data-panel {
+  background: #00857e;
+  color: #e6e6e6;
+  margin-bottom: 60px;
+  padding: 30px;
+}
+
+.meta-data-panel a {
+  color: #fff;
+}
+
+.meta-data-panel .heading-secondary {
+  color: #bfbfbf;
+}
+
+.mdp-info-section {
+  margin-top: 15px;
+  line-height: 1.5em;
+}
+
+.mdp-links-section {
+  border-left: 1px solid #e6e6e6;
+}
+
+.mdp-links-section .mdp-heading {
+  margin: 0;
+  line-height: 1.5em;
+}
+
+.column-three-quarters {
+  padding: 0 15px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@media (min-width: 641px) {
+  .column-three-quarters {
+    float: left;
+    width: 75%;
+  }
 }
 
 .find-area-form {
