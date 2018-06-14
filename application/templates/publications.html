@@ -36,7 +36,9 @@
           <div class="grid-row">
             <form class="form pub-search-form column-half">
               <div class="form-group">
-                <label class="form-label-bold" for="pub-picker">Filter publications</label>
+                <label class="form-label-bold" for="pub-picker">Filter publications
+                  <span class="form-hint">Enter name of a publication e.g. Lambeth Local Views</span>
+                </label>
                 <select name="pub-picker" id="pub-picker">
                   <option value="">Select publication</option>
                   {% for pub in publications %}
