@@ -20,13 +20,13 @@
           <div class="column-one-quarter">
             <div class="data">
               <span class="data-item bold-xxlarge">{{ org_num }}</span>
-              <span class="data-item bold-xsmall">Organisations</span>
+              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
             </div>
           </div>
           <div class="column-one-quarter">
             <div class="data">
               <span class="data-item bold-xxlarge">{{ lic_num }}</span>
-              <span class="data-item bold-xsmall">Licences</span>
+              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.licences') }}">Licences</a></span>
             </div>
           </div>
         </div>
@@ -36,14 +36,16 @@
           <div class="grid-row">
             <form class="form pub-search-form column-half">
               <div class="form-group">
-                <label class="form-label-bold" for="pub-picker">Filter publications</label>
+                <label class="form-label-bold" for="pub-picker">Filter publications
+                  <span class="form-hint">Enter name of a publication e.g. Lambeth Local Views</span>
+                </label>
                 <select name="pub-picker" id="pub-picker">
                   <option value="">Select publication</option>
                   {% for pub in publications %}
                   <option value="{{ pub.publication }}">{{ pub.name }}</option>
                   {% endfor %}
                 </select>
-                <a href="{{ url_for('frontend.publications') }}" class="button button-close">View publication</a>
+                <a href="{{ url_for('frontend.publications') }}" class="button button-close button-filter-table">View publication</a>
               </div>
             </form>
           </div>
@@ -91,6 +93,7 @@
     var base_url = "/publications/";
     $(function() {
       var $form = $(".pub-search-form");
+      $form.find('.button-filter-table').hide();
 
       accessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
@@ -103,7 +106,10 @@
               return el;
             }
           }).data('identifier');
-          $form.find(".button").attr('href', base_url + identifier);
+          $form
+            .find(".button")
+              .attr('href', base_url + identifier)
+              .show();
         }
       })
     });

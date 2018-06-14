@@ -14,16 +14,16 @@
         <div class="grid-row">
           <form class="form org-search-form column-half">
             <div class="form-group">
-              <label class="form-label-bold" for="org-picker">Organisation name</label>
+              <label class="form-label-bold" for="org-picker">Filter organisations
+                <span class="form-hint">Enter name of an organisation e.g. Lambeth Council</span></label>
               <select name="org-picker" id="org-picker">
                 <option value="">Select organistion</option>
                 {% for org in organisations %}
                 <option value="{{ org.organisation }}">{{ org.name }}</option>
                 {% endfor %}
               </select>
-              <a href="{{ url_for('frontend.organisations') }}" class="button button-close">View organisation</a>
+              <a href="{{ url_for('frontend.organisations') }}" class="button button-close button-filter-table">View organisation</a>
             </div>
-            
           </form>
         </div>
 
@@ -35,6 +35,7 @@
                       <th scope="col">Name</th>
                       <th>Organisation identifier</th>
                       <th>Website</th>
+                      <th>Publications</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -45,6 +46,7 @@
                                 {{ org.organisation }}</a>
                             </td>
                             <td><a href="{{ org.website }}">{{ org.website }}</a></td>
+                            <td class="numeric">{{ org.publications|length }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -61,6 +63,7 @@
     var base_url = "/organisations/";
     $(function() {
       var $form = $(".org-search-form");
+      $form.find('.button-filter-table').hide();
 
       accessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
@@ -73,7 +76,10 @@
               return el;
             }
           }).data('identifier');
-          $form.find(".button").attr('href', base_url + identifier);
+          $form
+            .find(".button")
+              .attr('href', base_url + identifier)
+              .show();
         }
       })
     });
