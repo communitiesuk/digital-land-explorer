@@ -81,17 +81,58 @@
             });
         };
 
+        var geoUtils = (function() {
+          var config = {};
+
+          /* reduce lat or lng number to desirable
+             number of decimal places */
+  			  var roundLatLng = function(latlng, decs) {
+  				  return parseFloat(latlng.toFixed(decs));
+  			  };
+
+          // attempts to geocode the query
+          var performGeocode = function(queryStr, cb) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: this.config.urls.geocode,
+                data: JSON.stringify({query: queryStr}),
+                success: cb,
+                dataType: "json"
+            });
+          };
+
+          // attempts to obtain an address from lat, lng coords
+          var performReverseGeocode = function(lat, lng, cb) {
+            $.ajax({
+              type: "POST",
+              contentType: "application/json; charset=utf-8",
+              url: this.config.urls.reversegeocode,
+              data: JSON.stringify({lat: lat, lng: lng}),
+              success: cb,
+              dataType: "json"
+            });
+          };
+
+          var init = function(settings) {
+            this.config = settings;
+            // only expose once url endpoints are set
+            if(this.config.urls.geocode) this.performGeocode = performGeocode;
+            if(this.config.urls.reversegeocode) this.performReverseGeocode = performReverseGeocode;
+            console.log(this);
+          }
+
+          return {
+            init: init,
+            roundLatLng: roundLatLng
+          }
+        })();
+
       (function($, window) {
           var mymap,
               query_marker,
               $form,
               $latlngPanel;
-
-        /* reduce lat or lng number to desirable
-           number of decimal places */
-			  var roundLatLngVal = function(latlng, decs) {
-				  return parseFloat(latlng.toFixed(decs));
-			  };
 
           var resetField = function($form, fieldselector) {
           if( $form !== undefined ) {
@@ -163,20 +204,9 @@
           mymap.on('click', function(ev){
             resetField($form, ".location");
             updateLinkURL(".reload-results-btn", ev.latlng.lat, ev.latlng.lng);
-            performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
+            geoUtils.performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
               displayLatLng(data);
             });
-          });
-        };
-
-        var performReverseGeocode = function(lat, lng, cb) {
-          $.ajax({
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            url: "{{ url_for('frontend.reverse_geocode') }}",
-            data: JSON.stringify({lat: lat, lng: lng}),
-            success: cb,
-            dataType: "json"
           });
         };
 
@@ -190,8 +220,8 @@
           } else {
   					$query_meta.hide();
   				}
-  				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
-  				$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
+  				$latlngPanel.find(".display-lat").text( geoUtils.roundLatLng(data.lat, 5) );
+  				$latlngPanel.find(".display-lng").text( geoUtils.roundLatLng(data.lng, 5) );
           query_marker = updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
   			};
 
@@ -210,20 +240,19 @@
         };
 
         $(function() {
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+            }
+          });
 
             $form = $(".location-search-form");
             $latlngPanel = $(".lat-lng-panel");
 
             $form.on("submit", function (e) {
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    url: "{{ url_for('frontend.geocode') }}",
-                    data: JSON.stringify({query: $form.find(".location").val()}),
-                    success: updateSearchQueryCallback,
-                    dataType: "json"
-                });
-                e.preventDefault();
+              geoUtils.performGeocode($form.find(".location").val(), updateSearchQueryCallback);
+              e.preventDefault();
             });
 
             {% if latitude %}
