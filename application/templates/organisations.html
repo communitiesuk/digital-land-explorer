@@ -40,7 +40,7 @@
                     </thead>
                     <tbody>
                     {% for org in organisations %}
-                        <tr data-name="{{ org.name }}" data-identifier="{{ org.organisation }}">
+                        <tr class="org-row" data-name="{{ org.name }}" data-identifier="{{ org.organisation }}">
                           <td scope="row">{{ org.name }}</td>
                             <td><a href="{{ url_for('frontend.organisation', id=org.organisation) }}">
                                 {{ org.organisation }}</a>
@@ -61,25 +61,30 @@
 <script type="text/javascript">
   (function($, window) {
     var base_url = "/organisations/";
+
+    const orgs = [];
+
+    function findMatches(strToMatch, orgs) {
+      return orgs.filter(orgrow => {
+        const regex = new RegExp(strToMatch, 'gi');
+        return orgrow.dataset.name.match(regex);
+      });
+    }
+
     $(function() {
       var $form = $(".org-search-form");
       $form.find('.button-filter-table').hide();
+
+      orgs.push(...document.querySelectorAll('.org-row'));
 
       accessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
         confirmOnBlur: false,
         selectElement: document.querySelector('#org-picker'),
         onConfirm: function(val) {
-          console.log("type ahead change", val);
-          var identifier = $(".org-table tr").filter(function(ind, el){
-            if( $(el).data('name') === val ) {
-              return el;
-            }
-          }).data('identifier');
-          $form
-            .find(".button")
-              .attr('href', base_url + identifier)
-              .show();
+          const matchedOrgs = findMatches(val, orgs);
+          orgs.forEach((el) => el.classList.add("visually-hidden"));
+          matchedOrgs.forEach((el) => el.classList.remove("visually-hidden"));
         }
       })
     });
