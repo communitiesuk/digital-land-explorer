@@ -69,85 +69,10 @@
     <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
     <script src="/static/javascripts/geoUtils.js"></script>
     <script src="/static/javascripts/dsl-map-utils.js"></script>
+    <script src="/static/javascripts/search-map.js"></script>
     <script>
 
-        var doSearch = function(url, lat, lng) {
-            $.ajax({
-                type: "GET",
-                url: url,
-                contentType: "text/html; charset=utf-8",
-                success: function(data) {
-                    $('#results-container').html(data);
-                    window.history.pushState({}, "current search", "/about-an-area?latitude="+lat+"&longitude="+lng);
-                }
-            });
-        };
-
       (function($, window) {
-          var mymap,
-              query_marker,
-              $form,
-              $latlngPanel;
-
-          var resetField = function($form, fieldselector) {
-          if( $form !== undefined ) {
-            $form.find(fieldselector).val("");
-          }
-        };
-
-        var updateLinkURL = function(linkselector, lat, lng) {
-            if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("disabled");
-                $( linkselector ).off('click');
-                $( linkselector ).click(function(event){
-                    event.preventDefault();
-                    url = event.currentTarget.getAttribute('href');
-                    doSearch(url, lat, lng);
-                });
-            }
-        };
-
-        var renderMap = function(lat, lng) {
-          mymap = dslMapUtils.renderLeafletMap('location-search-map')
-                             .setView([lat, lng], 12);
-
-          mymap.on('click', function(ev){
-            resetField($form, ".location");
-            updateLinkURL(".reload-results-btn", ev.latlng.lat, ev.latlng.lng);
-            geoUtils.performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
-              displayLatLng(data);
-            });
-          });
-        };
-
-        var displayLatLng = function(data) {
-  				var $query_meta = $latlngPanel.find(".query-meta");
-          $query_meta.show();
-  				if( data.query ) {
-  					$latlngPanel.find(".display-query").text( data.query );
-  				} else if (data.address) {
-            $latlngPanel.find(".display-query").text( data.address );
-          } else {
-  					$query_meta.hide();
-  				}
-  				$latlngPanel.find(".display-lat").text( geoUtils.roundLatLng(data.lat, 5) );
-  				$latlngPanel.find(".display-lng").text( geoUtils.roundLatLng(data.lng, 5) );
-          dslMapUtils.updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
-  			};
-
-        var updateSearchQueryCallback = function(data) {
-          var $location_input = $form.find(".location"),
-              $form_group = $form.find(".form-group-search");
-          if( data.success ) {
-            $location_input.removeClass("form-control-error");
-            $form_group.removeClass("form-group-error");
-            updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
-            displayLatLng(data);
-          } else {
-            $form_group.addClass("form-group-error");
-            $location_input.addClass("form-control-error");
-          }
-        };
 
         $(function() {
           geoUtils.init({
@@ -161,30 +86,27 @@
             mapbox_token: '{{ config.MAPBOX_TOKEN }}'
           });
 
-            $form = $(".location-search-form");
-            $latlngPanel = $(".lat-lng-panel");
+          {% if latitude %}
+          var start_place = {
+            lat: {{ latitude }},
+            lng: {{ longitude }}
+          }
+          {% else %}
+          var start_place = {
+            lat: 54.29159,
+            lng: -1.99674
+          };
+          {% endif %}
 
-            $form.on("submit", function (e) {
-              geoUtils.performGeocode($form.find(".location").val(), updateSearchQueryCallback);
-              e.preventDefault();
-            });
+          searchMap.initializeMap({
+            place: start_place,
+            form_selector: '.location-search-form',
+            latlng_panel_selector: '.lat-lng-panel',
+            map_selector: 'location-search-map',
+            result_btn_selector: '.reload-results-btn',
+            results_page: true
+          });
 
-            {% if latitude %}
-            var start_place = {
-              lat: {{ latitude }},
-              lng: {{ longitude }}
-            }
-            {% else %}
-            var start_place = {
-              lat: 54.29159,
-              lng: -1.99674
-            };
-            {% endif %}
-            renderMap(start_place.lat, start_place.lng);
-            query_marker = dslMapUtils.addMarkerToMap(mymap, start_place.lat, start_place.lng);
-            var url = "/about-an-area-query?latitude="+ start_place.lat +"&longitude="+ start_place.lng;
-            doSearch(url, start_place.lat, start_place.lng);
-            displayLatLng(start_place);
         });
 
       }).call(this, jQuery, window);
