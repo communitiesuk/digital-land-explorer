@@ -68,6 +68,7 @@
 {% block end_body %}
     <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
     <script src="/static/javascripts/geoUtils.js"></script>
+    <script src="/static/javascripts/dsl-map-utils.js"></script>
     <script>
 
         var doSearch = function(url, lat, lng) {
@@ -106,54 +107,9 @@
             }
         };
 
-        /* Given map
-  			   create marker at lat and lng
-  			   return marker ref */
-        var addMarkerToMap = function(map, lat, lng) {
-            var marker = L.marker([lat, lng]);
-            map.addLayer(marker);
-            return marker;
-        };
-
-        var removeMarkerFromMap = function(marker, map) {
-          if( marker ) {
-            map.removeLayer( marker );
-          }
-        };
-
-        /* Update a marker position on a map
-            marker: an existing marker object
-            Lmap: a leaflet map
-            lat: new latitude
-            lng: new longitude
-            pan: [Bool] if you want map to pan to new marker */
-        var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
-          removeMarkerFromMap( marker, Lmap );
-  				new_marker = addMarkerToMap(Lmap, lat, lng);
-          if ( pan ) {
-            Lmap.panTo(new L.LatLng(lat, lng));
-          }
-          return new_marker;
-        };
-
-
-        /* render a basic leaflet map
-            takes #id for the map
-            and any leaflet options */
-        var renderLeafletMap = function(map_element_id, options) {
-          var options = options || {};
-          var Lmap = L.map(map_element_id, options);
-          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-          }).addTo(Lmap);
-          return Lmap;
-        };
-
         var renderMap = function(lat, lng) {
-          mymap = renderLeafletMap('location-search-map').setView([lat, lng], 12);
+          mymap = dslMapUtils.renderLeafletMap('location-search-map')
+                             .setView([lat, lng], 12);
 
           mymap.on('click', function(ev){
             resetField($form, ".location");
@@ -176,7 +132,7 @@
   				}
   				$latlngPanel.find(".display-lat").text( geoUtils.roundLatLng(data.lat, 5) );
   				$latlngPanel.find(".display-lng").text( geoUtils.roundLatLng(data.lng, 5) );
-          query_marker = updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
+          query_marker = dslMapUtils.updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
   			};
 
         var updateSearchQueryCallback = function(data) {
@@ -201,6 +157,10 @@
             }
           });
 
+          dslMapUtils.init({
+            mapbox_token: '{{ config.MAPBOX_TOKEN }}'
+          });
+
             $form = $(".location-search-form");
             $latlngPanel = $(".lat-lng-panel");
 
@@ -211,7 +171,7 @@
 
             {% if latitude %}
                 renderMap({{ latitude }}, {{ longitude }});
-                query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
+                query_marker = dslMapUtils.addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
             {% else %}
                 renderMap(54.29159, -1.99674);
             {% endif %}
