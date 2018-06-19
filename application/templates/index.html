@@ -82,6 +82,7 @@
 
 
 {% block end_body %}
+    <script src="/static/javascripts/geoUtils.js"></script>
     <script>
         /* default place vals */
         var place = {
@@ -90,12 +91,6 @@
             zoom: 12,
             current_query: false
         };
-
-        /* reduce lat or lng number to desirable
-           number of decimal places */
-        var roundLatLngVal = function(latlng, decs) {
-            return parseFloat(latlng.toFixed(decs));
-        }
 
         /* Given map
            create marker at lat and lng
@@ -130,8 +125,8 @@
         /* update lat and lng in form and
            update marker pos */
         var setLatLng = function(lat, lng, pan){
-      		var lat = roundLatLngVal(lat, 5),
-          		lng = roundLatLngVal(lng, 5);
+      		var lat = geoUtils.roundLatLng(lat, 5),
+          		lng = geoUtils.roundLatLng(lng, 5);
 			  	$latlngPanel.find(".display-lat").text( lat );
 			  	$latlngPanel.find(".display-lng").text( lng );
 					if (query_marker) {
@@ -210,16 +205,16 @@
 					var $searchForm = jQuery(".location-search-form");
 					$latlngPanel = $(".lat-lng-panel");
 
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+            }
+          });
+
           $searchForm.on("submit", function (e) {
-              $.ajax({
-                  type: "POST",
-                  contentType: "application/json; charset=utf-8",
-                  url: "{{ url_for('frontend.geocode') }}",
-                  data: JSON.stringify({query: $searchForm.find(".location").val()}),
-                  success: updateSearchQueryCallback,
-                  dataType: "json"
-              });
-              e.preventDefault();
+            geoUtils.performGeocode($searchForm.find(".location").val(), updateSearchQueryCallback);
+            e.preventDefault();
           });
 
 				});
