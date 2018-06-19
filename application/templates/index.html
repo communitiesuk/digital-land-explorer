@@ -101,7 +101,7 @@
 			  	$latlngPanel.find(".display-lat").text( lat );
 			  	$latlngPanel.find(".display-lng").text( lng );
 					if (query_marker) {
-						query_marker = dslMapUtils.updateMarkerPos(query_marker, mymap, lat, lng, pan);
+						dslMapUtils.updateMarkerPos(query_marker, mymap, lat, lng, pan);
 					} else {
 						query_marker = dslMapUtils.addMarkerToMap(mymap, lat, lng);
 					}

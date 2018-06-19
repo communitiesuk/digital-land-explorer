@@ -132,7 +132,7 @@
   				}
   				$latlngPanel.find(".display-lat").text( geoUtils.roundLatLng(data.lat, 5) );
   				$latlngPanel.find(".display-lng").text( geoUtils.roundLatLng(data.lng, 5) );
-          query_marker = dslMapUtils.updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
+          dslMapUtils.updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
   			};
 
         var updateSearchQueryCallback = function(data) {
@@ -170,21 +170,24 @@
             });
 
             {% if latitude %}
-                renderMap({{ latitude }}, {{ longitude }});
-                query_marker = dslMapUtils.addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
+            var start_place = {
+              lat: {{ latitude }},
+              lng: {{ longitude }}
+            }
             {% else %}
-                renderMap(54.29159, -1.99674);
+            var start_place = {
+              lat: 54.29159,
+              lng: -1.99674
+            };
             {% endif %}
+            renderMap(start_place.lat, start_place.lng);
+            query_marker = dslMapUtils.addMarkerToMap(mymap, start_place.lat, start_place.lng);
+            var url = "/about-an-area-query?latitude="+ start_place.lat +"&longitude="+ start_place.lng;
+            doSearch(url, start_place.lat, start_place.lng);
+            displayLatLng(start_place);
         });
 
       }).call(this, jQuery, window);
-
-      document.addEventListener("DOMContentLoaded", function() {
-          url =  "/about-an-area-query?latitude="+{{ latitude }}+"&longitude="+{{ longitude }};
-          if(url !== undefined) {
-              doSearch(url, {{ latitude }}, {{ longitude }});
-          }
-      });
 
     </script>
 

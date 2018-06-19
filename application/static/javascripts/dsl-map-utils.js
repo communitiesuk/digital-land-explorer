@@ -23,12 +23,10 @@ var dslMapUtils = (function() {
       lng: new longitude
       pan: [Bool] if you want map to pan to new marker */
   var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
-    removeMarkerFromMap( marker, Lmap );
-		new_marker = addMarkerToMap(Lmap, lat, lng);
+    marker.setLatLng([lat, lng]);
     if ( pan ) {
       Lmap.panTo(new L.LatLng(lat, lng));
     }
-    return new_marker;
   };
 
   /* render a basic leaflet map
