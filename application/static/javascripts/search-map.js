@@ -24,8 +24,7 @@ window.searchMap = (function() {
       $form.find(".location").val("");
       updateLinkURL( e.latlng.lat, e.latlng.lng );
       geoUtils.performReverseGeocode(e.latlng.lat, e.latlng.lng, function(data) {
-        updateLatLngPanel(data);
-        updateLinkURL(data.lat, data.lng);
+        updateMapFocus(data, true);
       });
     });
   };
@@ -55,7 +54,8 @@ window.searchMap = (function() {
 
   // generate the URL for the area query
   var generateURL = function(lat, lng) {
-    return "/about-an-area-query?latitude="+lat+"&longitude="+lng;
+    if( config.results_page ) return "/about-an-area-query?latitude="+lat+"&longitude="+lng;
+    return  "/about-an-area?latitude="+lat+"&longitude="+lng;
   };
 
   // render the Leaflet map
@@ -69,7 +69,6 @@ window.searchMap = (function() {
   };
 
   // callback for any geocode query performed
-  // - checks response
   // - shows any errors if geocode fails
   // - calls update function if successful
   var queryGeocodeCallback = function(data) {
@@ -79,8 +78,7 @@ window.searchMap = (function() {
     if( data.success ) {
       $location_input.removeClass("form-control-error");
       $form_group.removeClass("form-group-error");
-      updateLinkURL(data.lat, data.lng);
-      updateLatLngPanel(data);
+      updateMapFocus(data, true);
     } else {
       $form_group.addClass("form-group-error");
       $location_input.addClass("form-control-error");
@@ -112,7 +110,6 @@ window.searchMap = (function() {
       .find(".display-lng")
       .text( geoUtils.roundLatLng(data.lng, 5) );
 
-    dslMapUtils.updateMarkerPos( query_marker, map, data.lat, data.lng, true);
 	};
 
   // update the link that will load the results
@@ -122,12 +119,25 @@ window.searchMap = (function() {
       .attr("href", url)
       .removeClass("disabled");
 
-    $results_btn.off('click');
-    $results_btn.click(function(e){
-      e.preventDefault();
-      doSearch(lat, lng, url);
-    });
+    if( config.results_page ) {
+      $results_btn.off('click');
+      $results_btn.click(function(e){
+        e.preventDefault();
+        doSearch(lat, lng, url);
+      });
+    }
   };
+
+  var updateMarkerPos = function(data, pan) {
+    var pan = pan || false;
+    dslMapUtils.updateMarkerPos(query_marker, map, data.lat, data.lng, pan);
+  };
+
+	var updateMapFocus = function(data, pan) {
+		updateLatLngPanel(data);
+    updateMarkerPos(data, pan);
+		updateLinkURL(data.lat, data.lng);
+	};
 
   // init function
   // sets up the search map component
@@ -138,7 +148,7 @@ window.searchMap = (function() {
     fetchElements();
 
     renderMap(config.place.lat, config.place.lng);
-    updateLatLngPanel(config.place);
+    updateMapFocus(config.place);
 
     addHandlers();
 
@@ -148,7 +158,8 @@ window.searchMap = (function() {
   };
 
   return {
-    initializeMap: init
+    initializeMap: init,
+    updateFocus: updateMapFocus
   }
 })();
 

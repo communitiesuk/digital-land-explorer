@@ -84,81 +84,9 @@
 {% block end_body %}
     <script src="/static/javascripts/geoUtils.js"></script>
     <script src="/static/javascripts/dsl-map-utils.js"></script>
+    <script src="/static/javascripts/search-map.js"></script>
     <script>
-        /* default place vals */
-        var place = {
-            lat: 54.29159,
-            lng:  -1.99674,
-            zoom: 12,
-            current_query: false
-        };
-
-        /* update lat and lng in form and
-           update marker pos */
-        var setLatLng = function(lat, lng, pan){
-      		var lat = geoUtils.roundLatLng(lat, 5),
-          		lng = geoUtils.roundLatLng(lng, 5);
-			  	$latlngPanel.find(".display-lat").text( lat );
-			  	$latlngPanel.find(".display-lng").text( lng );
-					if (query_marker) {
-						dslMapUtils.updateMarkerPos(query_marker, mymap, lat, lng, pan);
-					} else {
-						query_marker = dslMapUtils.addMarkerToMap(mymap, lat, lng);
-					}
-        }
-
-        /* My Leaflet vars */
-        var mymap;
-        var query_marker;
-				var $latlngPanel;
-
-        /* renders the initial map
-           adds click handler */
-        var renderMap = function(){
-					mymap = dslMapUtils.renderLeafletMap("location-search-map").setView([place.lat, place.lng], place.zoom);
-
-          setLatLng(place.lat, place.lng, false);
-
-          mymap.on('click', function(ev){
-						var data = {
-							lat: ev.latlng.lat,
-							lng: ev.latlng.lng
-						};
-						updateMapFocus(data, false);
-          });
-  				setQueryDisplay({lat:place.lat, lng: place.lng});
-					updateLinkURL(".load-results-btn", place.lat, place.lng);
-        };
-
-        var updateLinkURL = function(linkselector, lat, lng) {
-            if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
-            }
-        };
-
-				var setQueryDisplay = function(data) {
-					var $el = $latlngPanel.find(".query-meta");
-  				if( data.query ) {
-  					$el.filter(".display-query").text( data.query );
-  					$el.show();
-  				} else {
-  					$el.hide();
-  				}
-				};
-
-				var updateMapFocus = function(data, pan) {
-					setLatLng(data.lat, data.lng, pan);
-  				setQueryDisplay(data);
-					updateLinkURL(".load-results-btn", data.lat, data.lng);
-				};
-
-				var updateSearchQueryCallback = function(data) {
-					updateMapFocus(data, true);
-				};
-
 				$(function() {
-					var $searchForm = jQuery(".location-search-form");
-					$latlngPanel = $(".lat-lng-panel");
 
           geoUtils.init({
             urls: {
@@ -171,24 +99,30 @@
             mapbox_token: '{{ config.MAPBOX_TOKEN }}'
           });
 
-          $searchForm.on("submit", function (e) {
-            geoUtils.performGeocode($searchForm.find(".location").val(), updateSearchQueryCallback);
-            e.preventDefault();
+          /* default place vals */
+          var place = {
+              lat: 54.29159,
+              lng:  -1.99674
+          };
+
+          searchMap.initializeMap({
+            place: place,
+            form_selector: '.location-search-form',
+            latlng_panel_selector: '.lat-lng-panel',
+            map_selector: 'location-search-map',
+            result_btn_selector: '.load-results-btn'
           });
 
-				});
-
-        /* check if geolocation available
-           and not current query */
-        if ("geolocation" in navigator && !place.current_query) {
+          // update to current position if available
+          if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function(position) {
-              place.lat = position.coords.latitude;
-              place.lng = position.coords.longitude;
-              renderMap();
+              searchMap.updateFocus({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
             });
-        } else {
-            renderMap();
-        }
+          }
+				});
 
     </script>
 {% endblock %}
