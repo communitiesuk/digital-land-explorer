@@ -82,9 +82,8 @@
 
 
 {% block end_body %}
-    <script src="/static/javascripts/geoUtils.js"></script>
-    <script src="/static/javascripts/dsl-map-utils.js"></script>
-    <script src="/static/javascripts/search-map.js"></script>
+    {% include 'partials/_search-map-scripts.html' %}
+
     <script>
         // handle Geolocation errors
         var geoError = function(error) {
@@ -128,6 +127,5 @@
             }, geoError, {maximumAge: 5 * 60 * 1000});
           }
 				});
-
     </script>
 {% endblock %}

@@ -66,12 +66,9 @@
 {% endblock %}
 
 {% block end_body %}
-    <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
-    <script src="/static/javascripts/geoUtils.js"></script>
-    <script src="/static/javascripts/dsl-map-utils.js"></script>
-    <script src="/static/javascripts/search-map.js"></script>
-    <script>
+    {% include 'partials/_search-map-scripts.html' %}
 
+    <script>
       (function($, window) {
 
         $(function() {
@@ -110,7 +107,6 @@
         });
 
       }).call(this, jQuery, window);
-
     </script>
 
 {% endblock %}
