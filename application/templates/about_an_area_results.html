@@ -38,14 +38,8 @@
         </div>
     <script>
 
-        var map = L.map('mapid_{{ loop.index0  }}', {zoomControl: false});
-
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-        }).addTo(map);
+      if( dslMapUtils.config.mapbox_token ) {
+        var map = dslMapUtils.renderLeafletMap('mapid_{{ loop.index0  }}', {zoomControl: false});
 
         {%  if latitude and longitude %}
             L.marker([{{ latitude }}, {{ longitude}}]).addTo(map);
@@ -53,6 +47,7 @@
 
         geojsonLayer = L.geoJSON({{ result.area.data | tojson }}).addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
+      }
 
     </script>
 {% endfor %}

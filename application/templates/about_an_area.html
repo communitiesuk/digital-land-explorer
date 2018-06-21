@@ -66,183 +66,47 @@
 {% endblock %}
 
 {% block end_body %}
-    <script src="/static/javascripts/vendor/jquery-1.11.0.min.js"></script>
+    {% include 'partials/_search-map-scripts.html' %}
+
     <script>
-
-        var doSearch = function(url, lat, lng) {
-            $.ajax({
-                type: "GET",
-                url: url,
-                contentType: "text/html; charset=utf-8",
-                success: function(data) {
-                    $('#results-container').html(data);
-                    window.history.pushState({}, "current search", "/about-an-area?latitude="+lat+"&longitude="+lng);
-                }
-            });
-        };
-
       (function($, window) {
-          var mymap,
-              query_marker,
-              $form,
-              $latlngPanel;
-
-        /* reduce lat or lng number to desirable
-           number of decimal places */
-			  var roundLatLngVal = function(latlng, decs) {
-				  return parseFloat(latlng.toFixed(decs));
-			  };
-
-          var resetField = function($form, fieldselector) {
-          if( $form !== undefined ) {
-            $form.find(fieldselector).val("");
-          }
-        };
-
-        var updateLinkURL = function(linkselector, lat, lng) {
-            if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area-query?latitude="+lat+"&longitude="+lng).removeClass("disabled");
-                $( linkselector ).off('click');
-                $( linkselector ).click(function(event){
-                    event.preventDefault();
-                    url = event.currentTarget.getAttribute('href');
-                    doSearch(url, lat, lng);
-                });
-            }
-        };
-
-        /* Given map
-  			   create marker at lat and lng
-  			   return marker ref */
-        var addMarkerToMap = function(map, lat, lng) {
-            var marker = L.marker([lat, lng]);
-            map.addLayer(marker);
-            return marker;
-        };
-
-        var removeMarkerFromMap = function(marker, map) {
-          if( marker ) {
-            map.removeLayer( marker );
-          }
-        };
-
-        /* Update a marker position on a map
-            marker: an existing marker object
-            Lmap: a leaflet map
-            lat: new latitude
-            lng: new longitude
-            pan: [Bool] if you want map to pan to new marker */
-        var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
-          removeMarkerFromMap( marker, Lmap );
-  				new_marker = addMarkerToMap(Lmap, lat, lng);
-          if ( pan ) {
-            Lmap.panTo(new L.LatLng(lat, lng));
-          }
-          return new_marker;
-        };
-
-
-        /* render a basic leaflet map
-            takes #id for the map
-            and any leaflet options */
-        var renderLeafletMap = function(map_element_id, options) {
-          var options = options || {};
-          var Lmap = L.map(map_element_id, options);
-          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-          }).addTo(Lmap);
-          return Lmap;
-        };
-
-        var renderMap = function(lat, lng) {
-          mymap = renderLeafletMap('location-search-map').setView([lat, lng], 12);
-
-          mymap.on('click', function(ev){
-            resetField($form, ".location");
-            updateLinkURL(".reload-results-btn", ev.latlng.lat, ev.latlng.lng);
-            performReverseGeocode(ev.latlng.lat, ev.latlng.lng, function(data) {
-              displayLatLng(data);
-            });
-          });
-        };
-
-        var performReverseGeocode = function(lat, lng, cb) {
-          $.ajax({
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            url: "{{ url_for('frontend.reverse_geocode') }}",
-            data: JSON.stringify({lat: lat, lng: lng}),
-            success: cb,
-            dataType: "json"
-          });
-        };
-
-        var displayLatLng = function(data) {
-  				var $query_meta = $latlngPanel.find(".query-meta");
-          $query_meta.show();
-  				if( data.query ) {
-  					$latlngPanel.find(".display-query").text( data.query );
-  				} else if (data.address) {
-            $latlngPanel.find(".display-query").text( data.address );
-          } else {
-  					$query_meta.hide();
-  				}
-  				$latlngPanel.find(".display-lat").text( roundLatLngVal(data.lat, 5) );
-  				$latlngPanel.find(".display-lng").text( roundLatLngVal(data.lng, 5) );
-          query_marker = updateMarkerPos( query_marker, mymap, data.lat, data.lng, true);
-  			};
-
-        var updateSearchQueryCallback = function(data) {
-          var $location_input = $form.find(".location"),
-              $form_group = $form.find(".form-group-search");
-          if( data.success ) {
-            $location_input.removeClass("form-control-error");
-            $form_group.removeClass("form-group-error");
-            updateLinkURL(".reload-results-btn", lat=data.lat, long=data.lng);
-            displayLatLng(data);
-          } else {
-            $form_group.addClass("form-group-error");
-            $location_input.addClass("form-control-error");
-          }
-        };
 
         $(function() {
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+            }
+          });
 
-            $form = $(".location-search-form");
-            $latlngPanel = $(".lat-lng-panel");
+          dslMapUtils.init({
+            mapbox_token: '{{ config.MAPBOX_TOKEN }}'
+          });
 
-            $form.on("submit", function (e) {
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    url: "{{ url_for('frontend.geocode') }}",
-                    data: JSON.stringify({query: $form.find(".location").val()}),
-                    success: updateSearchQueryCallback,
-                    dataType: "json"
-                });
-                e.preventDefault();
-            });
+          {% if latitude %}
+          var start_place = {
+            lat: {{ latitude }},
+            lng: {{ longitude }}
+          }
+          {% else %}
+          var start_place = {
+            lat: 54.29159,
+            lng: -1.99674
+          };
+          {% endif %}
 
-            {% if latitude %}
-                renderMap({{ latitude }}, {{ longitude }});
-                query_marker = addMarkerToMap(mymap, {{ latitude }}, {{ longitude }});
-            {% else %}
-                renderMap(54.29159, -1.99674);
-            {% endif %}
+          searchMap.initializeMap({
+            place: start_place,
+            form_selector: '.location-search-form',
+            latlng_panel_selector: '.lat-lng-panel',
+            map_selector: 'location-search-map',
+            result_btn_selector: '.reload-results-btn',
+            results_page: true
+          });
+
         });
 
       }).call(this, jQuery, window);
-
-      document.addEventListener("DOMContentLoaded", function() {
-          url =  "/about-an-area-query?latitude="+{{ latitude }}+"&longitude="+{{ longitude }};
-          if(url !== undefined) {
-              doSearch(url, {{ latitude }}, {{ longitude }});
-          }
-      });
-
     </script>
 
 {% endblock %}

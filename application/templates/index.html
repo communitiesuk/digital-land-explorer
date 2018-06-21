@@ -82,159 +82,50 @@
 
 
 {% block end_body %}
+    {% include 'partials/_search-map-scripts.html' %}
+
     <script>
-        /* default place vals */
-        var place = {
-            lat: 54.29159,
-            lng:  -1.99674,
-            zoom: 12,
-            current_query: false
+        // handle Geolocation errors
+        var geoError = function(error) {
+          console.log('Error occurred. Error code: ' + error.code);
         };
-
-        /* reduce lat or lng number to desirable
-           number of decimal places */
-        var roundLatLngVal = function(latlng, decs) {
-            return parseFloat(latlng.toFixed(decs));
-        }
-
-        /* Given map
-           create marker at lat and lng
-           return marker ref */
-        var addMarkerToMap = function(map, lat, lng) {
-            var marker = L.marker([lat, lng]);
-            map.addLayer(marker);
-            return marker;
-        };
-
-        var removeMarkerFromMap = function(marker, map) {
-          if( marker ) {
-            map.removeLayer( marker );
-          }
-        };
-
-        /* Update a marker position on a map
-            marker: an existing marker object
-            Lmap: a leaflet map
-            lat: new latitude
-            lng: new longitude
-            pan: [Bool] if you want map to pan to new marker */
-        var updateMarkerPos = function(marker, Lmap, lat, lng, pan) {
-          removeMarkerFromMap( marker, Lmap );
-  				new_marker = addMarkerToMap(Lmap, lat, lng);
-          if ( pan ) {
-            Lmap.panTo(new L.LatLng(lat, lng));
-          }
-          return new_marker;
-        };
-
-        /* update lat and lng in form and
-           update marker pos */
-        var setLatLng = function(lat, lng, pan){
-      		var lat = roundLatLngVal(lat, 5),
-          		lng = roundLatLngVal(lng, 5);
-			  	$latlngPanel.find(".display-lat").text( lat );
-			  	$latlngPanel.find(".display-lng").text( lng );
-					if (query_marker) {
-						query_marker = updateMarkerPos(query_marker, mymap, lat, lng, pan);
-					} else {
-						query_marker = addMarkerToMap(mymap, lat, lng);
-					}
-        }
-
-        /* My Leaflet vars */
-        var mymap;
-        var query_marker;
-				var $latlngPanel;
-
-
-        /* render a basic leaflet map
-            takes #id for the map
-            and any leaflet options */
-        var renderLeafletMap = function(map_element_id, options) {
-          var options = options || {};
-          var Lmap = L.map(map_element_id, options);
-          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-          }).addTo(Lmap);
-          return Lmap;
-        };
-
-        /* renders the initial map
-           adds click handler */
-        var renderMap = function(){
-					mymap = renderLeafletMap("location-search-map").setView([place.lat, place.lng], place.zoom);
-
-          setLatLng(place.lat, place.lng, false);
-
-          mymap.on('click', function(ev){
-						var data = {
-							lat: ev.latlng.lat,
-							lng: ev.latlng.lng
-						};
-						updateMapFocus(data, false);
-          });
-  				setQueryDisplay({lat:place.lat, lng: place.lng});
-					updateLinkURL(".load-results-btn", place.lat, place.lng);
-        };
-
-        var updateLinkURL = function(linkselector, lat, lng) {
-            if(lat !== undefined && lng !== undefined) {
-                $( linkselector ).attr("href", "/about-an-area?latitude="+lat+"&longitude="+lng).removeClass("visually-hidden");
-            }
-        };
-
-				var setQueryDisplay = function(data) {
-					var $el = $latlngPanel.find(".query-meta");
-  				if( data.query ) {
-  					$el.filter(".display-query").text( data.query );
-  					$el.show();
-  				} else {
-  					$el.hide();
-  				}
-				};
-
-				var updateMapFocus = function(data, pan) {
-					setLatLng(data.lat, data.lng, pan);
-  				setQueryDisplay(data);
-					updateLinkURL(".load-results-btn", data.lat, data.lng);
-				};
-
-				var updateSearchQueryCallback = function(data) {
-					updateMapFocus(data, true);
-				};
 
 				$(function() {
-					var $searchForm = jQuery(".location-search-form");
-					$latlngPanel = $(".lat-lng-panel");
 
-          $searchForm.on("submit", function (e) {
-              $.ajax({
-                  type: "POST",
-                  contentType: "application/json; charset=utf-8",
-                  url: "{{ url_for('frontend.geocode') }}",
-                  data: JSON.stringify({query: $searchForm.find(".location").val()}),
-                  success: updateSearchQueryCallback,
-                  dataType: "json"
-              });
-              e.preventDefault();
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+            }
           });
 
-				});
+          dslMapUtils.init({
+            mapbox_token: '{{ config.MAPBOX_TOKEN }}'
+          });
 
-        /* check if geolocation available
-           and not current query */
-        if ("geolocation" in navigator && !place.current_query) {
+          /* default place vals */
+          var place = {
+              lat: 54.29159,
+              lng:  -1.99674
+          };
+
+          searchMap.initializeMap({
+            place: place,
+            form_selector: '.location-search-form',
+            latlng_panel_selector: '.lat-lng-panel',
+            map_selector: 'location-search-map',
+            result_btn_selector: '.load-results-btn'
+          });
+
+          // update to current position if available
+          if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function(position) {
-              place.lat = position.coords.latitude;
-              place.lng = position.coords.longitude;
-              renderMap();
-            });
-        } else {
-            renderMap();
-        }
-
+              searchMap.updateFocus({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
+            }, geoError, {maximumAge: 5 * 60 * 1000});
+          }
+				});
     </script>
 {% endblock %}
