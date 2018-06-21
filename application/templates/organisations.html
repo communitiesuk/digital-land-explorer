@@ -41,12 +41,10 @@
                     <tbody>
                     {% for org in organisations %}
                         <tr class="org-row" data-name="{{ org.name }}" data-identifier="{{ org.organisation }}">
-                          <td scope="row">{{ org.name }}</td>
-                            <td><a href="{{ url_for('frontend.organisation', id=org.organisation) }}">
-                                {{ org.organisation }}</a>
-                            </td>
-                            <td><a href="{{ org.website }}">{{ org.website }}</a></td>
-                            <td class="numeric">{{ org.publications|length }}</td>
+                          <td scope="row"><a href="{{ url_for('frontend.organisation', id=org.organisation) }}">{{ org.name }}</a></td>
+                          <td>{{ org.organisation }}</td>
+                          <td>{% if org.website %}<a href="{{ org.website }}">Site</a>{% endif %}</td>
+                          <td class="numeric">{{ org.publications|length }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
