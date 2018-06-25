@@ -139,7 +139,7 @@ def about_an_area_query():
     message = None
     lat, long, query = request.args.get('latitude'), request.args.get('longitude'), request.args.get('query')
     if lat is not None and long is not None:
-        results = _get_data_from_a_point(lat, long)
+        results, nearby = _get_data_from_a_point(lat, long)
         if not results:
             message = 'No results found'
     elif query is not None:
@@ -153,7 +153,7 @@ def about_an_area_query():
     else:
         message = 'Both latitude and longitude parameters required'
 
-    return render_template('about_an_area_results.html', latitude=lat, longitude=long, results=results, message=message)
+    return render_template('about_an_area_results.html', latitude=lat, longitude=long, results=results, nearby=nearby, message=message)
 
 
 @frontend.route('/geocode', methods=['POST'])
@@ -179,15 +179,30 @@ def asset_path_context_processor():
 
 def _get_data_from_a_point(lat, lng):
   results = []
+  nearby = []
   from application.extensions import db
+  from sqlalchemy import cast
+  from geoalchemy2 import Geography
   point = func.ST_MakePoint(float(lng), float(lat))
-  contains_point = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
-                                    Feature.feature,
-                                    Feature.publication).filter(Feature.geometry.ST_Contains(point)).all()
-  # near_point = db.session.query(Feature).filter(geoalchemy2.functions.ST_DWithin(Feature.geometry, point, 1000)).all()
-  features = contains_point + []
+
+  features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
+                              Feature.feature,
+                              Feature.publication).filter(Feature.geometry.ST_Contains(point)).all()
   for feature in features:
       publication = Publication.query.filter_by(publication=feature[2]).first()
       organisation = Organisation.query.filter_by(feature_id=feature[1]).first()
       results.append({'feature': json.loads(feature[0]), 'organisation': organisation, 'publication': publication})
-  return results
+
+
+  # nearby_features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
+  #                                    Feature.feature,
+  #                                    Feature.publication).filter(geoalchemy2.functions.ST_DWithin(Feature.geometry,
+  #                                                                                                 cast(point, Geography),
+  #                                                                                         500)).all()
+  # for feature in nearby_features:
+  #     publication = Publication.query.filter_by(publication=feature[2]).first()
+  #     organisation = Organisation.query.filter_by(feature_id=feature[1]).first()
+  #     nearby.append({'feature': json.loads(feature[0]), 'organisation': organisation, 'publication': publication})
+
+
+  return results, nearby
