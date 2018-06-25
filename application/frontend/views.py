@@ -181,11 +181,13 @@ def _get_data_from_a_point(lat, lng):
   results = []
   from application.extensions import db
   point = func.ST_MakePoint(float(lng), float(lat))
-  contains_point = db.session.query(Feature).filter(Feature.geometry.ST_Contains(point)).all()
+  contains_point = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
+                                    Feature.feature,
+                                    Feature.publication).filter(Feature.geometry.ST_Contains(point)).all()
   # near_point = db.session.query(Feature).filter(geoalchemy2.functions.ST_DWithin(Feature.geometry, point, 1000)).all()
   features = contains_point + []
   for feature in features:
-      # publication = Publication.query.filter(Publication.publication == feature.data.split(':')[0]).first()
-      organisation = Organisation.query.filter_by(feature=feature).first()
-      results.append({'feature': feature, 'organisation': organisation, 'publication': None})
+      publication = Publication.query.filter_by(publication=feature[2]).first()
+      organisation = Organisation.query.filter_by(feature_id=feature[1]).first()
+      results.append({'feature': json.loads(feature[0]), 'organisation': organisation, 'publication': publication})
   return results

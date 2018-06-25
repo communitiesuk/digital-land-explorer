@@ -41,7 +41,7 @@
             L.marker([{{ latitude }}, {{ longitude}}]).addTo(map);
         {% endif %}
 
-        geojsonLayer = L.geoJSON({{ result.feature.data | tojson }}).addTo(map);
+        geojsonLayer = L.geoJSON({{ result.feature | tojson }}).addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
       }
 
