@@ -23,8 +23,8 @@ else:
 json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
 repo = os.getenv('DATA_REPO', 'https://raw.githubusercontent.com/communitiesuk/digital-land-collector')
 branch = os.getenv('BRANCH', 'master')
-s3_region = 'eu-west-2'
-s3_bucket = 'digital-land'
+s3_region = os.getenv('S3_REGION')
+s3_bucket = os.getenv('S3_BUCKET')
 s3_bucket_url = 'http://%s.s3.amazonaws.com' % s3_bucket
 
 
@@ -132,6 +132,7 @@ def load_everything():
     for item in items:
         if item in ['licence', 'copyright', 'publication']:
             item_url = '%s/%s/data/%s/index.tsv' % (repo, branch, item)
+            print('Loading', item_url)
             with closing(requests.get(item_url, stream=True)) as r:
                 reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
                 for row in reader:
@@ -141,6 +142,7 @@ def load_everything():
 
         elif item == 'organisation':
             item_url = '%s/%s/data/organisation.tsv' % (repo, branch)
+            print('Loading', item_url)
             with closing(requests.get(item_url, stream=True)) as r:
                 reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
                 for row in reader:
