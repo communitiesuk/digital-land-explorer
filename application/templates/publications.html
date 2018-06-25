@@ -75,7 +75,7 @@
                                {% endif %}
                            </td>
                            <td><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></td>
-                           <td><a href="">{{ publication.attribution.name }}</a></td>
+                           <td><a href="">{{ publication.copyright.name }}</a></td>
                            <td><a href="">{{ publication.category.category }}</a></td>
                         </tr>
                     {% endfor %}

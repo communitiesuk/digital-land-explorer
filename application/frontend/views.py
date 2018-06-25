@@ -1,3 +1,7 @@
+import json
+
+import geoalchemy2
+import sqlalchemy
 from flask import (
     Blueprint,
     render_template,
@@ -6,11 +10,13 @@ from flask import (
     jsonify)
 from sqlalchemy import func
 
+from application.extensions import db
 from application.frontend.forms import LatLongForm, UKAreaForm
-from application.models import Organisation, Publication, Licence, Area, Attribution
+from application.models import Organisation, Publication, Licence, Feature, Copyright
 from application.geocode import nom_geocode, nom_reverse_geocode
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
+
 
 @frontend.route('/')
 def index():
@@ -26,19 +32,19 @@ def organisations():
 @frontend.route('/organisations/<id>')
 def organisation(id):
     org = Organisation.query.get(id)
-    points = org.other_areas.filter(func.ST_GeometryType(Area.geometry) == 'ST_Point').all()
-    other_areas = org.other_areas.filter(func.ST_GeometryType(Area.geometry) != 'ST_Point')
-    areas_by_type = {}
-    for a in other_areas:
-        area_type_key = a.data['properties']['area'].split(':')[0]
-        if a.name is not None:
-            a.data['properties']['content'] = a.name
-        if area_type_key not in areas_by_type.keys():
-            areas_by_type[area_type_key] = [a.data]
+    points = org.other_features.filter(func.ST_GeometryType(Feature.geometry) == 'ST_Point').all()
+    other_features = org.other_features.filter(func.ST_GeometryType(Feature.geometry) != 'ST_Point')
+    features_by_type = {}
+    for f in other_features:
+        feature_type_key = f.data['properties']['feature'].split(':')[0]
+        if f.name is not None:
+            f.data['properties']['content'] = f.name
+        if feature_type_key not in features_by_type.keys():
+            features_by_type[feature_type_key] = [f.data]
         else:
-            areas_by_type[area_type_key].append(a.data)
+            features_by_type[feature_type_key].append(f.data)
 
-    return render_template('organisation.html', organisation=org, points=points, areas_by_type=areas_by_type)
+    return render_template('organisation.html', organisation=org, points=points, features_by_type=features_by_type)
 
 
 @frontend.route('/publications')
@@ -47,14 +53,21 @@ def publications():
     for pub in Publication.query.all():
       if pub.organisation not in orgs:
         orgs.append(pub.organisation)
-    licences = len(Licence.query.all())
-    return render_template('publications.html', publications=Publication.query.all(), org_num=len(orgs), lic_num=licences)
+    return render_template('publications.html',
+                            publications=Publication.query.all(),
+                            org_num=len(orgs),
+                            lic_num=len(Licence.query.all()))
 
 
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
-    return render_template('publication.html', publication=pub)
+    results = []
+    features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom)).filter(Feature.publication == pub.publication)
+    for f in features:
+        results.append(json.loads(f[0]))
+    fs = {"type": "FeatureCollection", "features": results}
+    return render_template('publication.html', publication=pub, features=fs)
 
 
 @frontend.route('/licences')
@@ -70,29 +83,29 @@ def licence(id):
 
 @frontend.route('/attributions')
 def attributions():
-    return render_template('attributions.html', attributions=Attribution.query.all())
+    return render_template('attributions.html', attributions=Copyright.query.all())
 
 
 @frontend.route('/attributions/<id>')
 def attribution(id):
-    attr = Attribution.query.get(id)
+    attr = Copyright.query.get(id)
     return render_template('attribution.html', attribution=attr)
 
 
-@frontend.route('/areas')
-def areas():
+@frontend.route('/features')
+def features():
     return render_template('areas.html', count=1000)
 
 
-@frontend.route('/areas/<id>')
-def area(id):
-    a = Area.query.get(id)
-    organisation = Organisation.query.filter_by(area=a).first()
-    publication = Publication.query.filter(Publication.publication == a.area.split(':')[0]).first()
-    return render_template('area.html',
-                           area=a,
-                           organisation=organisation,
-                           publication=publication)
+@frontend.route('/feature/<id>')
+def feature(id):
+    f = Feature.query.get(id)
+    # organisation = Organisation.query.filter_by(feature=f).first()
+    # publication = Publication.query.filter(Publication.publication == a.area.split(':')[0]).first()
+    return render_template('feature.html',
+                           feature=f,
+                           organisation=None,
+                           publication=None)
 
 
 @frontend.route('/publication/<id>/areas')
@@ -103,7 +116,7 @@ def publication_area(id):
         prefix = id
     q = prefix + '%'
     publication = Publication.query.get(id)
-    areas = [area.data for area in Area.query.filter(Area.area.like(q)).all()]
+    areas = [area.data for area in Feature.query.filter(Feature.feature.like(q)).all()]
     return render_template('publication_area.html',
                            publication=publication,
                            areas=areas)
@@ -143,18 +156,15 @@ def about_an_area_query():
 def geocode():
   response = {}
   json = request.get_json()
-  
   geocoded_query = nom_geocode(json['query'])
-
   return jsonify(geocoded_query)
+
 
 @frontend.route('/reversegeocode', methods=['POST'])
 def reverse_geocode():
   response = {}
   json = request.get_json()
-  
   geocoded_query = nom_reverse_geocode(json['lat'], json['lng'])
-
   return jsonify(geocoded_query)
 
 
@@ -166,10 +176,12 @@ def asset_path_context_processor():
 def _get_data_from_a_point(lat, lng):
   results = []
   from application.extensions import db
-  point = 'POINT(%f %f)' % (float(lng), float(lat))
-  areas = db.session.query(Area).filter(Area.geometry.ST_Contains(point))
-  for area in areas:
-      publication = Publication.query.filter(Publication.publication == area.area.split(':')[0]).first()
-      organisation = Organisation.query.filter_by(area=area).first()
-      results.append({'area': area, 'organisation': organisation, 'publication': publication})
+  point = func.ST_MakePoint(float(lng), float(lat))
+  contains_point = db.session.query(Feature).filter(Feature.geometry.ST_Contains(point)).all()
+  # near_point = db.session.query(Feature).filter(geoalchemy2.functions.ST_DWithin(Feature.geometry, point, 1000)).all()
+  features = contains_point + []
+  for feature in features:
+      # publication = Publication.query.filter(Publication.publication == feature.data.split(':')[0]).first()
+      organisation = Organisation.query.filter_by(feature=feature).first()
+      results.append({'feature': feature, 'organisation': organisation, 'publication': None})
   return results

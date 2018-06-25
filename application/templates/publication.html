@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 {% block title %}{{ publication.publication }}{% endblock %}
+{% block end_head %}
+    <script src="https://unpkg.com/Leaflet.Deflate@0.3.0/dist/L.Deflate.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
+
+{% endblock %}
 {% block content %}
     <main id="content" role="main">
       {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
@@ -28,7 +36,7 @@
               <dt>Licence</dt>
               <dd><a href="{{ url_for('frontend.licence', id=publication.licence.licence) }}">{{ publication.licence.name }}</a></dd>
               <dt>Attribution</dt>
-              <dd><a href="{{ url_for('frontend.attribution', id=publication.attribution.attribution) }}">{{ publication.attribution.name }}</a></dd>
+              <dd><a href="{{ url_for('frontend.attribution', id=publication.copyright.copyright) }}">{{ publication.copyright.name }}</a></dd>
               <dt>Category</dt>
               <dd></dd>
             </dl>
@@ -68,6 +76,60 @@
         </div>
       </div>
 
+      {% if features %}
+        <div class="grid-row">
+            <div class="column-full">
+                <h2 class="heading-small">{{ publication.name }}</h2>
+                <div id="map" style="width: 900px; height: 600px;"></div>
+            </div>
+        </div>
+      {% endif %}
+
     </main>
+{% endblock %}
+
+
+{% block end_body %}
+    {% if features %}
+
+        <script>
+
+            var polygons = {{ features | tojson }};
+
+            var map = L.map('map', {zoomControl: false});
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets',
+                accessToken: '{{ config.MAPBOX_TOKEN }}'
+              }
+            ).addTo(map);
+
+            var polygonArray = []
+            for (i = 0; i < polygons.features.length; i++) {
+                polygonArray.push(polygons.features[i]);
+            }
+
+            L.Polygon.addInitHook(function () {
+                this._latlng = this._bounds.getCenter();
+            });
+
+            L.Polygon.include({
+                getLatLng: function () {
+                    return this._latlng;
+                },
+                setLatLng: function () {
+                } // no-op.
+            });
+
+            var markers = L.markerClusterGroup().addTo(map);
+            var geoJsonLayer = L.geoJson(polygonArray);
+            markers.addLayer(geoJsonLayer);
+            map.fitBounds(markers.getBounds());
+
+
+        </script>
+
+    {% endif %}
 {% endblock %}
 

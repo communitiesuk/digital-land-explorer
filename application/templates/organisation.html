@@ -29,7 +29,7 @@
 
 
         <div class="grid-row">
-            {% if organisation.area %}
+            {% if organisation.feature %}
 
                 <div class="column-half">
                   <h2 class="heading-small">Boundary</h2>
@@ -59,7 +59,7 @@
 
         <div class="grid-row">
             <div class="column-full">
-                {% for key in areas_by_type.keys() %}
+                {% for key in features_by_type.keys() %}
                     <h2 class="heading-small">{{ key | format_identifier }}</h2>
                     <div id="map_{{ key }}" style="width: 900px; height: 600px;"></div>
                 {% endfor %}
@@ -70,65 +70,71 @@
 {% endblock %}
 
 {% block end_body %}
-    <script>
-        var map = L.map('mapid', {zoomControl: false});
 
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-        }).addTo(map);
+    {% if organisation.feature %}
 
-        geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(map);
-        map.fitBounds(geojsonLayer.getBounds());
-
-        var pointsMap  = L.map('map_points', {zoomControl: false});
-
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: '{{ config.MAPBOX_TOKEN }}'
-        }).addTo(pointsMap);
-
-        var markers = L.markerClusterGroup();
-        {% for point in points %}
-            markers.addLayer(L.marker(
-                [ {{ point.data['geometry']['coordinates'][1] }}, {{ point.data['geometry']['coordinates'][0] }} ]
-                ).bindTooltip('{{ point.area }}')
-            );
-        {% endfor %}
-
-        pointsMap.addLayer(markers);
-        geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(pointsMap);
-        pointsMap.fitBounds(geojsonLayer.getBounds());
-
-
-        var onEachFeature = function(feature, layer){
-            if (feature.properties && feature.properties.content) {
-                layer.bindTooltip(feature.properties.content);
-            }
-        };
-
-        {% for key, val in areas_by_type.items() %}
-
-            var otherMap  = L.map('map_{{ key }}', {zoomControl: false});
+        <script>
+            var map = L.map('mapid', {zoomControl: false});
 
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
                 attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
                 maxZoom: 18,
                 id: 'mapbox.streets',
                 accessToken: '{{ config.MAPBOX_TOKEN }}'
-            }).addTo(otherMap);
+            }).addTo(map);
 
-            geojsonLayer = L.geoJSON({{ val | tojson }}, {
-                onEachFeature: onEachFeature
-            }).addTo(otherMap);
-            otherMap.fitBounds(geojsonLayer.getBounds());
+            geojsonLayer = L.geoJSON({{ organisation.feature.data | tojson }}).addTo(map);
+            map.fitBounds(geojsonLayer.getBounds());
 
-        {%  endfor %}
+            var pointsMap  = L.map('map_points', {zoomControl: false});
 
-    </script>
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                maxZoom: 18,
+                id: 'mapbox.streets',
+                accessToken: '{{ config.MAPBOX_TOKEN }}'
+            }).addTo(pointsMap);
+
+            var markers = L.markerClusterGroup();
+            {% for point in points %}
+                markers.addLayer(L.marker(
+                    [ {{ point.data['geometry']['coordinates'][1] }}, {{ point.data['geometry']['coordinates'][0] }} ]
+                    ).bindTooltip('{{ point.area }}')
+                );
+            {% endfor %}
+
+            pointsMap.addLayer(markers);
+            geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(pointsMap);
+            pointsMap.fitBounds(geojsonLayer.getBounds());
+
+
+            var onEachFeature = function(feature, layer){
+                if (feature.properties && feature.properties.content) {
+                    layer.bindTooltip(feature.properties.content);
+                }
+            };
+
+            {% for key, val in features_by_type.items() %}
+
+                var otherMap  = L.map('map_{{ key }}', {zoomControl: false});
+
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox.streets',
+                    accessToken: '{{ config.MAPBOX_TOKEN }}'
+                }).addTo(otherMap);
+
+                geojsonLayer = L.geoJSON({{ val | tojson }}, {
+                    onEachFeature: onEachFeature
+                }).addTo(otherMap);
+                otherMap.fitBounds(geojsonLayer.getBounds());
+
+            {%  endfor %}
+
+
+        </script>
+
+    {% endif %}
 {% endblock %}
 

@@ -19,6 +19,8 @@ pytest = "*"
 flask-wtf = "*"
 ijson = "*"
 yajl-py = "*"
+python-frontmatter = "*"
+"boto3" = "*"
 
 [dev-packages]
 pytest = "*"

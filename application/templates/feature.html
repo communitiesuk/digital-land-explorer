@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}{{ area.area }}{% endblock %}
+{% block title %}{{ feature.feature }}{% endblock %}
 
 {% block content %}
     <div id="content" role="main">
 
         <h1 class="heading-large">
-          <span class="heading-secondary">Area</span>
-          {% if area.name %}{{ area.name }}{%  else %}{{ area.area }}{% endif %}
+          <span class="heading-secondary">Feature</span>
+          {% if feature.name %}{{ feature.name }}{%  else %}{{ feature.feature }}{% endif %}
         </h1>
 
         <div class="grid-row">
             <div class="column-two-thirds">
-                <h2 class="heading-small">Area</h2>
+                <h2 class="heading-small">Feature</h2>
                 <div id="mapid" style="width: 600px; height: 400px;"></div>
                 <!-- TODO map here-->
             </div>
@@ -52,9 +52,9 @@
             L.marker([{{ lat }}, {{ long }}]).addTo(map);
         {% endif %}
 
-        geojsonLayer = L.geoJSON({{ area.data | tojson }}).addTo(map);
+        geojsonLayer = L.geoJSON({{ feature.data | tojson }});
+        geojsonLayer.addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
-
 
     </script>
 {% endblock %}

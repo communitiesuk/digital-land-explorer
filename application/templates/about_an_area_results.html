@@ -21,19 +21,15 @@
                     <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>
                  {% endif %}
 
-                <h2 class="heading-small">Area</h2>
-                    {% if result.area.name %}
-                        <p>
-                            <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.name }}</a>
-                        </p>
-                    {% endif %}
-                    <p>
-                        <a href="{{ url_for('frontend.area', id=result.area.area) }}">{{ result.area.area }}</a>
-                    </p>
-                    {% if result.publication %}
-                        <h2 class="heading-small">Publication</h2>
-                        <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>
-                    {% endif %}
+                {% if result.feature %}
+                    <h2 class="heading-small">Feature</h2>
+                    <a href="{{ url_for('frontend.feature', id=result.feature.feature) }}">{{ result.feature.feature }}</a>
+                {% endif %}
+
+                {% if result.publication %}
+                    <h2 class="heading-small">Publication</h2>
+                    <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>
+                {% endif %}
             </div>
         </div>
     <script>
@@ -45,7 +41,7 @@
             L.marker([{{ latitude }}, {{ longitude}}]).addTo(map);
         {% endif %}
 
-        geojsonLayer = L.geoJSON({{ result.area.data | tojson }}).addTo(map);
+        geojsonLayer = L.geoJSON({{ result.feature.data | tojson }}).addTo(map);
         map.fitBounds(geojsonLayer.getBounds());
       }
 
