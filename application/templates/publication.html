@@ -91,7 +91,6 @@
 
 {% block end_body %}
     {% if features %}
-
         <script>
 
             var polygons = {{ features | tojson }};
@@ -105,11 +104,6 @@
               }
             ).addTo(map);
 
-            var polygonArray = []
-            for (i = 0; i < polygons.features.length; i++) {
-                polygonArray.push(polygons.features[i]);
-            }
-
             L.Polygon.addInitHook(function () {
                 this._latlng = this._bounds.getCenter();
             });
@@ -122,14 +116,19 @@
                 } // no-op.
             });
 
-            var markers = L.markerClusterGroup().addTo(map);
-            var geoJsonLayer = L.geoJson(polygonArray);
+            var onEachFeature = function(feature, layer) {
+                layer.bindTooltip(feature.properties.feature);
+            };
+
+            var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
+            var geoJsonLayer = L.geoJson(polygons, {
+                onEachFeature : onEachFeature
+            });
+
             markers.addLayer(geoJsonLayer);
             map.fitBounds(markers.getBounds());
 
-
         </script>
-
     {% endif %}
 {% endblock %}
 

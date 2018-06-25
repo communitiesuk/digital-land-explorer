@@ -63,9 +63,11 @@ def publications():
 def publication(id):
     pub = Publication.query.get(id)
     results = []
-    features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom)).filter(Feature.publication == pub.publication)
+    features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom), Feature.feature).filter(Feature.publication == pub.publication)
     for f in features:
-        results.append(json.loads(f[0]))
+        feat = json.loads(f[0])
+        feat['properties'] = {'feature': f[1]}
+        results.append(feat)
     fs = {"type": "FeatureCollection", "features": results}
     return render_template('publication.html', publication=pub, features=fs)
 
@@ -99,27 +101,29 @@ def features():
 
 @frontend.route('/feature/<id>')
 def feature(id):
-    f = Feature.query.get(id)
+    f = Feature.query.with_entities(Feature.data, geoalchemy2.functions.ST_AsGeoJSON(Feature.geometry)).filter(Feature.feature == id).one()
     # organisation = Organisation.query.filter_by(feature=f).first()
     # publication = Publication.query.filter(Publication.publication == a.area.split(':')[0]).first()
+    feature = json.loads(f[1])
+    feature['properties'] = f[0]
     return render_template('feature.html',
-                           feature=f,
+                           feature=feature,
                            organisation=None,
                            publication=None)
 
 
-@frontend.route('/publication/<id>/areas')
-def publication_area(id):
-    if id[-1] == 's':
-        prefix = id[:-1]
-    else:
-        prefix = id
-    q = prefix + '%'
-    publication = Publication.query.get(id)
-    areas = [area.data for area in Feature.query.filter(Feature.feature.like(q)).all()]
-    return render_template('publication_area.html',
-                           publication=publication,
-                           areas=areas)
+# @frontend.route('/publication/<id>/areas')
+# def publication_area(id):
+#     if id[-1] == 's':
+#         prefix = id[:-1]
+#     else:
+#         prefix = id
+#     q = prefix + '%'
+#     publication = Publication.query.get(id)
+#     areas = [area.data for area in Feature.query.filter(Feature.feature.like(q)).all()]
+#     return render_template('publication_area.html',
+#                            publication=publication,
+#                            areas=areas)
 
 
 @frontend.route('/about-an-area')

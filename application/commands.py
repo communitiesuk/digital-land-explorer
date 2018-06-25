@@ -49,7 +49,7 @@ def process_file(file_url):
             if db.session.query(Feature).get(feature_id) is None:
                 geo = json.dumps(feature['geometry'])
                 geometry = db.session.execute(json_to_geo_query % geo).fetchone()[0]
-                f = Feature(feature=feature_id, data=feature, geometry=geometry, item=item, publication=publication)
+                f = Feature(feature=feature_id, data=feature['properties'], geometry=geometry, item=item, publication=publication)
                 db.session.add(f)
                 db.session.commit()
         print('Done', file_url)
