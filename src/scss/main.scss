@@ -11,6 +11,7 @@ $path: "/static/govuk_template/images/";
 @import "components/filter-section";
 @import "components/related-section";
 @import "components/meta-data-panel";
+@import "components/latlng-panel";
 
 @import "common/forms";
 @import "common/layout";
@@ -34,19 +35,6 @@ $path: "/static/govuk_template/images/";
 	&__heading {
 		margin-top: $gutter-half;
 	}
-}
-
-.map-wrapper {
-	position: relative;
-}
-
-.lat-lng-panel {
-	position: absolute;
-	bottom: $gutter-half;
-	left: $gutter-half;
-	z-index: 1000;
-	background: $page-colour;
-	padding: $gutter-half;
 }
 
 .search-form-control-wrapper {

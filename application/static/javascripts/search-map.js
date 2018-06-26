@@ -2,10 +2,12 @@
 
 window.searchMap = (function() {
   var config = {
+    map_wrapper_selector: '.map-wrapper',
     results_page: false,
     results_container_selector: '#results-container'
   };
   var map;
+  var $map_wrapper;
   var $form;
   var $latlng_panel;
   var $results_btn;
@@ -16,11 +18,13 @@ window.searchMap = (function() {
   // elements
   var addHandlers = function() {
     $form.on("submit", function(e) {
+      indicatePerformingGeocode();
       geoUtils.performGeocode($form.find(".location").val(), queryGeocodeCallback);
       e.preventDefault();
     });
 
     map.on('click', function(e){
+      indicatePerformingGeocode();
       $form.find(".location").val("");
       updateLinkURL( e.latlng.lat, e.latlng.lng );
       geoUtils.performReverseGeocode(e.latlng.lat, e.latlng.lng, function(data) {
@@ -49,6 +53,7 @@ window.searchMap = (function() {
   var fetchElements = function() {
     $form = $( config.form_selector );
     $latlng_panel = $( config.latlng_panel_selector );
+    $map_wrapper = $( config.map_wrapper_selector );
     $results_btn = $( config.result_btn_selector );
   };
 
@@ -56,6 +61,16 @@ window.searchMap = (function() {
   var generateURL = function(lat, lng) {
     if( config.results_page ) return "/about-an-area-query?latitude="+lat+"&longitude="+lng;
     return  "/about-an-area?latitude="+lat+"&longitude="+lng;
+  };
+
+  var indicatePerformingGeocode = function(state) {
+    if(state === "finished") {
+      $map_wrapper.removeClass("performing-geocode");
+      $results_btn.attr("disabled", false);
+    } else {
+      $map_wrapper.addClass("performing-geocode");
+      $results_btn.attr("disabled", true);
+    }
   };
 
   // render the Leaflet map
@@ -82,6 +97,7 @@ window.searchMap = (function() {
     } else {
       $form_group.addClass("form-group-error");
       $location_input.addClass("form-control-error");
+      indicatePerformingGeocode("finished");
     }
   };
 
@@ -137,6 +153,7 @@ window.searchMap = (function() {
 		updateLatLngPanel(data);
     updateMarkerPos(data, pan);
 		updateLinkURL(data.lat, data.lng);
+    indicatePerformingGeocode("finished");
 	};
 
   // init function
