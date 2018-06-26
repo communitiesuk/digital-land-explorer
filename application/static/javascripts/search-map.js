@@ -18,15 +18,13 @@ window.searchMap = (function() {
   // elements
   var addHandlers = function() {
     $form.on("submit", function(e) {
-      $map_wrapper.addClass("performing-geocode");
-      $results_btn.attr("disabled", true);
+      indicatePerformingGeocode();
       geoUtils.performGeocode($form.find(".location").val(), queryGeocodeCallback);
       e.preventDefault();
     });
 
     map.on('click', function(e){
-      $map_wrapper.addClass("performing-geocode");
-      $results_btn.attr("disabled", true);
+      indicatePerformingGeocode();
       $form.find(".location").val("");
       updateLinkURL( e.latlng.lat, e.latlng.lng );
       geoUtils.performReverseGeocode(e.latlng.lat, e.latlng.lng, function(data) {
@@ -65,6 +63,16 @@ window.searchMap = (function() {
     return  "/about-an-area?latitude="+lat+"&longitude="+lng;
   };
 
+  var indicatePerformingGeocode = function(state) {
+    if(state === "finished") {
+      $map_wrapper.removeClass("performing-geocode");
+      $results_btn.attr("disabled", false);
+    } else {
+      $map_wrapper.addClass("performing-geocode");
+      $results_btn.attr("disabled", true);
+    }
+  };
+
   // render the Leaflet map
   // add marker in current focused position
   var renderMap = function(lat, lng) {
@@ -89,8 +97,7 @@ window.searchMap = (function() {
     } else {
       $form_group.addClass("form-group-error");
       $location_input.addClass("form-control-error");
-      $map_wrapper.removeClass("performing-geocode");
-      $results_btn.attr("disabled", false);
+      indicatePerformingGeocode("finished");
     }
   };
 
@@ -146,8 +153,7 @@ window.searchMap = (function() {
 		updateLatLngPanel(data);
     updateMarkerPos(data, pan);
 		updateLinkURL(data.lat, data.lng);
-    $map_wrapper.removeClass("performing-geocode");
-    $results_btn.attr("disabled", false);
+    indicatePerformingGeocode("finished");
 	};
 
   // init function
