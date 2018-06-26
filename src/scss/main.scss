@@ -11,6 +11,7 @@ $path: "/static/govuk_template/images/";
 @import "components/filter-section";
 @import "components/related-section";
 @import "components/meta-data-panel";
+@import "components/latlng-panel";
 
 @import "common/forms";
 @import "common/layout";
@@ -34,19 +35,6 @@ $path: "/static/govuk_template/images/";
 	&__heading {
 		margin-top: $gutter-half;
 	}
-}
-
-.map-wrapper {
-	position: relative;
-}
-
-.lat-lng-panel {
-	position: absolute;
-	bottom: $gutter-half;
-	left: $gutter-half;
-	z-index: 1000;
-	background: $page-colour;
-	padding: $gutter-half;
 }
 
 .search-form-control-wrapper {
@@ -76,38 +64,4 @@ $path: "/static/govuk_template/images/";
 
 .pub-info-section__heading {
   margin: 0;
-}
-
-$loader-height: 4px;
-.loader {
-  height: $loader-height;
-  width: 100%;
-  position: absolute;
-  overflow: hidden;
-  background-color: $panel-colour;
-  top: -($loader-height);
-  left: 0;
-}
-
-$loader-width: 20px;
-.loader:before {
-  display: block;
-  position: absolute;
-  content: "";
-  left: -($loader-width);
-  width: $loader-width;
-  height: 4px;
-  background-color: $govuk-blue;
-}
-@keyframes loading {
-    from {left: -($loader-width); width: 30%;}
-    50% {width: 30%; left: 55%;}
-    95% {left: 120%;}
-    to {left: 100%;}
-}
-.performing-geocode {
-  .loader:before {
-    display: block;
-    animation: loading 1s linear infinite;
-  }
 }

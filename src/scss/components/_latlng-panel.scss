@@ -1,0 +1,57 @@
+// LatLng Info Panel
+// ======================
+
+// set up
+.map-wrapper {
+	position: relative;
+}
+
+.lat-lng-panel {
+	position: absolute;
+	bottom: $gutter-half;
+	left: $gutter-half;
+	z-index: 1000;
+	background: $page-colour;
+	padding: $gutter-half;
+}
+
+
+// For loader
+$loader-height: 4px;
+$loader-width: 20px;
+
+.loader {
+  height: $loader-height;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+  background-color: $panel-colour;
+  top: -($loader-height);
+  left: 0;
+}
+
+.loader:before {
+  display: block;
+  position: absolute;
+  content: "";
+  left: -($loader-width);
+  width: $loader-width;
+  height: 4px;
+  background-color: $govuk-blue;
+}
+
+// the loader animation for 
+@keyframes loading {
+    from {left: -($loader-width); width: 30%;}
+    50% {width: 30%; left: 55%;}
+    95% {left: 120%;}
+    to {left: 100%;}
+}
+
+// class it acts on
+.performing-geocode {
+  .loader:before {
+    display: block;
+    animation: loading 1s linear infinite;
+  }
+}
