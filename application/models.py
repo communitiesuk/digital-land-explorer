@@ -87,6 +87,7 @@ class Feature(db.Model):
     feature = db.Column(db.String(256), primary_key=True)
     item = db.Column(db.String(256))
     data = db.Column(JSONB)
-    geometry = db.Column(Geometry())
+    geometry = db.Column(Geometry(srid=4326))
     name = db.Column(db.Text)
     publication = db.Column(db.String(64))
+

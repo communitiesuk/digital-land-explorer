@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      {% if features %}
+      {% if features.features %}
         <div class="grid-row">
             <div class="column-full">
                 <h2 class="heading-small">{{ publication.name }}</h2>
@@ -90,7 +90,7 @@
 
 
 {% block end_body %}
-    {% if features %}
+    {% if features.features %}
         <script>
 
             var polygons = {{ features | tojson }};
@@ -117,7 +117,7 @@
             });
 
             var onEachFeature = function(feature, layer) {
-                layer.bindTooltip(feature.properties.feature);
+                layer.bindTooltip(JSON.stringify(feature.properties), {sticky: true});
             };
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);

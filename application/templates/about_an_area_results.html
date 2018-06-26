@@ -52,55 +52,55 @@
 
 {#{% if nearby %}#}
 {##}
-{#     <div class="grid-row">#}
+{#    <div class="grid-row">#}
 {#        <div class="column-full">#}
 {#            <header>#}
-{#                {%  set res = nearby | count %}#}
+{#                {% set res = nearby | count %}#}
 {#                <h2 class="heading-medium">{{ res }} Features within 500 metres{% if res > 1 %}s{% endif %}</h2>#}
 {#            </header>#}
 {#        </div>#}
 {#    </div>#}
 {##}
-{#{%  endif %}#}
-{##}
-{#<ul class="results">#}
-{#{% for result in nearby %}#}
-{#    <li class="result">#}
-{#      <div class="grid-row">#}
-{#        <div class="column-two-thirds">#}
-{#            <div class="map-result" id="nearby_mapid_{{ loop.index0 }}" style="height: 350px;"></div>#}
-{#        </div>#}
-{#        <div class="column-one-third">#}
-{#            <div class="details">#}
-{#                {% if result.organisation %}#}
-{#                    <h2 class="heading-small">Organisation </h2>#}
-{#                    <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>#}
-{#                 {% endif %}#}
-{##}
-{#                {% if result.feature %}#}
-{#                    <h2 class="heading-small">Feature</h2>#}
-{#                    <a href="{{ url_for('frontend.feature', id=result.feature.feature) }}">{{ result.feature.feature }}</a>#}
-{#                {% endif %}#}
-{##}
-{#                {% if result.publication %}#}
-{#                    <h2 class="heading-small">Publication</h2>#}
-{#                    <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>#}
-{#                {% endif %}#}
+{#    <ul class="results">#}
+{#        {% for result in nearby %}#}
+{#            <li class="result">#}
+{#            <div class="grid-row">#}
+{#            <div class="column-two-thirds">#}
+{#                <div class="map-result" id="nearby_mapid_{{ loop.index0 }}" style="height: 350px;"></div>#}
 {#            </div>#}
-{#        </div>#}
-{#    <script>#}
+{#            <div class="column-one-third">#}
+{#                <div class="details">#}
+{#                    {% if result.organisation %}#}
+{#                        <h2 class="heading-small">Organisation </h2>#}
+{#                        <a href="{{ url_for('frontend.organisation', id=result.organisation.organisation) }}">{{ result.organisation.name }}</a>#}
+{#                    {% endif %}#}
 {##}
-{#      if( dslMapUtils.config.mapbox_token ) {#}
-{#        var map = dslMapUtils.renderLeafletMap('nearby_mapid_{{ loop.index0  }}', {zoomControl: false});#}
+{#                    {% if result.feature %}#}
+{#                        <h2 class="heading-small">Feature</h2>#}
+{#                        <a href="{{ url_for('frontend.feature', id=result.feature.feature) }}">{{ result.feature.feature }}</a>#}
+{#                    {% endif %}#}
 {##}
-{#        {%  if latitude and longitude %}#}
-{#            L.marker([{{ latitude }}, {{ longitude}}]).addTo(map);#}
-{#        {% endif %}#}
+{#                    {% if result.publication %}#}
+{#                        <h2 class="heading-small">Publication</h2>#}
+{#                        <a href="{{ url_for('frontend.publication', id=result.publication.publication) }}">{{ result.publication.name }}</a>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{#            </div>#}
+{#            <script>#}
 {##}
-{#        geojsonLayer = L.geoJSON({{ result.feature | tojson }}).addTo(map);#}
-{#        map.fitBounds(geojsonLayer.getBounds());#}
-{#      }#}
+{#                if (dslMapUtils.config.mapbox_token) {#}
+{#                    var map = dslMapUtils.renderLeafletMap('nearby_mapid_{{ loop.index0  }}', {zoomControl: false});#}
 {##}
-{#    </script>#}
-{#{% endfor %}#}
-</ul>
+{#                    {%  if latitude and longitude %}#}
+{#                        L.marker([{{ latitude }}, {{ longitude}}]).addTo(map);#}
+{#                    {% endif %}#}
+{##}
+{#                    geojsonLayer = L.geoJSON({{ result.feature | tojson }}).addTo(map);#}
+{#                    map.fitBounds(geojsonLayer.getBounds());#}
+{#                }#}
+{##}
+{#            </script>#}
+{#        {% endfor %}#}
+{##}
+{#    </ul>#}
+{#{% endif %}#}

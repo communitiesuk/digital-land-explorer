@@ -20,7 +20,7 @@ else:
     import ijson
 
 
-json_to_geo_query = "SELECT ST_AsText(ST_GeomFromGeoJSON('%s'))"
+json_to_geo_query = "SELECT ST_SetSRID(ST_GeomFromGeoJSON('%s'), 4326);"
 repo = os.getenv('DATA_REPO', 'https://raw.githubusercontent.com/communitiesuk/digital-land-collector')
 branch = os.getenv('BRANCH', 'master')
 s3_region = os.getenv('S3_REGION')
@@ -35,7 +35,7 @@ def floaten(event):
         return event
 
 
-def process_file(file_url):
+def process_file(file_url, org_feature_mappings):
     print('Processing', file_url)
     try:
         f = urlopen(file_url)
@@ -46,10 +46,14 @@ def process_file(file_url):
             item = 'item:%s' % feature['properties'].get('item')
             publication = feature['properties'].get('publication')
             feature_id = id if id is not None else item
+
             if db.session.query(Feature).get(feature_id) is None:
                 geo = json.dumps(feature['geometry'])
                 geometry = db.session.execute(json_to_geo_query % geo).fetchone()[0]
-                f = Feature(feature=feature_id, data=feature['properties'], geometry=geometry, item=item, publication=publication)
+                f = Feature(feature=feature_id, data=feature, geometry=geometry, item=item, publication=publication)
+                if feature_id in org_feature_mappings:
+                    org = Organisation.query.get(org_feature_mappings[feature_id])
+                    org.feature = f
                 db.session.add(f)
                 db.session.commit()
         print('Done', file_url)
@@ -99,7 +103,9 @@ def _handle_markdown(item, contents):
             return 0
 
 
-def _handle_organisation(contents):
+def _handle_organisation(contents, org_feature_mappings):
+    if contents.get('feature') is not None:
+        org_feature_mappings['feature'] = contents['organisation']
     if not db.session.query(Organisation).get(contents['organisation']):
         organisation = Organisation(organisation=contents['organisation'],
                                     name=contents['name'],
@@ -112,12 +118,12 @@ def _handle_organisation(contents):
         return 0
 
 
-def _load_features():
+def _load_features(org_feature_mappings):
     s3 = boto3.resource('s3', region_name=s3_region)
     bucket = s3.Bucket(s3_bucket)
     for file in bucket.objects.all():
         file_url = '%s/%s' % (s3_bucket_url, file.key)
-        process_file(file_url)
+        process_file(file_url, org_feature_mappings)
 
 
 @click.command()
@@ -125,6 +131,8 @@ def _load_features():
 def load_everything():
 
     print('Loading the entire universe')
+
+    org_feature_mappings = {}
 
     items = ['licence', 'copyright', 'organisation', 'publication']
     count = 0
@@ -137,6 +145,7 @@ def load_everything():
                 reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
                 for row in reader:
                     file_url = '%s/%s/data/%s/%s' % (repo, branch, item, row['path'])
+                    print('Processing', file_url)
                     contents = requests.get(file_url).content.decode('utf-8')
                     count += _handle_markdown(item, contents)
 
@@ -146,12 +155,16 @@ def load_everything():
             with closing(requests.get(item_url, stream=True)) as r:
                 reader = csv.DictReader(r.iter_lines(decode_unicode=True), delimiter='\t')
                 for row in reader:
-                    count += _handle_organisation(row)
+                    count += _handle_organisation(row, org_feature_mappings)
 
         print('Loaded', count, item, 'files')
         count = 0
 
-    _load_features()
+    try:
+        _load_features(org_feature_mappings)
+    finally:
+        db.session.execute('CLUSTER feature USING idx_feature_geometry')
+        db.session.execute('VACUUM ANALYZE feature;')
 
     print('Done')
 

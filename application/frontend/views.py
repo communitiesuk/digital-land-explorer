@@ -1,17 +1,14 @@
-import json
-
-import geoalchemy2
-import sqlalchemy
 from flask import (
     Blueprint,
     render_template,
-    abort,
     request,
-    jsonify)
+    jsonify
+)
+
 from sqlalchemy import func
 
 from application.extensions import db
-from application.frontend.forms import LatLongForm, UKAreaForm
+from application.frontend.forms import UKAreaForm
 from application.models import Organisation, Publication, Licence, Feature, Copyright
 from application.geocode import nom_geocode, nom_reverse_geocode
 
@@ -63,11 +60,9 @@ def publications():
 def publication(id):
     pub = Publication.query.get(id)
     results = []
-    features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom), Feature.feature).filter(Feature.publication == pub.publication)
+    features = db.session.query(Feature.data).filter(Feature.publication == pub.publication)
     for f in features:
-        feat = json.loads(f[0])
-        feat['properties'] = {'feature': f[1]}
-        results.append(feat)
+        results.append(f.data)
     fs = {"type": "FeatureCollection", "features": results}
     return render_template('publication.html', publication=pub, features=fs)
 
@@ -101,29 +96,12 @@ def features():
 
 @frontend.route('/feature/<id>')
 def feature(id):
-    f = Feature.query.with_entities(Feature.data, geoalchemy2.functions.ST_AsGeoJSON(Feature.geometry)).filter(Feature.feature == id).one()
-    # organisation = Organisation.query.filter_by(feature=f).first()
-    # publication = Publication.query.filter(Publication.publication == a.area.split(':')[0]).first()
-    feature = json.loads(f[1])
-    feature['properties'] = f[0]
+    f = db.session.query(Feature.data).filter(Feature.feature == id).first()
+    publication = Publication.query.filter(Publication.publication == f.data['properties']['publication']).first()
     return render_template('feature.html',
-                           feature=feature,
-                           organisation=None,
-                           publication=None)
-
-
-# @frontend.route('/publication/<id>/areas')
-# def publication_area(id):
-#     if id[-1] == 's':
-#         prefix = id[:-1]
-#     else:
-#         prefix = id
-#     q = prefix + '%'
-#     publication = Publication.query.get(id)
-#     areas = [area.data for area in Feature.query.filter(Feature.feature.like(q)).all()]
-#     return render_template('publication_area.html',
-#                            publication=publication,
-#                            areas=areas)
+                           feature=f.data,
+                           organisation=publication.organisation,
+                           publication=publication)
 
 
 @frontend.route('/about-an-area')
@@ -178,31 +156,24 @@ def asset_path_context_processor():
 
 
 def _get_data_from_a_point(lat, lng):
-  results = []
-  nearby = []
-  from application.extensions import db
-  from sqlalchemy import cast
-  from geoalchemy2 import Geography
-  point = func.ST_MakePoint(float(lng), float(lat))
+    results = []
+    nearby = []
+    from application.extensions import db
+    point = func.ST_SetSRID(func.ST_MakePoint(float(lng), float(lat)), 4326)
+    features = db.session.query(Feature.data,
+                                Feature.feature,
+                                Feature.publication).filter(Feature.geometry.ST_Contains(point)).all()
 
-  features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
-                              Feature.feature,
-                              Feature.publication).filter(Feature.geometry.ST_Contains(point)).all()
-  for feature in features:
-      publication = Publication.query.filter_by(publication=feature[2]).first()
-      organisation = Organisation.query.filter_by(feature_id=feature[1]).first()
-      results.append({'feature': json.loads(feature[0]), 'organisation': organisation, 'publication': publication})
+    for feature in features:
+        publication = Publication.query.filter_by(publication=feature.publication).first()
+        # organisation = Organisation.query.filter_by(feature_id=feature.feature).first()
+        results.append({'feature': feature, 'organisation': publication.organisation, 'publication': publication})
 
+    # from geoalchemy2 import Geography
+    # from sqlalchemy import cast
+    # nearby_features = db.session.query(Feature.data).filter(func.ST_DWithin(Feature.geometry, cast(point, Geography), 500)).all()
+    # for feature in nearby_features:
+    #     publication = Publication.query.filter_by(publication=feature.data['properties']['publication']).first()
+    #     nearby.append({'feature': feature.data, 'organisation': publication.organisation, 'publication': publication})
 
-  # nearby_features = db.session.query(geoalchemy2.functions.ST_AsGeoJSON(func.ST_Dump(Feature.geometry).geom),
-  #                                    Feature.feature,
-  #                                    Feature.publication).filter(geoalchemy2.functions.ST_DWithin(Feature.geometry,
-  #                                                                                                 cast(point, Geography),
-  #                                                                                         500)).all()
-  # for feature in nearby_features:
-  #     publication = Publication.query.filter_by(publication=feature[2]).first()
-  #     organisation = Organisation.query.filter_by(feature_id=feature[1]).first()
-  #     nearby.append({'feature': json.loads(feature[0]), 'organisation': organisation, 'publication': publication})
-
-
-  return results, nearby
+    return results, nearby
