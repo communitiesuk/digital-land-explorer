@@ -1,5 +1,4 @@
 ---
 applications:
 - name: digital-land-explorer
-  memory: 4G
   buildpack: python_buildpack
