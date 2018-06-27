@@ -164,7 +164,7 @@ def load_everything():
         _load_features(org_feature_mappings)
     finally:
         db.session.execute('CLUSTER feature USING idx_feature_geometry')
-        db.session.execute('VACUUM ANALYZE feature;')
+        # db.session.execute('VACUUM ANALYZE feature;')
 
     print('Done')
 
