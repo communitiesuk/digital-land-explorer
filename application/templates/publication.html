@@ -135,9 +135,6 @@
                         $('.properties tbody').append('<tr><td>' + key +'</td><td>' + value +'</td></tr>');
                     });
                 });
-                layer.on('mouseout', function(e) {
-                     $('.properties tbody').empty();
-                });
             };
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
