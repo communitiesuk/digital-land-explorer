@@ -78,9 +78,16 @@
 
       {% if features.features %}
         <div class="grid-row">
-            <div class="column-full">
+            <div class="column-two-thirds">
                 <h2 class="heading-small">{{ publication.name }}</h2>
-                <div id="map" style="width: 900px; height: 600px;"></div>
+                <div id="map" style="width: 600px; height: 400px;"></div>
+            </div>
+            <div class="column-one-third">
+                <table class="properties">
+                    <caption class="heading-small">Feature properties</caption>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
         </div>
       {% endif %}
@@ -117,7 +124,20 @@
             });
 
             var onEachFeature = function(feature, layer) {
-                layer.bindTooltip(JSON.stringify(feature.properties), {sticky: true});
+                if(feature.properties.feature){
+                    layer.bindTooltip(feature.properties.feature, {sticky: true});
+                } else {
+                   layer.bindTooltip(feature.properties.item, {sticky: true});
+                }
+                layer.on('mouseover', function(e) {
+                    $('.properties tbody').empty();
+                    $.each(feature.properties, function(key, value) {
+                        $('.properties tbody').append('<tr><td>' + key +'</td><td>' + value +'</td></tr>');
+                    });
+                });
+                layer.on('mouseout', function(e) {
+                     $('.properties tbody').empty();
+                });
             };
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
