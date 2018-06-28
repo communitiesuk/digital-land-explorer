@@ -91,19 +91,15 @@
         <dd>{{ features.features|map(attribute='geometry')|map(attribute='type')|list|unique|join(", ") }}</dd>
       </dl>
       
-        <div class="grid-row">
-            <div class="column-two-thirds">
-                <h2 class="heading-small">{{ publication.name }}</h2>
-                <div id="map" style="width: 600px; height: 400px;"></div>
-            </div>
-            <div class="column-one-third">
-                <table class="properties">
-                    <caption class="heading-small">Feature properties</caption>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+      <h2 class="heading-small">{{ publication.name }}</h2>
+      <div class="leaflet-map" id="map"></div>
+
+      <table class="properties">
+        <caption class="heading-small">Feature properties</caption>
+        <tbody>
+        </tbody>
+      </table>
+
       {% endif %}
     
       {% endcall %}
@@ -119,6 +115,15 @@
         <script>
 
             var polygons = {{ features | tojson }};
+
+            function setMapHeight(mapId, ratio) {
+              var ratio = ratio || (2/3);
+              var map = document.getElementById('map');
+              var width = map.offsetWidth;
+              map.style.height = `${width * ratio}px`;
+            }
+
+            setMapHeight('map');
 
             var map = L.map('map', {zoomControl: false});
 
