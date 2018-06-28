@@ -2545,6 +2545,54 @@ ul.details {
   margin-left: 15px;
 }
 
-.pub-info-section__heading {
+.pub-info-section:first-of-type .pub-info-section__heading {
   margin: 0;
+}
+
+.leaflet-map-wrapper {
+  position: relative;
+}
+
+.leaflet-map {
+  width: 100%;
+  height: 400px;
+}
+
+.properties-panel {
+  background: #fff;
+  position: absolute;
+  width: 30%;
+  top: 15px;
+  right: 15px;
+  bottom: 15px;
+  overflow: scroll;
+  z-index: 400;
+  padding: 0 15px 15px;
+}
+
+.properties-list {
+  font-family: "nta", Arial, sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 14px;
+  line-height: 1.14286;
+}
+
+@media (min-width: 641px) {
+  .properties-list {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+}
+
+.properties-list dt {
+  font-weight: bold;
+}
+
+.properties-list dt:after {
+  content: ':';
+}
+
+.properties-list dd {
+  margin-bottom: 5px;
 }

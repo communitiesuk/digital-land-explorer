@@ -7,27 +7,20 @@
     <div id="content" role="main">
       {% from "macros/breadcrumbs.html" import render_breadcrumbs %}
       {{ render_breadcrumbs("publications") }}
+  
+      {% from "macros/data.html" import render_data_component %}
         <h1 class="heading-xlarge">
           <span class="heading-secondary">Explore</span>
           Publications</h1>
         <div class="grid-row">
           <div class="column-one-half">
-            <div class="data">
-              <span class="data-item bold-xxlarge">{{ publications|length }}</span>
-              <span class="data-item bold-xsmall">Publications</span>
-            </div>
+            {{ render_data_component(publications|length, "Publications") }}
           </div>
           <div class="column-one-quarter">
-            <div class="data">
-              <span class="data-item bold-xxlarge">{{ org_num }}</span>
-              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.organisations') }}">Organisations</a></span>
-            </div>
+            {{ render_data_component(org_num, "Organisations", url_for('frontend.organisations')) }}
           </div>
           <div class="column-one-quarter">
-            <div class="data">
-              <span class="data-item bold-xxlarge">{{ lic_num }}</span>
-              <span class="data-item bold-xsmall"><a href="{{ url_for('frontend.licences') }}">Licences</a></span>
-            </div>
+            {{ render_data_component(lic_num, "Licences", url_for('frontend.licences')) }}
           </div>
         </div>
 

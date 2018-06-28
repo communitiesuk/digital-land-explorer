@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="grid-row">
+      <!--<div class="grid-row">
         <div class="column-one-third">
           <div class="contents-section">
             Contents
@@ -62,35 +62,50 @@
             </ol>
           </div>
         </div>
-        <div class="column-two-thirds">
+        <div class="column-two-thirds"></div>
+      </div>-->
 
-          {% macro render_pub_info_section(sectionTitle, sectionId) %}
-          <section class="pub-info-section" id="{{ sectionId }}">
-            <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
-          </section>
-          {% endmacro %}
-          {{ render_pub_info_section("Description", "pub-info-description") }}
-          {{ render_pub_info_section("Data", "pub-info-data") }}
-          {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
+      {% macro render_pub_info_section(sectionTitle, sectionId, colWidth="column-two-thirds") %}
+      <section class="grid-row pub-info-section" id="{{ sectionId }}">
+        <div class="{{ colWidth }}">
+          <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
+          {% if caller %}
+            {{ caller() }}
+          {% endif %}
+        </div>
+      </section>
+      {% endmacro %}
 
+      {% call render_pub_info_section("Description", "pub-info-description") %}
+      <p class="text">Description from the markdown file should appear here...</p>
+      {% endcall %}
+
+      {% call render_pub_info_section("Data", "pub-info-data", "column-full") %}
+
+      {% if features.features %}
+      {% from "macros/data.html" import render_data_component %}
+      {{ render_data_component(features.features|length, "Features") }}
+
+      <dl class="definition-inline">
+        <dt>Contains feature types</dt>
+        <dd>{{ features.features|map(attribute='geometry')|map(attribute='type')|list|unique|join(", ") }}</dd>
+      </dl>
+      
+      <h2 class="heading-small">{{ publication.name }}</h2>
+      <div class="leaflet-map-wrapper">
+        <div class="leaflet-map" id="map"></div>
+
+        <div class="properties-panel">
+          <h4 class="heading-small">Feature properties</h4>
+          <dl class="properties-list"></dl>
         </div>
       </div>
 
-      {% if features.features %}
-        <div class="grid-row">
-            <div class="column-two-thirds">
-                <h2 class="heading-small">{{ publication.name }}</h2>
-                <div id="map" style="width: 600px; height: 400px;"></div>
-            </div>
-            <div class="column-one-third">
-                <table class="properties">
-                    <caption class="heading-small">Feature properties</caption>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
       {% endif %}
+    
+      {% endcall %}
+
+      {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
 
     </main>
 {% endblock %}
@@ -101,6 +116,22 @@
         <script>
 
             var polygons = {{ features | tojson }};
+
+            function setMapHeight(mapId, ratio) {
+              var ratio = ratio || (2/3);
+              var map = document.getElementById('map');
+              var width = map.offsetWidth;
+              map.style.height = `${width * ratio}px`;
+            }
+
+            function panMapOffset(map, offset) {
+              var centerPoint = map.getSize().divideBy(2),
+                  targetPoint = centerPoint.add(offset),
+                  targetLatLng = map.containerPointToLatLng(targetPoint);
+              return targetLatLng;
+            }
+
+            setMapHeight('map');
 
             var map = L.map('map', {zoomControl: false});
 
@@ -123,6 +154,13 @@
                 } // no-op.
             });
 
+            var defaultStyle = {
+              color: "#2B8CC4"
+            };
+            var highlightStyle = {
+              color: "#912B88"
+            };
+
             var onEachFeature = function(feature, layer) {
                 if(feature.properties.feature){
                     layer.bindTooltip(feature.properties.feature, {sticky: true});
@@ -130,20 +168,28 @@
                    layer.bindTooltip(feature.properties.item, {sticky: true});
                 }
                 layer.on('mouseover', function(e) {
-                    $('.properties tbody').empty();
-                    $.each(feature.properties, function(key, value) {
-                        $('.properties tbody').append('<tr><td>' + key +'</td><td>' + value +'</td></tr>');
-                    });
+                  var $propListEl = $('.properties-list');
+                  $propListEl.empty();
+                  $.each(feature.properties, function(key, value) {
+                      $propListEl.append('<dt>' + key +'</dt><dd>' + value +'</dd>');
+                  });
+                  layer.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function(e) {
+                  layer.setStyle(defaultStyle);
                 });
             };
+            
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
             var geoJsonLayer = L.geoJson(polygons, {
-                onEachFeature : onEachFeature
+                onEachFeature : onEachFeature,
+                style: defaultStyle
             });
 
             markers.addLayer(geoJsonLayer);
             map.fitBounds(markers.getBounds());
+            map.panTo( panMapOffset(map, [150, 0]));
 
         </script>
     {% endif %}
