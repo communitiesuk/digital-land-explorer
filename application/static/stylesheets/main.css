@@ -2545,6 +2545,6 @@ ul.details {
   margin-left: 15px;
 }
 
-.pub-info-section__heading {
+.pub-info-section:first-of-type .pub-info-section__heading {
   margin: 0;
 }

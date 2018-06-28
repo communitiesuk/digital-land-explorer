@@ -62,6 +62,9 @@ $path: "/static/govuk_template/images/";
   }
 }
 
-.pub-info-section__heading {
-  margin: 0;
+.pub-info-section:first-of-type {
+  .pub-info-section__heading {
+    margin: 0;
+  }
 }
+

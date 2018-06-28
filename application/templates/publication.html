@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="grid-row">
+      <!--<div class="grid-row">
         <div class="column-one-third">
           <div class="contents-section">
             Contents
@@ -62,19 +62,25 @@
             </ol>
           </div>
         </div>
-        <div class="column-two-thirds">
+        <div class="column-two-thirds"></div>
+      </div>-->
 
-          {% macro render_pub_info_section(sectionTitle, sectionId) %}
-          <section class="pub-info-section" id="{{ sectionId }}">
-            <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
-          </section>
-          {% endmacro %}
-          {{ render_pub_info_section("Description", "pub-info-description") }}
-          {{ render_pub_info_section("Data", "pub-info-data") }}
-          {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
-
+      {% macro render_pub_info_section(sectionTitle, sectionId, colWidth="column-two-thirds") %}
+      <section class="grid-row pub-info-section" id="{{ sectionId }}">
+        <div class="{{ colWidth }}">
+          <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
+          {% if caller %}
+            {{ caller() }}
+          {% endif %}
         </div>
-      </div>
+      </section>
+      {% endmacro %}
+
+      {% call render_pub_info_section("Description", "pub-info-description") %}
+      <p class="text">Description from the markdown file should appear here...</p>
+      {% endcall %}
+
+      {% call render_pub_info_section("Data", "pub-info-data", "column-full") %}
 
       {% if features.features %}
         <div class="grid-row">
@@ -91,6 +97,10 @@
             </div>
         </div>
       {% endif %}
+    
+      {% endcall %}
+
+      {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
 
     </main>
 {% endblock %}
@@ -136,6 +146,7 @@
                     });
                 });
             };
+            
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
             var geoJsonLayer = L.geoJson(polygons, {
