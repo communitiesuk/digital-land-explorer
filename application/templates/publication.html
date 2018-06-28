@@ -92,13 +92,14 @@
       </dl>
       
       <h2 class="heading-small">{{ publication.name }}</h2>
-      <div class="leaflet-map" id="map"></div>
+      <div class="leaflet-map-wrapper">
+        <div class="leaflet-map" id="map"></div>
 
-      <table class="properties">
-        <caption class="heading-small">Feature properties</caption>
-        <tbody>
-        </tbody>
-      </table>
+        <div class="properties-panel">
+          <h4 class="heading-small">Feature properties</h4>
+          <dl class="properties-list"></dl>
+        </div>
+      </div>
 
       {% endif %}
     
@@ -162,7 +163,7 @@
                 layer.on('mouseover', function(e) {
                     $('.properties tbody').empty();
                     $.each(feature.properties, function(key, value) {
-                        $('.properties tbody').append('<tr><td>' + key +'</td><td>' + value +'</td></tr>');
+                        $('.properties-list').append('<dt>' + key +'</dt><dd>' + value +'</dd>');
                     });
                     layer.setStyle(highlightStyle);
                 });

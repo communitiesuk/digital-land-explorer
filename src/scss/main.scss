@@ -67,9 +67,35 @@ $path: "/static/govuk_template/images/";
     margin: 0;
   }
 }
-
+.leaflet-map-wrapper {
+  position: relative;
+}
 .leaflet-map {
   width: 100%;
   height: 400px;
+}
+.properties-panel {
+  background: $page-colour;
+  position: absolute;
+  width: 30%;
+  top: $gutter-half;
+  right: $gutter-half;
+  bottom: $gutter-half;
+  overflow: scroll;
+  z-index: 400;
+  padding: 0 $gutter-half $gutter-half;
+}
+
+.properties-list {
+  @include core-16;
+  dt {
+    font-weight: bold;
+    &:after {
+      content: ':';
+    }
+  }
+  dd {
+    margin-bottom: 5px;
+  }
 }
 
