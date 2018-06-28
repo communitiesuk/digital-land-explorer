@@ -83,6 +83,12 @@
       {% call render_pub_info_section("Data", "pub-info-data", "column-full") %}
 
       {% if features.features %}
+
+      <dl class="definition-inline">
+        <dt>Contains feature types</dt>
+        <dd>{{ features.features|map(attribute='geometry')|map(attribute='type')|list|unique|join(", ") }}</dd>
+      </dl>
+      
         <div class="grid-row">
             <div class="column-two-thirds">
                 <h2 class="heading-small">{{ publication.name }}</h2>
