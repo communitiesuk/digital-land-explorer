@@ -124,6 +124,13 @@
               map.style.height = `${width * ratio}px`;
             }
 
+            function panMapOffset(map, offset) {
+              var centerPoint = map.getSize().divideBy(2),
+                  targetPoint = centerPoint.add(offset),
+                  targetLatLng = map.containerPointToLatLng(targetPoint);
+              return targetLatLng;
+            }
+
             setMapHeight('map');
 
             var map = L.map('map', {zoomControl: false});
@@ -161,11 +168,12 @@
                    layer.bindTooltip(feature.properties.item, {sticky: true});
                 }
                 layer.on('mouseover', function(e) {
-                    $('.properties tbody').empty();
-                    $.each(feature.properties, function(key, value) {
-                        $('.properties-list').append('<dt>' + key +'</dt><dd>' + value +'</dd>');
-                    });
-                    layer.setStyle(highlightStyle);
+                  var $propListEl = $('.properties-list');
+                  $propListEl.empty();
+                  $.each(feature.properties, function(key, value) {
+                      $propListEl.append('<dt>' + key +'</dt><dd>' + value +'</dd>');
+                  });
+                  layer.setStyle(highlightStyle);
                 });
                 layer.on('mouseout', function(e) {
                   layer.setStyle(defaultStyle);
@@ -181,6 +189,7 @@
 
             markers.addLayer(geoJsonLayer);
             map.fitBounds(markers.getBounds());
+            map.panTo( panMapOffset(map, [150, 0]));
 
         </script>
     {% endif %}
