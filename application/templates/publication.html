@@ -83,6 +83,8 @@
       {% call render_pub_info_section("Data", "pub-info-data", "column-full") %}
 
       {% if features.features %}
+      {% from "macros/data.html" import render_data_component %}
+      {{ render_data_component(features.features|length, "Features") }}
 
       <dl class="definition-inline">
         <dt>Contains feature types</dt>

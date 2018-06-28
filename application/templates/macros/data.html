@@ -1,0 +1,10 @@
+{% macro render_data_component(figure, name, url, classes) %}
+<div class="data {{ classes }}">
+  <span class="data-item bold-xxlarge">{{ figure }}</span>
+  {% if url %}
+  <span class="data-item bold-xsmall"><a href="{{ url }}">{{ name }}</a></span>
+  {% else %}
+  <span class="data-item bold-xsmall">{{ name }}</span>
+  {% endif %}
+</div>
+{% endmacro %}
