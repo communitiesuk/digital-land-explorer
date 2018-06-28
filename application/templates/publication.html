@@ -133,6 +133,13 @@
                 } // no-op.
             });
 
+            var defaultStyle = {
+              color: "#2B8CC4"
+            };
+            var highlightStyle = {
+              color: "#912B88"
+            };
+
             var onEachFeature = function(feature, layer) {
                 if(feature.properties.feature){
                     layer.bindTooltip(feature.properties.feature, {sticky: true});
@@ -144,13 +151,18 @@
                     $.each(feature.properties, function(key, value) {
                         $('.properties tbody').append('<tr><td>' + key +'</td><td>' + value +'</td></tr>');
                     });
+                    layer.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function(e) {
+                  layer.setStyle(defaultStyle);
                 });
             };
             
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
             var geoJsonLayer = L.geoJson(polygons, {
-                onEachFeature : onEachFeature
+                onEachFeature : onEachFeature,
+                style: defaultStyle
             });
 
             markers.addLayer(geoJsonLayer);
