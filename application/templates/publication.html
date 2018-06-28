@@ -171,7 +171,18 @@
                   var $propListEl = $('.properties-list');
                   $propListEl.empty();
                   $.each(feature.properties, function(key, value) {
-                      $propListEl.append('<dt>' + key +'</dt><dd>' + value +'</dd>');
+                      var item = '<dt>' + key +'</dt><dd>' + value +'</dd>'
+
+                      if ('feature' in feature.properties) {
+                          if(key == 'feature') {
+                            item ='<dt>' + key +'</dt><dd><a href="/feature/'+ value +'">' + value +'</a></dd>';
+                          }
+                      } else if ('item' in feature.properties) {
+                          if(key == 'item') {
+                            item ='<dt>' + key +'</dt><dd><a href="/feature/item:'+ value +'">' + value +'</a></dd>';
+                          }
+                      }
+                      $propListEl.append(item);
                   });
                   layer.setStyle(highlightStyle);
                 });
