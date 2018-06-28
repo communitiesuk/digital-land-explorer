@@ -104,7 +104,7 @@
             {% endfor %}
 
             pointsMap.addLayer(markers);
-            geojsonLayer = L.geoJSON({{ organisation.feature() | tojson }}).addTo(pointsMap);
+            geojsonLayer = L.geoJSON({{ organisation.feature.data | tojson }}).addTo(pointsMap);
             pointsMap.fitBounds(geojsonLayer.getBounds());
 
 

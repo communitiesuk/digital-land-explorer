@@ -104,8 +104,8 @@ def _handle_markdown(item, contents):
 
 
 def _handle_organisation(contents, org_feature_mappings):
-    if contents.get('feature') is not None:
-        org_feature_mappings['feature'] = contents['organisation']
+    if contents.get('feature'):
+        org_feature_mappings[contents.get('feature')] = contents['organisation']
     if not db.session.query(Organisation).get(contents['organisation']):
         organisation = Organisation(organisation=contents['organisation'],
                                     name=contents['name'],

@@ -6,6 +6,7 @@ from flask import (
 )
 
 from sqlalchemy import func
+from sqlalchemy.orm import load_only
 
 from application.extensions import db
 from application.frontend.forms import UKAreaForm
@@ -59,11 +60,9 @@ def publications():
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
-    results = []
-    features = db.session.query(Feature.data).filter(Feature.publication == pub.publication)
-    for f in features:
-        results.append(f.data)
-    fs = {"type": "FeatureCollection", "features": results}
+    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication).all()
+    features = [f.data for f in features]
+    fs = {"type": "FeatureCollection", "features": features}
     return render_template('publication.html', publication=pub, features=fs)
 
 

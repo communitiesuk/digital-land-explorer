@@ -15,67 +15,68 @@
     <main id="content" role="main">
 
         {% if form %}
-				<div class="grid-row">
-					<div class="column-two-thirds">
-			      <h2 class="heading-large">Search for data about an area</h2>
-			      <form method="GET" action="{{ url_for('frontend.about_an_area') }}" class="form location-search-form">
-			        <fieldset class="form-group">
-			          <legend>
-			            <h2 class="heading-medium visuallyhidden">
-			              Search for areas by lat/long
-			            </h2>
-			          </legend>
-			          {{ form.query.label(class="form-label")  }}
-			          <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
-			          <div class="grid-row">
-			            <div class="search-form-control-wrapper column-half">
-			              {% if query %}
-			              {{ form.query(class="form-control location", value=query) }}
-			              {% else %}
-			              {{ form.query(class="form-control location") }}
-			              {% endif %}
-			              <button class="button button-search" type="submit">Search</button>
-			            </div>
-			          </div>
-			        </fieldset>
-			        {{ form.csrf_token }}
-			      </form>
-			      <div class="grid-row">
-			        <div class="column-full">
-			          <div class="map-wrapper">
-									<div id="location-search-map" style="height: 450px;"></div>
-									<div class="lat-lng-panel">
-                    <div class="loader"></div>
-										<dl class="definition-inline">
-											<dt class="query-meta">Query</dt>
-											<dd class="display-query query-meta"></dd>
-											<dt>Latitude</dt>
-											<dd class="display-lat"></dd>
-											<dt>Longitude</dt>
-											<dd class="display-lng"></dd>
-										</dl>
-										<a class="button load-results-btn button-load-data" href="#">Load data</a>
-									</div>
-								</div>
-							</div>
-			      </div>
-					</div>
-					
-					<div class="column-one-third">
-            <div class="related-section related-section-parallel-large">
-  						<h3 class="heading-small">
-  							Related data
-  						</h3>
-  						<ul class="related-links">
-  							<li><a href="{{ url_for('frontend.organisations') }}">Organisations</a></li>
-  							<li><a href="{{ url_for('frontend.publications') }}">Publications</a></li>
-  							<li><a href="{{ url_for('frontend.licences') }}">Licences</a></li>
-  							<li><a href="{{ url_for('frontend.attributions') }}">Attributions</a></li>
-  						</ul>
+            <div class="grid-row">
+                <div class="column-two-thirds">
+                    <h2 class="heading-large">Search for data about an area</h2>
+                    <form method="GET" action="{{ url_for('frontend.about_an_area') }}"
+                          class="form location-search-form">
+                        <fieldset class="form-group">
+                            <legend>
+                                <h2 class="heading-medium visuallyhidden">
+                                    Search for areas by lat/long
+                                </h2>
+                            </legend>
+                            {{ form.query.label(class="form-label") }}
+                            <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
+                            <div class="grid-row">
+                                <div class="search-form-control-wrapper column-half">
+                                    {% if query %}
+                                        {{ form.query(class="form-control location", value=query) }}
+                                    {% else %}
+                                        {{ form.query(class="form-control location") }}
+                                    {% endif %}
+                                    <button class="button button-search" type="submit">Search</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                        {{ form.csrf_token }}
+                    </form>
+                    <div class="grid-row">
+                        <div class="column-full">
+                            <div class="map-wrapper">
+                                <div id="location-search-map" style="height: 450px;"></div>
+                                <div class="lat-lng-panel">
+                                    <div class="loader"></div>
+                                    <dl class="definition-inline">
+                                        <dt class="query-meta">Query</dt>
+                                        <dd class="display-query query-meta"></dd>
+                                        <dt>Latitude</dt>
+                                        <dd class="display-lat"></dd>
+                                        <dt>Longitude</dt>
+                                        <dd class="display-lng"></dd>
+                                    </dl>
+                                    <a class="button load-results-btn button-load-data" href="#">Load data</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column-one-third">
+                    <div class="related-section related-section-parallel-large">
+                        <h3 class="heading-small">
+                            Related data
+                        </h3>
+                        <ul class="related-links">
+                            <li><a href="{{ url_for('frontend.organisations') }}">Organisations</a></li>
+                            <li><a href="{{ url_for('frontend.publications') }}">Publications</a></li>
+                            <li><a href="{{ url_for('frontend.licences') }}">Licences</a></li>
+                            <li><a href="{{ url_for('frontend.attributions') }}">Attributions</a></li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
-					</div>
-          
-				</div>
         {% endif %}
     </main>
 
@@ -91,7 +92,7 @@
           console.log('Error occurred. Error code: ' + error.code);
         };
 
-				$(function() {
+        $(function() {
 
           geoUtils.init({
             urls: {
@@ -127,6 +128,7 @@
               });
             }, geoError, {maximumAge: 5 * 60 * 1000});
           }
-				});
+        });
+
     </script>
 {% endblock %}
