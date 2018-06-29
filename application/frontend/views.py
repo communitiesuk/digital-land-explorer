@@ -60,7 +60,7 @@ def publications():
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
-    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication).limit(1)
+    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication)
     features = [f.data for f in features]
     fs = {"type": "FeatureCollection", "features": features}
     return render_template('publication.html', publication=pub, features=fs)
