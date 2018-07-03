@@ -171,6 +171,7 @@
                   var $propListEl = $('.properties-list');
                   $propListEl.empty();
                   $.each(feature.properties, function(key, value) {
+
                       var item = '<dt>' + key +'</dt><dd>' + value +'</dd>'
 
                       if (feature.properties.hasOwnProperty('feature')) {
@@ -183,6 +184,7 @@
                           }
                       }
                       $propListEl.append(item);
+
                   });
                   layer.setStyle(highlightStyle);
                 });
@@ -190,10 +192,16 @@
                   layer.setStyle(defaultStyle);
                 });
             };
+
+            // show circles instead of markers for points
+            function pointToCircle(geoJsonPoint, latlng) {
+                return L.circle(latlng, {radius: 10});
+            }
             
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
             var geoJsonLayer = L.geoJson(polygons, {
+                pointToLayer: pointToCircle,
                 onEachFeature : onEachFeature,
                 style: defaultStyle
             });
