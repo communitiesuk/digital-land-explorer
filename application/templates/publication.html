@@ -68,7 +68,7 @@
       {% macro render_pub_info_section(sectionTitle, sectionId, colWidth="column-two-thirds") %}
       <section class="grid-row pub-info-section" id="{{ sectionId }}">
         <div class="{{ colWidth }}">
-          <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
+          <h3 class="heading-large pub-info-section__heading">{{ sectionTitle }}</h3>
           {% if caller %}
             {{ caller() }}
           {% endif %}
