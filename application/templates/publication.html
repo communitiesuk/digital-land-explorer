@@ -68,7 +68,7 @@
       {% macro render_pub_info_section(sectionTitle, sectionId, colWidth="column-two-thirds") %}
       <section class="grid-row pub-info-section" id="{{ sectionId }}">
         <div class="{{ colWidth }}">
-          <h3 class="heading-medium pub-info-section__heading">{{ sectionTitle }}</h3>
+          <h3 class="heading-large pub-info-section__heading">{{ sectionTitle }}</h3>
           {% if caller %}
             {{ caller() }}
           {% endif %}
@@ -96,8 +96,12 @@
         <div class="leaflet-map" id="map"></div>
 
         <div class="properties-panel">
+          <h4 class="heading-medium">Properties</h4>
+          <h4 class="heading-small">Collector properties</h4>
+          <dl class="collector-properties-list"></dl>
+          <hr />
           <h4 class="heading-small">Feature properties</h4>
-          <dl class="properties-list"></dl>
+          <dl class="feature-properties-list"></dl>
         </div>
       </div>
 
@@ -161,6 +165,35 @@
               color: "#912B88"
             };
 
+            function generateItemHTML(prop, propVal) {
+              return '<dt>' + prop +'</dt><dd>' + propVal +'</dd>';
+            }
+
+            function renderCollectorProperties(propObj, collectorProperties, $container) {
+              collectorProperties.forEach((prop) => {
+                if(propObj[prop]) {
+                  var str = propObj[prop];
+                  if (propObj.hasOwnProperty('feature')) {
+                      if(prop == 'feature') {
+                        str = '<a href="/feature/'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
+                      }
+                  } else if (propObj.hasOwnProperty('item')) {
+                      if(prop == 'item') {
+                        str ='<a href="/feature/item:'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
+                      }
+                  }
+                  $container.append( generateItemHTML(prop, str) );
+                }
+              });
+            }
+
+            function copyReduce(obj, propArr) {
+              var copy = Object.assign({}, obj);
+              propArr.forEach((prop) => delete copy[prop]);
+              return copy;
+            }
+
+            var lastHighlightedLayer;
             var onEachFeature = function(feature, layer) {
                 if(feature.properties.feature){
                     layer.bindTooltip(feature.properties.feature, {sticky: true});
@@ -168,32 +201,34 @@
                    layer.bindTooltip(feature.properties.item, {sticky: true});
                 }
                 layer.on('mouseover', function(e) {
-                  var $propListEl = $('.properties-list');
-                  $propListEl.empty();
-                  $.each(feature.properties, function(key, value) {
-                      var item = '<dt>' + key +'</dt><dd>' + value +'</dd>'
+                  var $collectorPropContainer = $('.collector-properties-list').empty();
+                  var $featurePropList = $('.feature-properties-list').empty();
+                  var collectorProperties = ['feature', 'item', 'publication'];
 
-                      if (feature.properties.hasOwnProperty('feature')) {
-                          if(key == 'feature') {
-                            item ='<dt>' + key +'</dt><dd><a href="/feature/'+ value +'">' + value +'</a></dd>';
-                          }
-                      } else if (feature.properties.hasOwnProperty('item')) {
-                          if(key == 'item') {
-                            item ='<dt>' + key +'</dt><dd><a href="/feature/item:'+ value +'">' + value +'</a></dd>';
-                          }
-                      }
-                      $propListEl.append(item);
+                  renderCollectorProperties(feature.properties, collectorProperties, $collectorPropContainer);
+                  var featureProperties = copyReduce(feature.properties, collectorProperties);
+
+                  $.each(featureProperties, function(key, value) {
+                    $featurePropList.append( generateItemHTML(key, value) );
                   });
+
+                  if (lastHighlightedLayer) {
+                    lastHighlightedLayer.setStyle(defaultStyle);
+                  }
                   layer.setStyle(highlightStyle);
-                });
-                layer.on('mouseout', function(e) {
-                  layer.setStyle(defaultStyle);
+                  lastHighlightedLayer = layer;
                 });
             };
+
+            // show circles instead of markers for points
+            function pointToCircle(geoJsonPoint, latlng) {
+                return L.circle(latlng, {radius: 10});
+            }
             
 
             var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
             var geoJsonLayer = L.geoJson(polygons, {
+                pointToLayer: pointToCircle,
                 onEachFeature : onEachFeature,
                 style: defaultStyle
             });

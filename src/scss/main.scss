@@ -80,22 +80,22 @@ $path: "/static/govuk_template/images/";
   width: 30%;
   top: $gutter-half;
   right: $gutter-half;
-  bottom: $gutter-half;
+  bottom: 25px;
   overflow: scroll;
   z-index: 400;
   padding: 0 $gutter-half $gutter-half;
-}
 
-.properties-list {
-  @include core-16;
-  dt {
-    font-weight: bold;
-    &:after {
-      content: ':';
+  dl {
+    @include core-16;
+    dt {
+      font-weight: bold;
+      &:after {
+        content: ':';
+      }
     }
-  }
-  dd {
-    margin-bottom: 5px;
+    dd {
+      margin-bottom: 5px;
+    }
   }
 }
 
