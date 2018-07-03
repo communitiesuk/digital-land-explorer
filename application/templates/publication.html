@@ -190,6 +190,7 @@
               return copy;
             }
 
+            var lastHighlightedLayer;
             var onEachFeature = function(feature, layer) {
                 if(feature.properties.feature){
                     layer.bindTooltip(feature.properties.feature, {sticky: true});
@@ -208,10 +209,11 @@
                     $featurePropList.append( generateItemHTML(key, value) );
                   });
 
+                  if (lastHighlightedLayer) {
+                    lastHighlightedLayer.setStyle(defaultStyle);
+                  }
                   layer.setStyle(highlightStyle);
-                });
-                layer.on('mouseout', function(e) {
-                  layer.setStyle(defaultStyle);
+                  lastHighlightedLayer = layer;
                 });
             };
 
