@@ -2570,7 +2570,7 @@ ul.details {
   padding: 0 15px 15px;
 }
 
-.properties-list {
+.properties-panel dl {
   font-family: "nta", Arial, sans-serif;
   font-weight: 400;
   text-transform: none;
@@ -2579,20 +2579,20 @@ ul.details {
 }
 
 @media (min-width: 641px) {
-  .properties-list {
+  .properties-panel dl {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 
-.properties-list dt {
+.properties-panel dl dt {
   font-weight: bold;
 }
 
-.properties-list dt:after {
+.properties-panel dl dt:after {
   content: ':';
 }
 
-.properties-list dd {
+.properties-panel dl dd {
   margin-bottom: 5px;
 }
