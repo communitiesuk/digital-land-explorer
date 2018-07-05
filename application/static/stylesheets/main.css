@@ -2571,6 +2571,9 @@ ul.details {
   top: 15px;
   right: 15px;
   bottom: 25px;
+  top: 10px;
+  right: 10px;
+  bottom: 20px;
   overflow: scroll;
   z-index: 400;
 }
