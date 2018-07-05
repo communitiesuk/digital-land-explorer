@@ -110,3 +110,15 @@ $path: "/static/govuk_template/images/";
   color: $page-colour;
 }
 
+.leaflet-form {
+  font-size: 16px;
+  .form-control {
+    width: 100%;
+  }
+  .button-search {
+    margin-right: -75px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+}
+

@@ -11,8 +11,8 @@ L.control.search = (function(L) {
       this._map = map;
       this._container = L.DomUtil.create('div', 'leaflet-control-search');
       this._form = this._createForm('leaflet-form');
-      this._input = this._createInput(this.options.textPlaceholder, 'search-input');
-      this._button = this._createButton('Search', 'search-button');
+      this._input = this._createInput(this.options.textPlaceholder, 'search-input form-control');
+      this._button = this._createButton('Search', 'button button-search');
       return this._container;
     },
     onRemove: function(map) {
@@ -44,9 +44,10 @@ L.control.search = (function(L) {
     		return input;
     	},
       _createButton: function (title, className) {
-    		var button = L.DomUtil.create('a', className, this._container);
-    		button.href = '#';
-    		button.title = title;
+    		var button = L.DomUtil.create('a', className, this._form);
+        button.href = '#';
+        button.title = title;
+        button.text = title;
 
     		L.DomEvent
     			.on(button, 'click', L.DomEvent.stop, this)

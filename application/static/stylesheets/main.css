@@ -2607,3 +2607,17 @@ ul.details {
   background: #0b0c0c;
   color: #fff;
 }
+
+.leaflet-form {
+  font-size: 16px;
+}
+
+.leaflet-form .form-control {
+  width: 100%;
+}
+
+.leaflet-form .button-search {
+  margin-right: -75px;
+  padding-top: 10px;
+  padding-bottom: 8px;
+}
