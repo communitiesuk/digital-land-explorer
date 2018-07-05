@@ -2602,3 +2602,8 @@ ul.details {
 .properties-panel dl dd {
   margin-bottom: 5px;
 }
+
+.amount-showing-panel {
+  background: #0b0c0c;
+  color: #fff;
+}

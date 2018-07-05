@@ -95,6 +95,9 @@
         <div class="leaflet-map" id="map" data-publication="{{ publication.publication }}"></div>
 
         <div class="properties-panel">
+          <div class="amount-showing-panel">
+            <p>Currently showing <span class="features-showing-count">0</span> of {{features.features|length}} features</p>
+          </div>
           <h4 class="heading-medium">Properties</h4>
           <h4 class="heading-small">Collector properties</h4>
           <dl class="collector-properties-list"></dl>
@@ -210,6 +213,7 @@
                 style: defaultStyle
               });
               markers.addLayer(geoJsonLayer);
+              numOfFeaturesShowing.textContent = data.features.length;
             }
 
             function fetchData(url, map) {
@@ -249,6 +253,7 @@
 
             setMapHeight('map');
 
+            var numOfFeaturesShowing = document.querySelector('.features-showing-count');
             var mapContainer = document.querySelector('.leaflet-map-wrapper');
             var map = L.map('map', {zoomControl: false});
 
