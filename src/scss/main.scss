@@ -80,7 +80,8 @@ $path: "/static/govuk_template/images/";
   width: 100%;
   height: 400px;
 }
-.properties-panel {
+
+.dataset-info-panel {
   background: $page-colour;
   position: absolute;
   width: 30%;
@@ -89,6 +90,8 @@ $path: "/static/govuk_template/images/";
   bottom: 25px;
   overflow: scroll;
   z-index: 400;
+}
+.properties-panel {
   padding: 0 $gutter-half $gutter-half;
 
   dl {
@@ -108,6 +111,11 @@ $path: "/static/govuk_template/images/";
 .amount-showing-panel {
   background: $text-colour;
   color: $page-colour;
+  padding: 5px $gutter-half 3px;
+  margin-bottom: $gutter-half;
+  p {
+    margin: 0;
+  }
 }
 
 .leaflet-form {

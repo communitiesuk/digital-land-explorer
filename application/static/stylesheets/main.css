@@ -2564,7 +2564,7 @@ ul.details {
   height: 400px;
 }
 
-.properties-panel {
+.dataset-info-panel {
   background: #fff;
   position: absolute;
   width: 30%;
@@ -2573,6 +2573,9 @@ ul.details {
   bottom: 25px;
   overflow: scroll;
   z-index: 400;
+}
+
+.properties-panel {
   padding: 0 15px 15px;
 }
 
@@ -2606,6 +2609,12 @@ ul.details {
 .amount-showing-panel {
   background: #0b0c0c;
   color: #fff;
+  padding: 5px 15px 3px;
+  margin-bottom: 15px;
+}
+
+.amount-showing-panel p {
+  margin: 0;
 }
 
 .leaflet-form {
