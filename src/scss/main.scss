@@ -16,6 +16,11 @@ $path: "/static/govuk_template/images/";
 @import "common/forms";
 @import "common/layout";
 
+* {
+    font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif !important;
+}
+
+
 .data-item a {
   color: $text-colour;
 }
