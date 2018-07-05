@@ -118,8 +118,16 @@
 
 
 {% block end_body %}
+  <script src="/static/javascripts/geoUtils.js"></script>
+  <script src="/static/javascripts/leaflet.search.control.js"></script>
     {% if features.features %}
         <script>
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+            }
+          });
 
            var defaultStyle = {
               color: "#2B8CC4"
@@ -263,7 +271,7 @@
                 accessToken: '{{ config.MAPBOX_TOKEN }}'
               }
             ).addTo(map);
-
+            map.zoomControl.setPosition('bottomleft');
 
             L.Polygon.addInitHook(function () {
                 this._latlng = this._bounds.getCenter();
@@ -287,6 +295,8 @@
             } else {
                  map = map.setView(new L.LatLng(51.507968, -0.128038), 12)
             }
+
+            var searchControl = L.control.search({}).addTo(map);
 
         </script>
     {% endif %}
