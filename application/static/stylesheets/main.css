@@ -2371,6 +2371,10 @@ ul.details {
   animation: loading 1s linear infinite;
 }
 
+.fetching-data .loader:before {
+  animation: loading 1s linear infinite;
+}
+
 .button-load-data,
 .button-filter-table {
   background-color: #005ea5;

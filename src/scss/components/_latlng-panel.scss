@@ -42,8 +42,8 @@ $loader-width: 20px;
 
 // the loader animation for 
 @keyframes loading {
-    from {left: -($loader-width); width: 30%;}
-    50% {width: 30%; left: 55%;}
+    from {left: -($loader-width); width: 20%;}
+    50% {width: 20%; left: 55%;}
     95% {left: 120%;}
     to {left: 100%;}
 }
@@ -52,6 +52,12 @@ $loader-width: 20px;
 .performing-geocode {
   .loader:before {
     display: block;
+    animation: loading 1s linear infinite;
+  }
+}
+
+.fetching-data {
+  .loader:before {
     animation: loading 1s linear infinite;
   }
 }

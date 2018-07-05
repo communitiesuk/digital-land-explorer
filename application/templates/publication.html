@@ -91,6 +91,7 @@
       
       <h2 class="heading-small">{{ publication.name }}</h2>
       <div class="leaflet-map-wrapper">
+        <div class="loader"></div>
         <div class="leaflet-map" id="map" data-publication="{{ publication.publication }}"></div>
 
         <div class="properties-panel">
@@ -213,9 +214,11 @@
 
             function fetchData(url, map) {
               fetchingData = true;
+              mapContainer.classList.add('fetching-data');
               $.getJSON(url, function(data) {
                 console.log(data);
                 fetchingData = false;
+                mapContainer.classList.remove('fetching-data');
                 renderData(data, map);
               }).then(() => {
                 // if nextRequest is set
@@ -246,6 +249,7 @@
 
             setMapHeight('map');
 
+            var mapContainer = document.querySelector('.leaflet-map-wrapper');
             var map = L.map('map', {zoomControl: false});
 
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
