@@ -2496,6 +2496,10 @@ ul.details {
   }
 }
 
+* {
+  font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif !important;
+}
+
 .data-item a {
   color: #0b0c0c;
 }
