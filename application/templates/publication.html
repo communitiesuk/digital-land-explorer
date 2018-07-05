@@ -185,24 +185,49 @@
                 return L.circle(latlng, {radius: 10});
             }
 
+            var fetchingData = false;
+            var nextRequest;
             function getDataAndRender(e){
-                var map = e.target,
-                    bounds = map.getBounds().toBBoxString(),
-                    markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map),
-                    publication = document.getElementById('map').dataset.publication,
-                    url = '/publications/'+ publication+'/feature?bbox=' + bounds;
+              var map = e.target,
+                  bounds = map.getBounds().toBBoxString(),
+                  publication = document.getElementById('map').dataset.publication,
+                  url = '/publications/'+ publication+'/feature?bbox=' + bounds;
 
-                $.getJSON(url, function(data) {
-                    console.log(data);
-                    var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
-                    var geoJsonLayer = L.geoJson(data, {
-                      pointToLayer: pointToCircle,
-                      onEachFeature : onEachFeature,
-                      style: defaultStyle
-                    });
-                    markers.addLayer(geoJsonLayer);
-                });
+              if( !fetchingData ) {
+                fetchData(url, map);
+              } else {
+                nextRequest = url;
+                console.log(`Already fetching.... ${url}`);
+              }
+            }
 
+            function renderData(data, map) {
+              var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
+              var geoJsonLayer = L.geoJson(data, {
+                pointToLayer: pointToCircle,
+                onEachFeature : onEachFeature,
+                style: defaultStyle
+              });
+              markers.addLayer(geoJsonLayer);
+            }
+
+            function fetchData(url, map) {
+              fetchingData = true;
+              $.getJSON(url, function(data) {
+                console.log(data);
+                fetchingData = false;
+                renderData(data, map);
+              }).then(() => {
+                // if nextRequest is set
+                if( nextRequest ) {
+                  console.log(`Now fetching requesting: ${nextRequest}`);
+                  // empty it
+                  nextUrl = nextRequest;
+                  nextRequest = "";
+                  // run fetch with value it had
+                  fetchData(nextUrl, map);
+                } 
+              });
             }
 
             function setMapHeight(mapId, ratio) {
