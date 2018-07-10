@@ -10,6 +10,9 @@ if os.environ.get('VCAP_SERVICES') is not None:
     os.environ['MAPBOX_TOKEN'] = vcap_services['user-provided'][0]['credentials']['MAPBOX_TOKEN']
     os.environ['S3_REGION'] = vcap_services['user-provided'][0]['credentials']['S3_REGION']
     os.environ['S3_BUCKET'] = vcap_services['user-provided'][0]['credentials']['S3_BUCKET']
+    os.environ['AWS_ACCESS_KEY_ID'] = vcap_services['user-provided'][0]['credentials']['AWS_ACCESS_KEY_ID']
+    os.environ['AWS_SECRET_ACCESS_KEY'] = vcap_services['user-provided'][0]['credentials']['AWS_SECRET_ACCESS_KEY']
+
 
 class Config(object):
     APP_ROOT = os.path.abspath(os.path.dirname(__file__))
