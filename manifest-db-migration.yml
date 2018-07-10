@@ -4,9 +4,9 @@ applications:
   no-route: true
   memory: 512M
   buildpack: python_buildpack
-    env:
+  env:
     FLASK_APP: application.wsgi:app
     FLASK_CONFIG: config.Config
     FLASK_ENV: production
   services:
-    - user-provided-config-service
+  - user-provided-config-service

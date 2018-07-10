@@ -77,6 +77,7 @@ def publication_feature(id):
         features.append(row[0])
     return jsonify(type="FeatureCollection", features=features), 200
 
+
 @frontend.route('/licences')
 def licences():
     return render_template('licences.html', licences=Licence.query.all())
@@ -97,11 +98,6 @@ def attributions():
 def attribution(id):
     attr = Copyright.query.get(id)
     return render_template('attribution.html', attribution=attr)
-
-
-@frontend.route('/features')
-def features():
-    return render_template('areas.html', count=1000)
 
 
 @frontend.route('/feature/<id>')
