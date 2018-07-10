@@ -95,6 +95,10 @@ $gutter-third: $gutter/3;
 .properties-panel {
   padding: 0 $gutter-half $gutter-half;
 
+  .heading-medium {
+    margin-top: $gutter-half;
+  }
+
   dl {
     @include core-16;
     dt {

@@ -2568,9 +2568,6 @@ ul.details {
   background: #fff;
   position: absolute;
   width: 30%;
-  top: 15px;
-  right: 15px;
-  bottom: 25px;
   top: 10px;
   right: 10px;
   bottom: 20px;
@@ -2580,6 +2577,10 @@ ul.details {
 
 .properties-panel {
   padding: 0 15px 15px;
+}
+
+.properties-panel .heading-medium {
+  margin-top: 15px;
 }
 
 .properties-panel dl {
