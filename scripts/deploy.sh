@@ -32,4 +32,4 @@ cf stop digital-land-explorer-db-migration
 
 # zero downtime push with autopilot
 cf install-plugin autopilot -f -r CF-Community
-cf zero-downtime-push digital-land-explore -f manifest.yml
+cf zero-downtime-push digital-land-explorer -f manifest.yml
