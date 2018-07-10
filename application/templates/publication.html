@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ publication.publication }}{% endblock %}
 {% block end_head %}
-    <script src="https://unpkg.com/Leaflet.Deflate@0.3.0/dist/L.Deflate.js"></script>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
     <script src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
@@ -93,16 +91,22 @@
       
       <h2 class="heading-small">{{ publication.name }}</h2>
       <div class="leaflet-map-wrapper">
-        <div class="leaflet-map" id="map"></div>
+        <div class="loader"></div>
+        <div class="leaflet-map" id="map" data-publication="{{ publication.publication }}"></div>
 
-        <div class="properties-panel">
-          <h4 class="heading-medium">Properties</h4>
-          <h4 class="heading-small">Collector properties</h4>
-          <dl class="collector-properties-list"></dl>
-          <hr />
-          <h4 class="heading-small">Feature properties</h4>
-          <dl class="feature-properties-list"></dl>
-        </div>
+        <div class="dataset-info-panel">
+          <div class="amount-showing-panel">
+            <p>Currently showing <span class="features-showing-count">0</span> of {{features.features|length}} features</p>
+          </div>
+
+          <div class="properties-panel">
+            <h4 class="heading-medium">Properties</h4>
+            <h4 class="heading-small">Collector properties</h4>
+            <dl class="collector-properties-list"></dl>
+            <hr />
+            <h4 class="heading-small">Feature properties</h4>
+            <dl class="feature-properties-list"></dl>
+          </div>
       </div>
 
       {% endif %}
@@ -116,49 +120,18 @@
 
 
 {% block end_body %}
+  <script src="/static/javascripts/geoUtils.js"></script>
+  <script src="/static/javascripts/leaflet.search.control.js"></script>
     {% if features.features %}
         <script>
-
-            var polygons = {{ features | tojson }};
-
-            function setMapHeight(mapId, ratio) {
-              var ratio = ratio || (2/3);
-              var map = document.getElementById('map');
-              var width = map.offsetWidth;
-              map.style.height = `${width * ratio}px`;
+          geoUtils.init({
+            urls: {
+              geocode: "{{ url_for('frontend.geocode') }}",
+              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
             }
+          });
 
-            function panMapOffset(map, offset) {
-              var centerPoint = map.getSize().divideBy(2),
-                  targetPoint = centerPoint.add(offset),
-                  targetLatLng = map.containerPointToLatLng(targetPoint);
-              return targetLatLng;
-            }
-
-            setMapHeight('map');
-
-            var map = L.map('map', {zoomControl: false});
-
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                id: 'mapbox.streets',
-                accessToken: '{{ config.MAPBOX_TOKEN }}'
-              }
-            ).addTo(map);
-
-            L.Polygon.addInitHook(function () {
-                this._latlng = this._bounds.getCenter();
-            });
-
-            L.Polygon.include({
-                getLatLng: function () {
-                    return this._latlng;
-                },
-                setLatLng: function () {
-                } // no-op.
-            });
-
-            var defaultStyle = {
+           var defaultStyle = {
               color: "#2B8CC4"
             };
             var highlightStyle = {
@@ -194,7 +167,7 @@
             }
 
             var lastHighlightedLayer;
-            var onEachFeature = function(feature, layer) {
+            function onEachFeature(feature, layer) {
                 if(feature.properties.feature){
                     layer.bindTooltip(feature.properties.feature, {sticky: true});
                 } else {
@@ -215,6 +188,7 @@
                   if (lastHighlightedLayer) {
                     lastHighlightedLayer.setStyle(defaultStyle);
                   }
+
                   layer.setStyle(highlightStyle);
                   lastHighlightedLayer = layer;
                 });
@@ -224,18 +198,107 @@
             function pointToCircle(geoJsonPoint, latlng) {
                 return L.circle(latlng, {radius: 10});
             }
-            
 
-            var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
-            var geoJsonLayer = L.geoJson(polygons, {
+            var fetchingData = false;
+            var nextRequest;
+            function getDataAndRender(e){
+              var map = e.target,
+                  bounds = map.getBounds().toBBoxString(),
+                  publication = document.getElementById('map').dataset.publication,
+                  url = '/publications/'+ publication+'/feature?bbox=' + bounds;
+
+              if( !fetchingData ) {
+                fetchData(url, map);
+              } else {
+                nextRequest = url;
+                console.log(`Already fetching.... ${url}`);
+              }
+            }
+
+            function renderData(data, map) {
+              var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
+              var geoJsonLayer = L.geoJson(data, {
                 pointToLayer: pointToCircle,
                 onEachFeature : onEachFeature,
                 style: defaultStyle
+              });
+              markers.addLayer(geoJsonLayer);
+              numOfFeaturesShowing.textContent = data.features.length;
+            }
+
+            function fetchData(url, map) {
+              fetchingData = true;
+              mapContainer.classList.add('fetching-data');
+              $.getJSON(url, function(data) {
+                console.log(data);
+                fetchingData = false;
+                mapContainer.classList.remove('fetching-data');
+                renderData(data, map);
+              }).then(() => {
+                // if nextRequest is set
+                if( nextRequest ) {
+                  console.log(`Now fetching requesting: ${nextRequest}`);
+                  // empty it
+                  nextUrl = nextRequest;
+                  nextRequest = "";
+                  // run fetch with value it had
+                  fetchData(nextUrl, map);
+                } 
+              });
+            }
+
+            function setMapHeight(mapId, ratio) {
+              var ratio = ratio || (2/3);
+              var map = document.getElementById('map');
+              var width = map.offsetWidth;
+              map.style.height = `${width * ratio}px`;
+            }
+
+            function panMapOffset(map, offset) {
+              var centerPoint = map.getSize().divideBy(2),
+                  targetPoint = centerPoint.add(offset),
+                  targetLatLng = map.containerPointToLatLng(targetPoint);
+              return targetLatLng;
+            }
+
+            setMapHeight('map');
+
+            var numOfFeaturesShowing = document.querySelector('.features-showing-count');
+            var mapContainer = document.querySelector('.leaflet-map-wrapper');
+            var map = L.map('map');
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets',
+                accessToken: '{{ config.MAPBOX_TOKEN }}'
+              }
+            ).addTo(map);
+            map.zoomControl.setPosition('bottomleft');
+
+            L.Polygon.addInitHook(function () {
+                this._latlng = this._bounds.getCenter();
             });
 
-            markers.addLayer(geoJsonLayer);
-            map.fitBounds(markers.getBounds());
-            map.panTo( panMapOffset(map, [150, 0]));
+            L.Polygon.include({
+                getLatLng: function () {
+                    return this._latlng;
+                },
+                setLatLng: function () {
+                } // no-op.
+            });
+
+            map.on('load', getDataAndRender);
+            map.on('moveend', getDataAndRender);
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    map = map.setView(new L.LatLng(position.coords.latitude, position.coords.longitude), 12);
+                });
+            } else {
+                 map = map.setView(new L.LatLng(51.507968, -0.128038), 12)
+            }
+
+            var searchControl = L.control.search({}).addTo(map);
 
         </script>
     {% endif %}

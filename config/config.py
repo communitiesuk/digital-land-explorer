@@ -21,9 +21,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN')
-    S3_REGION=os.getenv('S3_REGION')
-    S3_BUCKET=os.getenv('S3_BUCKET')
-
+    JSONIFY_PRETTYPRINT_REGULAR=False
 
 class DevelopmentConfig(Config):
     DEBUG = True

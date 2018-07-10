@@ -60,11 +60,22 @@ def publications():
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
-    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication).all()
+    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication)
     features = [f.data for f in features]
     fs = {"type": "FeatureCollection", "features": features}
     return render_template('publication.html', publication=pub, features=fs)
 
+
+@frontend.route('/publications/<id>/feature')
+def publication_feature(id):
+    swLng, swLat, neLng, neLat = [float(p) for p in request.args.get('bbox').split(',')]
+    query = '''SELECT feature.data FROM feature WHERE feature.publication = '%s'
+               AND feature.geometry && ST_MakeEnvelope(%f,%f,%f,%f, 4326);''' % (id, swLng, swLat, neLng, neLat)
+    result = db.engine.execute(query)
+    features = []
+    for row in result:
+        features.append(row[0])
+    return jsonify(type="FeatureCollection", features=features), 200
 
 @frontend.route('/licences')
 def licences():
