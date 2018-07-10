@@ -28,5 +28,8 @@ cf run-task digital-land-explorer-db-migration "flask db upgrade" --name db-upgr
 cf stop digital-land-explorer-db-migration
 
 # push default manifest - i.e. the actual application
+# cf push
 
-cf push
+# zero downtime push with autopilot
+cf install-plugin autopilot -f -r CF-Community
+cf zero-downtime-push digital-land-explorer -f manifest.yml
