@@ -12,14 +12,16 @@ $path: "/static/govuk_template/images/";
 @import "components/related-section";
 @import "components/meta-data-panel";
 @import "components/latlng-panel";
+@import "components/loader";
 
 @import "common/forms";
 @import "common/layout";
 
+$gutter-third: $gutter/3;
+
 * {
     font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif !important;
 }
-
 
 .data-item a {
   color: $text-colour;
@@ -79,16 +81,23 @@ $path: "/static/govuk_template/images/";
   width: 100%;
   height: 400px;
 }
-.properties-panel {
+
+.dataset-info-panel {
   background: $page-colour;
   position: absolute;
   width: 30%;
-  top: $gutter-half;
-  right: $gutter-half;
-  bottom: 25px;
+  top: $gutter-third;
+  right: $gutter-third;
+  bottom: $gutter-third*2;
   overflow: scroll;
   z-index: 400;
+}
+.properties-panel {
   padding: 0 $gutter-half $gutter-half;
+
+  .heading-medium {
+    margin-top: $gutter-half;
+  }
 
   dl {
     @include core-16;
@@ -101,6 +110,28 @@ $path: "/static/govuk_template/images/";
     dd {
       margin-bottom: 5px;
     }
+  }
+}
+
+.amount-showing-panel {
+  background: $text-colour;
+  color: $page-colour;
+  padding: 5px $gutter-half 3px;
+  margin-bottom: $gutter-half;
+  p {
+    margin: 0;
+  }
+}
+
+.leaflet-form {
+  font-size: 16px;
+  .form-control {
+    width: 100%;
+  }
+  .button-search {
+    margin-right: -75px;
+    padding-top: 10px;
+    padding-bottom: 8px;
   }
 }
 

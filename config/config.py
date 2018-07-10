@@ -14,6 +14,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN')
+    JSONIFY_PRETTYPRINT_REGULAR=False
 
 class DevelopmentConfig(Config):
     DEBUG = True
