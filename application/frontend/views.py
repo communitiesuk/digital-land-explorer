@@ -8,7 +8,7 @@ from flask import (
 from sqlalchemy import func
 from sqlalchemy.orm import load_only
 
-from application.extensions import db
+from application.extensions import db, cache
 from application.frontend.forms import UKAreaForm
 from application.models import Organisation, Publication, Licence, Feature, Copyright
 from application.geocode import nom_geocode, nom_reverse_geocode
@@ -60,12 +60,19 @@ def publications():
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
-    features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication)
-    features = [f.data for f in features]
-    fs = {"type": "FeatureCollection", "features": features}
-    return render_template('publication.html', publication=pub, features=fs)
+    lazy_load = pub.large_data_set
+    if lazy_load:
+        feature_count = db.session.query(func.count(Feature.feature)).filter(Feature.publication == pub.publication).one()[0]
+        fs = {"type": "FeatureCollection", "features": []}
+    else:
+        features = db.session.query(Feature).options(load_only('data')).filter(Feature.publication == pub.publication)
+        features = [f.data for f in features]
+        feature_count = len(features)
+        fs = {"type": "FeatureCollection", "features": features}
+    return render_template('publication.html', publication=pub, features=fs, feature_count=feature_count, lazy_load=lazy_load)
 
 
+@cache.cached(timeout=300, query_string=True)
 @frontend.route('/publications/<id>/feature')
 def publication_feature(id):
     swLng, swLat, neLng, neLat = [float(p) for p in request.args.get('bbox').split(',')]

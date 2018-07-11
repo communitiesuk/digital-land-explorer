@@ -79,6 +79,8 @@ class Publication(db.Model):
     data_gov_uk = db.Column(db.Text)
     documentation_url = db.Column(db.Text)
 
+    large_data_set = db.Column(db.BOOLEAN, default=False)
+
     # editions = relationship('Edition', backref='publication', lazy=True)
     # task = db.ForeignKey(Task) # how to fetch an edition ..
 

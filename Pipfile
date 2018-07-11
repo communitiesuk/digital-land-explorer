@@ -21,6 +21,8 @@ ijson = "*"
 yajl-py = "*"
 python-frontmatter = "*"
 "boto3" = "*"
+flask-compress = "*"
+flask-caching = "*"
 
 [dev-packages]
 pytest = "*"
