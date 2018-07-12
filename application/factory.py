@@ -39,6 +39,11 @@ def register_extensions(app):
     from application.extensions import db
     db.init_app(app)
 
+    from application.extensions import compress
+    compress.init_app(app)
+
+    from application.extensions import cache
+    cache.init_app(app)
 
 def register_commands(app):
     from application.commands import load_everything, clear_everything

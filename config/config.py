@@ -23,6 +23,7 @@ class Config(object):
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN')
     JSONIFY_PRETTYPRINT_REGULAR=False
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
     WTF_CSRF_ENABLED = False

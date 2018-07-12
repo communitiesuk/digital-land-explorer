@@ -80,9 +80,8 @@
 
       {% call render_pub_info_section("Data", "pub-info-data", "column-full") %}
 
-      {% if features.features %}
       {% from "macros/data.html" import render_data_component %}
-      {{ render_data_component(features.features|length, "Features") }}
+      {{ render_data_component(feature_count, "Features") }}
 
       <dl class="definition-inline">
         <dt>Contains feature types</dt>
@@ -96,7 +95,7 @@
 
         <div class="dataset-info-panel">
           <div class="amount-showing-panel">
-            <p>Currently showing <span class="features-showing-count">0</span> of {{features.features|length}} features</p>
+            <p>Currently showing <span class="features-showing-count">0</span> of {{ feature_count }} features</p>
           </div>
 
           <div class="properties-panel">
@@ -109,8 +108,6 @@
           </div>
       </div>
 
-      {% endif %}
-    
       {% endcall %}
 
       {{ render_pub_info_section("Tasks performed", "pub-info-tasks") }}
@@ -122,185 +119,198 @@
 {% block end_body %}
   <script src="/static/javascripts/geoUtils.js"></script>
   <script src="/static/javascripts/leaflet.search.control.js"></script>
-    {% if features.features %}
-        <script>
-          geoUtils.init({
-            urls: {
-              geocode: "{{ url_for('frontend.geocode') }}",
-              reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+
+    <script>
+
+      var features = {{ features | tojson }},
+          lazyLoad = {{ lazy_load | tojson }};
+
+      geoUtils.init({
+        urls: {
+          geocode: "{{ url_for('frontend.geocode') }}",
+          reversegeocode: "{{ url_for('frontend.reverse_geocode') }}"
+        }
+      });
+
+       var defaultStyle = {
+          color: "#2B8CC4"
+        };
+        var highlightStyle = {
+          color: "#912B88"
+        };
+
+        function generateItemHTML(prop, propVal) {
+          return '<dt>' + prop +'</dt><dd>' + propVal +'</dd>';
+        }
+
+        function renderCollectorProperties(propObj, collectorProperties, $container) {
+          collectorProperties.forEach((prop) => {
+            if(propObj[prop]) {
+              var str = propObj[prop];
+              if (propObj.hasOwnProperty('feature')) {
+                  if(prop == 'feature') {
+                    str = '<a href="/feature/'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
+                  }
+              } else if (propObj.hasOwnProperty('item')) {
+                  if(prop == 'item') {
+                    str ='<a href="/feature/item:'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
+                  }
+              }
+              $container.append( generateItemHTML(prop, str) );
             }
           });
+        }
 
-           var defaultStyle = {
-              color: "#2B8CC4"
-            };
-            var highlightStyle = {
-              color: "#912B88"
-            };
+        function copyReduce(obj, propArr) {
+          var copy = Object.assign({}, obj);
+          propArr.forEach((prop) => delete copy[prop]);
+          return copy;
+        }
 
-            function generateItemHTML(prop, propVal) {
-              return '<dt>' + prop +'</dt><dd>' + propVal +'</dd>';
-            }
-
-            function renderCollectorProperties(propObj, collectorProperties, $container) {
-              collectorProperties.forEach((prop) => {
-                if(propObj[prop]) {
-                  var str = propObj[prop];
-                  if (propObj.hasOwnProperty('feature')) {
-                      if(prop == 'feature') {
-                        str = '<a href="/feature/'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
-                      }
-                  } else if (propObj.hasOwnProperty('item')) {
-                      if(prop == 'item') {
-                        str ='<a href="/feature/item:'+ propObj[prop] +'">' + propObj[prop] +'</a></dd>';
-                      }
-                  }
-                  $container.append( generateItemHTML(prop, str) );
-                }
-              });
-            }
-
-            function copyReduce(obj, propArr) {
-              var copy = Object.assign({}, obj);
-              propArr.forEach((prop) => delete copy[prop]);
-              return copy;
-            }
-
-            var lastHighlightedLayer;
-            function onEachFeature(feature, layer) {
-                if(feature.properties.feature){
-                    layer.bindTooltip(feature.properties.feature, {sticky: true});
-                } else {
-                   layer.bindTooltip(feature.properties.item, {sticky: true});
-                }
-                layer.on('mouseover', function(e) {
-                  var $collectorPropContainer = $('.collector-properties-list').empty();
-                  var $featurePropList = $('.feature-properties-list').empty();
-                  var collectorProperties = ['feature', 'item', 'publication'];
-
-                  renderCollectorProperties(feature.properties, collectorProperties, $collectorPropContainer);
-                  var featureProperties = copyReduce(feature.properties, collectorProperties);
-
-                  $.each(featureProperties, function(key, value) {
-                    $featurePropList.append( generateItemHTML(key, value) );
-                  });
-
-                  if (lastHighlightedLayer) {
-                    lastHighlightedLayer.setStyle(defaultStyle);
-                  }
-
-                  layer.setStyle(highlightStyle);
-                  lastHighlightedLayer = layer;
-                });
-            };
-
-            // show circles instead of markers for points
-            function pointToCircle(geoJsonPoint, latlng) {
-                return L.circle(latlng, {radius: 10});
-            }
-
-            var fetchingData = false;
-            var nextRequest;
-            function getDataAndRender(e){
-              var map = e.target,
-                  bounds = map.getBounds().toBBoxString(),
-                  publication = document.getElementById('map').dataset.publication,
-                  url = '/publications/'+ publication+'/feature?bbox=' + bounds;
-
-              if( !fetchingData ) {
-                fetchData(url, map);
-              } else {
-                nextRequest = url;
-                console.log(`Already fetching.... ${url}`);
-              }
-            }
-
-            function renderData(data, map) {
-              var markers = L.markerClusterGroup({ chunkedLoading: true }).addTo(map);
-              var geoJsonLayer = L.geoJson(data, {
-                pointToLayer: pointToCircle,
-                onEachFeature : onEachFeature,
-                style: defaultStyle
-              });
-              markers.addLayer(geoJsonLayer);
-              numOfFeaturesShowing.textContent = data.features.length;
-            }
-
-            function fetchData(url, map) {
-              fetchingData = true;
-              mapContainer.classList.add('fetching-data');
-              $.getJSON(url, function(data) {
-                console.log(data);
-                fetchingData = false;
-                mapContainer.classList.remove('fetching-data');
-                renderData(data, map);
-              }).then(() => {
-                // if nextRequest is set
-                if( nextRequest ) {
-                  console.log(`Now fetching requesting: ${nextRequest}`);
-                  // empty it
-                  nextUrl = nextRequest;
-                  nextRequest = "";
-                  // run fetch with value it had
-                  fetchData(nextUrl, map);
-                } 
-              });
-            }
-
-            function setMapHeight(mapId, ratio) {
-              var ratio = ratio || (2/3);
-              var map = document.getElementById('map');
-              var width = map.offsetWidth;
-              map.style.height = `${width * ratio}px`;
-            }
-
-            function panMapOffset(map, offset) {
-              var centerPoint = map.getSize().divideBy(2),
-                  targetPoint = centerPoint.add(offset),
-                  targetLatLng = map.containerPointToLatLng(targetPoint);
-              return targetLatLng;
-            }
-
-            setMapHeight('map');
-
-            var numOfFeaturesShowing = document.querySelector('.features-showing-count');
-            var mapContainer = document.querySelector('.leaflet-map-wrapper');
-            var map = L.map('map');
-
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                id: 'mapbox.streets',
-                accessToken: '{{ config.MAPBOX_TOKEN }}'
-              }
-            ).addTo(map);
-            map.zoomControl.setPosition('bottomleft');
-
-            L.Polygon.addInitHook(function () {
-                this._latlng = this._bounds.getCenter();
-            });
-
-            L.Polygon.include({
-                getLatLng: function () {
-                    return this._latlng;
-                },
-                setLatLng: function () {
-                } // no-op.
-            });
-
-            map.on('load', getDataAndRender);
-            map.on('moveend', getDataAndRender);
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    map = map.setView(new L.LatLng(position.coords.latitude, position.coords.longitude), 12);
-                });
+        var lastHighlightedLayer;
+        function onEachFeature(feature, layer) {
+            if(feature.properties.feature){
+                layer.bindTooltip(feature.properties.feature, {sticky: true});
             } else {
-                 map = map.setView(new L.LatLng(51.507968, -0.128038), 12)
+               layer.bindTooltip(feature.properties.item, {sticky: true});
             }
+            layer.on('mouseover', function(e) {
+              var $collectorPropContainer = $('.collector-properties-list').empty();
+              var $featurePropList = $('.feature-properties-list').empty();
+              var collectorProperties = ['feature', 'item', 'publication'];
 
-            var searchControl = L.control.search({}).addTo(map);
+              renderCollectorProperties(feature.properties, collectorProperties, $collectorPropContainer);
+              var featureProperties = copyReduce(feature.properties, collectorProperties);
 
-        </script>
-    {% endif %}
+              $.each(featureProperties, function(key, value) {
+                $featurePropList.append( generateItemHTML(key, value) );
+              });
+
+              if (lastHighlightedLayer) {
+                lastHighlightedLayer.setStyle(defaultStyle);
+              }
+
+              layer.setStyle(highlightStyle);
+              lastHighlightedLayer = layer;
+            });
+        };
+
+        // show circles instead of markers for points
+        function pointToCircle(geoJsonPoint, latlng) {
+            return L.circle(latlng, {radius: 10});
+        }
+
+        var fetchingData = false;
+        var nextRequest;
+        function getDataAndRender(e){
+          var map = e.target,
+              bounds = map.getBounds().toBBoxString(),
+              publication = document.getElementById('map').dataset.publication,
+              url = '/publications/'+ publication+'/feature?bbox=' + bounds;
+
+          if( !fetchingData ) {
+            fetchData(url, map);
+          } else {
+            nextRequest = url;
+            console.log(`Already fetching.... ${url}`);
+          }
+        }
+
+        function renderData(data, map, fetchingData) {
+          var markers = L.markerClusterGroup().addTo(map);
+          var geoJsonLayer = L.geoJson(data, {
+            pointToLayer: pointToCircle,
+            onEachFeature : onEachFeature,
+            style: defaultStyle
+          });
+          markers.addLayer(geoJsonLayer);
+          numOfFeaturesShowing.textContent = data.features.length;
+          if(fetchingData) {
+            map.fitBounds(markers.getBounds());
+          }
+        }
+
+        function fetchData(url, map) {
+          fetchingData = true;
+          mapContainer.classList.add('fetching-data');
+          console.log(`Fetching.... ${url}`);
+          $.getJSON(url, function(data) {
+            console.log(data);
+            fetchingData = false;
+            mapContainer.classList.remove('fetching-data');
+            renderData(data, map, fetchingData);
+          }).then(() => {
+            // if nextRequest is set
+            if( nextRequest ) {
+              console.log(`Now fetching requesting: ${nextRequest}`);
+              // empty it
+              nextUrl = nextRequest;
+              nextRequest = "";
+              // run fetch with value it had
+              fetchData(nextUrl, map, fetchingData);
+            }
+          });
+        }
+
+        function setMapHeight(mapId, ratio) {
+          var ratio = ratio || (2/3);
+          var map = document.getElementById('map');
+          var width = map.offsetWidth;
+          map.style.height = `${width * ratio}px`;
+        }
+
+        function panMapOffset(map, offset) {
+          var centerPoint = map.getSize().divideBy(2),
+              targetPoint = centerPoint.add(offset),
+              targetLatLng = map.containerPointToLatLng(targetPoint);
+          return targetLatLng;
+        }
+
+        setMapHeight('map');
+
+        var numOfFeaturesShowing = document.querySelector('.features-showing-count');
+        var mapContainer = document.querySelector('.leaflet-map-wrapper');
+        var map = L.map('map');
+
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={{ config.MAPBOX_TOKEN }}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox.streets',
+            accessToken: '{{ config.MAPBOX_TOKEN }}'
+          }
+        ).addTo(map);
+        map.zoomControl.setPosition('bottomleft');
+
+        L.Polygon.addInitHook(function () {
+            this._latlng = this._bounds.getCenter();
+        });
+
+        L.Polygon.include({
+            getLatLng: function () {
+                return this._latlng;
+            },
+            setLatLng: function () {
+            } // no-op.
+        });
+
+      if (lazyLoad) {
+          map.on('load', function(e) {
+            getDataAndRender(e);
+            map.on('moveend', getDataAndRender);
+          });
+          if ("geolocation" in navigator) {
+              navigator.geolocation.getCurrentPosition(function (position) {
+                  map = map.setView(new L.LatLng(position.coords.latitude, position.coords.longitude), 12);
+              });
+          } else {
+              map = map.setView(new L.LatLng(51.507968, -0.128038), 12);
+          }
+      } else {
+        renderData(features, map, true);
+      }
+
+      var searchControl = L.control.search({}).addTo(map);
+
+    </script>
+
 {% endblock %}
 
