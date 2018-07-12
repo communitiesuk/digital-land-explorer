@@ -293,8 +293,10 @@
         });
 
       if (lazyLoad) {
-          map.on('load', getDataAndRender);
-          map.on('moveend', getDataAndRender);
+          map.on('load', function(e) {
+            getDataAndRender(e);
+            map.on('moveend', getDataAndRender);
+          });
           if ("geolocation" in navigator) {
               navigator.geolocation.getCurrentPosition(function (position) {
                   map = map.setView(new L.LatLng(position.coords.latitude, position.coords.longitude), 12);
