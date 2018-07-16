@@ -93,20 +93,26 @@
         <div class="loader"></div>
         <div class="leaflet-map" id="map" data-publication="{{ publication.publication }}"></div>
 
-        <div class="dataset-info-panel">
-          <div class="amount-showing-panel">
-            <p>Currently showing <span class="features-showing-count">0</span> of {{ feature_count }} features</p>
+        <div class="dataset-info-panel-container">
+          <div class="dataset-info-panel slide-in">
+            <div class="dataset-info-panel-wrapper">
+              <div class="amount-showing-panel">
+                <p>Currently showing <span class="features-showing-count">0</span> of {{ feature_count }} features</p>
+              </div>
+  
+              <div class="properties-panel">
+                <h4 class="heading-medium">Properties</h4>
+                <h4 class="heading-small">Collector properties</h4>
+                <dl class="collector-properties-list"></dl>
+                <hr />
+                <h4 class="heading-small">Feature properties</h4>
+                <dl class="feature-properties-list"></dl>
+              </div>
+            </div>
+            <button class="toggle-panel-button">Toggle</button>
           </div>
-
-          <div class="properties-panel">
-            <h4 class="heading-medium">Properties</h4>
-            <h4 class="heading-small">Collector properties</h4>
-            <dl class="collector-properties-list"></dl>
-            <hr />
-            <h4 class="heading-small">Feature properties</h4>
-            <dl class="feature-properties-list"></dl>
-          </div>
-      </div>
+        </div>
+        
 
       {% endcall %}
 
@@ -309,6 +315,34 @@
       }
 
       var searchControl = L.control.search({}).addTo(map);
+      
+      var $panel = document.querySelector('.dataset-info-panel');
+      var $panelContainer = document.querySelector('.dataset-info-panel-container');
+      var $toggle = document.querySelector('.toggle-panel-button');
+
+      function animationEndHandler() {
+        $panelContainer.classList.add('flattened');
+      }
+
+      $toggle.addEventListener('click', function() {
+          var isOpen = $panel.classList.contains('slide-in');
+
+          if(isOpen) {
+            $panel.classList.remove('slide-in');
+            $panel.classList.add('slide-out');
+            $panel.addEventListener('animationend', animationEndHandler);
+          } else {
+            $panelContainer.classList.remove('flattened');
+            $panel.classList.remove('slide-out');
+            $panel.classList.add('slide-in');
+            $panel.removeEventListener('animationend', animationEndHandler);
+          }
+          //$panel.setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
+      });
+
+      function positionToggleButton() {
+        
+      }
 
     </script>
 
