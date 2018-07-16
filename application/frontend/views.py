@@ -57,6 +57,7 @@ def publications():
                             lic_num=len(Licence.query.all()))
 
 
+@cache.cached(timeout=300)
 @frontend.route('/publications/<id>')
 def publication(id):
     pub = Publication.query.get(id)
