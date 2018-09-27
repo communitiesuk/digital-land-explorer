@@ -9,4 +9,4 @@ class LatLongForm(FlaskForm):
     longitude = FloatField('Longitude', validators=[DataRequired()])
 
 class UKAreaForm(FlaskForm):
-    query = StringField('UK location', validators=[DataRequired()])
+    query = StringField('Enter UK location or click on map', validators=[DataRequired()])

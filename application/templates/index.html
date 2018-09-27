@@ -17,7 +17,7 @@
         {% if form %}
             <div class="grid-row">
                 <div class="column-two-thirds">
-                    <h2 class="heading-large">Search for data about an area</h2>
+                    <h2 class="heading-large">Search for data related to an area</h2>
                     <form method="GET" action="{{ url_for('frontend.about_an_area') }}"
                           class="form location-search-form">
                         <fieldset class="form-group">
@@ -27,7 +27,7 @@
                                 </h2>
                             </legend>
                             {{ form.query.label(class="form-label") }}
-                            <span class="form-hint text">E.g. "Brockwell Park" or click on map below</span>
+                            <span class="form-hint text">("Brockwell Park", for example)</span>
                             <div class="grid-row">
                                 <div class="search-form-control-wrapper column-half">
                                     {% if query %}
