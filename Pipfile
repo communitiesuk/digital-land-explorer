@@ -18,7 +18,7 @@ pytest = "*"
 "geoalchemy2" = "*"
 flask-wtf = "*"
 ijson = "*"
-yajl-py = "*"
+yajl-py = {version="*", markers="sys_platform == 'darwin'"}
 python-frontmatter = "*"
 "boto3" = "*"
 flask-compress = "*"
