@@ -96,8 +96,8 @@ def load_everything():
 
     from flask import current_app
 
-    s3_region = current_app.config.S3_REGION
-    s3_bucket = current_app.config.S3_BUCKET
+    s3_region = current_app.config['S3_REGION']
+    s3_bucket = current_app.config['S3_BUCKET']
     s3_bucket_url = 'http://%s.s3.amazonaws.com' % s3_bucket
 
     print('Loading the entire universe')
