@@ -2,4 +2,3 @@ FLASK_ENV=development
 FLASK_CONFIG=config.DevelopmentConfig
 FLASK_APP=application.wsgi:app
 SECRET_KEY=doesnotmatter
-DATABASE_URL=postgresql://localhost/digital_land
