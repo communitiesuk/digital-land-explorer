@@ -22,6 +22,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN')
     JSONIFY_PRETTYPRINT_REGULAR=False
+    S3_REGION = os.getenv('S3_REGION')
+    S3_BUCKET = os.getenv('S3_BUCKET')
 
 
 class DevelopmentConfig(Config):
