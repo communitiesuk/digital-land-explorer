@@ -161,7 +161,7 @@ def load_local_file(file):
 
 def process_file(file_url, org_feature_mappings):
     print('Loading', file_url)
-    some_engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/digital_land'))
+    some_engine = create_engine(os.getenv('DATABASE_URL', 'postgresql://localhost/digital_land'))
     Session = sessionmaker(bind=some_engine)
     session = Session()
     total = 0
