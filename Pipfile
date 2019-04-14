@@ -18,11 +18,12 @@ pytest = "*"
 "geoalchemy2" = "*"
 flask-wtf = "*"
 ijson = "*"
-yajl-py = {version="*", markers="sys_platform == 'darwin'"}
+yajl-py = {version = "*",markers = "sys_platform == 'darwin'"}
 python-frontmatter = "*"
 "boto3" = "*"
 flask-compress = "*"
 flask-caching = "*"
+jinja2 = ">2.10"
 
 [dev-packages]
 pytest = "*"
