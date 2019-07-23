@@ -1,3 +1,6 @@
+Inactive project
+================
+
 digital-land-explorer
 ===============================
 
