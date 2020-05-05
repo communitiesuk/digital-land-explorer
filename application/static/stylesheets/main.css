@@ -2564,15 +2564,79 @@ ul.details {
   height: 400px;
 }
 
-.dataset-info-panel {
-  background: #fff;
+.dataset-info-panel-container {
   position: absolute;
-  width: 30%;
+  width: 288px;
   top: 10px;
   right: 10px;
   bottom: 20px;
-  overflow: scroll;
   z-index: 400;
+  overflow: hidden;
+}
+
+.dataset-info-panel-container.flattened {
+  pointer-events: none;
+}
+
+.dataset-info-panel-container.flattened .toggle-panel-button {
+  pointer-events: auto;
+}
+
+.dataset-info-panel-container.flattened .toggle-panel-button:after {
+  content: "\25C0";
+}
+
+.dataset-info-panel {
+  overflow: scroll;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding-left: 30px;
+  box-sizing: border-box;
+}
+
+.dataset-info-panel-wrapper {
+  background: #fff;
+  height: 100%;
+}
+
+.toggle-panel-button {
+  height: 31px;
+  width: 30px;
+  background: #0b0c0c;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  text-indent: -99999px;
+}
+
+.toggle-panel-button:after {
+  content: "\25b6";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  line-height: 2em;
+  width: 100%;
+  z-index: 30000;
+  text-indent: 0px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #dee0e2;
+}
+
+.toggle-panel-button:hover {
+  background: #232727;
+}
+
+.toggle-panel-button:hover:after {
+  color: #f8f8f8;
+  cursor: pointer;
+}
+
+.toggle-panel-button:focus {
+  outline: none;
 }
 
 .properties-panel {
@@ -2633,4 +2697,50 @@ ul.details {
   margin-right: -75px;
   padding-top: 10px;
   padding-bottom: 8px;
+}
+
+.slide-in {
+  animation: slide-in 0.5s forwards;
+  -webkit-animation: slide-in 0.5s forwards;
+}
+
+.slide-out {
+  animation: slide-out 0.5s forwards;
+  -webkit-animation: slide-out 0.5s forwards;
+}
+
+@keyframes slide-in {
+  0% {
+    margin-left: 258px;
+  }
+  100% {
+    margin-left: 0;
+  }
+}
+
+@-webkit-keyframes slide-in {
+  0% {
+    margin-left: 258px;
+  }
+  100% {
+    margin-left: 0;
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: 258px;
+  }
+}
+
+@-webkit-keyframes slide-out {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: 258px;
+  }
 }
